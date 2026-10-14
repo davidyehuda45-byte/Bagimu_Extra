@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>David — Login Guru — {{ config('app.name', 'Bagimu Extra') }}</title>
+    <title>Login Guru — {{ config('app.name', 'Bagimu Extra') }}</title>
     <meta name="theme-color" content="#1e3a8a">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -70,7 +70,7 @@
                     <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold bg-blue-50 text-blue-800 ring-1 ring-inset ring-blue-700/10 mb-2">
                         <x-icon name="shield" class="h-3.5 w-3.5" /> Portal Khusus Guru
                     </span>
-                    <h2 class="text-xl font-bold text-slate-900">David - Login Guru</h2>
+                    <h2 class="text-xl font-bold text-slate-900">Login Guru</h2>
                     <p class="mt-1 text-sm text-slate-500">Masuk menggunakan username atau email akun guru Anda.</p>
                 </div>
 
