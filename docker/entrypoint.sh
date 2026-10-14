@@ -48,4 +48,18 @@ if [ "${APP_ENV}" = "production" ] && [ -n "${APP_KEY}" ]; then
     php artisan view:cache 2>/dev/null || true
 fi
 
+# 1. Migrasi database secara idempotent
+if [ "${AUTO_MIGRATE:-true}" = "true" ]; then
+    echo "==> [1/3] Menjalankan migrasi database (idempotent)..."
+    php artisan migrate --force
+fi
+
+# 2. Seeder data awal secara idempotent
+if [ "${AUTO_SEED:-true}" = "true" ]; then
+    echo "==> [2/3] Menjalankan seeder data awal (idempotent)..."
+    ALLOW_PROD_SEED=true php artisan db:seed --force
+fi
+
+# 3. Jalankan sistem aplikasi (Supervisord: Nginx + PHP-FPM)
+echo "==> [3/3] Menjalankan sistem aplikasi..."
 exec "$@"

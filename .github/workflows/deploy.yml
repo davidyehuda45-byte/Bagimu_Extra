@@ -1,0 +1,98 @@
+name: CI/CD Pipeline - Build, Push & Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: rizzzdev/bagimu-extra
+          tags: |
+            type=raw,value=latest
+            type=sha,format=short
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to VPS with Traefik
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH to VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -e
+
+            # Masuk ke direktori proyek di VPS
+            PROJECT_DIR="${{ secrets.VPS_PROJECT_PATH }}"
+            echo "==> Pindah ke direktori: $PROJECT_DIR"
+            cd "$PROJECT_DIR"
+
+            # Update repository jika menggunakan git di VPS
+            if [ -d .git ]; then
+              echo "==> Git pull file konfigurasi terbaru..."
+              git pull origin main
+            fi
+
+            # Pastikan network proxy dan backend sudah aktif
+            echo "==> Memastikan network Docker tersedia..."
+            docker network create proxy 2>/dev/null || true
+            docker network create backend 2>/dev/null || true
+
+            # Pull image terbaru dari Docker Hub
+            echo "==> Pulling image terbaru rizzzdev/bagimu-extra:latest..."
+            docker compose pull
+
+            # Jalankan container (migration service akan otomatis jalan terlebih dahulu sampai selesai, baru bagimu-extra start)
+            echo "==> Menjalankan container dengan Docker Compose..."
+            docker compose up -d --remove-orphans
+
+            # Tunggu sesaat agar web server up
+            echo "==> Menunggu container ready..."
+            sleep 5
+
+            # Optimasi cache Laravel (config, route, view)
+            echo "==> Mengoptimalkan cache Laravel..."
+            docker compose exec -T bagimu-extra php artisan optimize
+
+            # Cek status kesehatan container
+            echo "==> Memeriksa status container dan healthcheck..."
+            docker compose ps bagimu-extra

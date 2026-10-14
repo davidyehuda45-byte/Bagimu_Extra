@@ -32,30 +32,44 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
-        $admin = User::create([
-            'name' => 'Admin Eskul',
-            'email' => 'admin@sekolah.sch.id',
-            'password' => Hash::make('password'),
-            'role' => Role::ADMIN,
-            'username' => 'admin',
-        ]);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@sekolah.sch.id'],
+            [
+                'name' => 'Admin Eskul',
+                'password' => Hash::make('password'),
+                'role' => Role::ADMIN,
+                'username' => 'admin',
+            ]
+        );
 
-        Periode::create([
-            'periode' => '2026/2027',
-            'nama' => 'Tahun Ajaran 2026/2027',
-            'status' => PeriodeStatus::DIBUKA,
-            'max_eskul_per_siswa' => 1,
-        ]);
+        Periode::firstOrCreate(
+            ['periode' => '2026/2027'],
+            [
+                'nama' => 'Tahun Ajaran 2026/2027',
+                'status' => PeriodeStatus::DIBUKA,
+                'max_eskul_per_siswa' => 1,
+            ]
+        );
 
-        PendaftaranWindow::create([
-            'periode' => '2026/2027',
-            'buka' => true,
-        ]);
+        PendaftaranWindow::firstOrCreate(
+            ['periode' => '2026/2027'],
+            [
+                'buka' => true,
+            ]
+        );
 
-        AppSetting::set('school.name', 'SMK Bagimu Negeriku');
-        AppSetting::set('school.contact', '');
-        AppSetting::set('school.address', 'Ngaliyan, Kota Semarang');
-        AppSetting::set('school.logo', '/logo.png');
+        if (! AppSetting::get('school.name')) {
+            AppSetting::set('school.name', 'SMK Bagimu Negeriku');
+        }
+        if (AppSetting::get('school.contact') === null) {
+            AppSetting::set('school.contact', '');
+        }
+        if (! AppSetting::get('school.address')) {
+            AppSetting::set('school.address', 'Ngaliyan, Kota Semarang');
+        }
+        if (! AppSetting::get('school.logo')) {
+            AppSetting::set('school.logo', '/logo.png');
+        }
 
         foreach ([
             ['Voli', 'Bola voli'],
@@ -64,56 +78,70 @@ class DatabaseSeeder extends Seeder
             ['Audio Sound', 'Tata suara dan audio'],
             ['PMR', 'Palang Merah Remaja'],
         ] as [$nama, $deskripsi]) {
-            Eskul::create([
-                'name' => $nama,
-                'description' => $deskripsi,
-                'kuota' => 0,
-                'kuota_aktif' => false,
-                'aktif' => true,
+            Eskul::firstOrCreate(
+                ['name' => $nama],
+                [
+                    'description' => $deskripsi,
+                    'kuota' => 0,
+                    'kuota_aktif' => false,
+                    'aktif' => true,
+                ]
+            );
+        }
+
+        $futsal = Eskul::where('name', 'Futsal')->first();
+        if ($futsal && $futsal->jadwals()->count() === 0) {
+            $futsal->jadwals()->createMany([
+                ['hari' => 'SELASA', 'jam_mulai' => '15:00', 'jam_selesai' => '17:00', 'tempat' => 'Lapangan Utama'],
+                ['hari' => 'JUMAT', 'jam_mulai' => '15:00', 'jam_selesai' => '17:00', 'tempat' => 'Lapangan Utama'],
             ]);
         }
 
-        Eskul::where('name', 'Futsal')->first()?->jadwals()->createMany([
-            ['hari' => 'SELASA', 'jam_mulai' => '15:00', 'jam_selesai' => '17:00', 'tempat' => 'Lapangan Utama'],
-            ['hari' => 'JUMAT', 'jam_mulai' => '15:00', 'jam_selesai' => '17:00', 'tempat' => 'Lapangan Utama'],
-        ]);
-
-        Eskul::where('name', 'Voli')->first()?->jadwals()->create([
-            'hari' => 'RABU', 'jam_mulai' => '15:00', 'jam_selesai' => '17:00', 'tempat' => 'Lapangan Voli',
-        ]);
+        $voli = Eskul::where('name', 'Voli')->first();
+        if ($voli && $voli->jadwals()->count() === 0) {
+            $voli->jadwals()->create([
+                'hari' => 'RABU', 'jam_mulai' => '15:00', 'jam_selesai' => '17:00', 'tempat' => 'Lapangan Voli',
+            ]);
+        }
 
         // Catatan: tabel announcements tidak dipakai aplikasi (tidak ada model);
         // pengumuman dikelola via AppSetting/notifikasi. Jangan seed di sini.
 
-        $siswa = User::create([
-            'name' => 'Siswa Demo',
-            'email' => 'siswa@sekolah.sch.id',
-            'password' => Hash::make('password'),
-            'role' => Role::STUDENT,
-            'username' => 'siswa',
-        ]);
+        $siswa = User::firstOrCreate(
+            ['email' => 'siswa@sekolah.sch.id'],
+            [
+                'name' => 'Siswa Demo',
+                'password' => Hash::make('password'),
+                'role' => Role::STUDENT,
+                'username' => 'siswa',
+            ]
+        );
 
-        $token = LoginToken::issue($siswa);
+        $token = $siswa->login_token ?: LoginToken::issue($siswa);
 
-        Student::create([
-            'nis' => '10001',
-            'nama' => 'Siswa Demo',
-            'kelas' => 'X RPL 1',
-            'jurusan' => 'RPL',
-            'gender' => 'LAKI_LAKI',
-            'status' => 'AKTIF',
-            'user_id' => $siswa->id,
-        ]);
+        Student::firstOrCreate(
+            ['nis' => '10001'],
+            [
+                'nama' => 'Siswa Demo',
+                'kelas' => 'X RPL 1',
+                'jurusan' => 'RPL',
+                'gender' => 'LAKI_LAKI',
+                'status' => 'AKTIF',
+                'user_id' => $siswa->id,
+            ]
+        );
 
         // Siswa kedua: data induk ada, akun + token belum (untuk demo alur TU).
-        Student::create([
-            'nis' => '10002',
-            'nama' => 'Siswi Demo',
-            'kelas' => 'X DKV 1',
-            'jurusan' => 'DKV',
-            'gender' => 'PEREMPUAN',
-            'status' => 'AKTIF',
-        ]);
+        Student::firstOrCreate(
+            ['nis' => '10002'],
+            [
+                'nama' => 'Siswi Demo',
+                'kelas' => 'X DKV 1',
+                'jurusan' => 'DKV',
+                'gender' => 'PEREMPUAN',
+                'status' => 'AKTIF',
+            ]
+        );
 
         $this->command->info('Admin  : admin@sekolah.sch.id / password');
         $this->command->info('Siswa  : NIS 10001 + token di bawah');
