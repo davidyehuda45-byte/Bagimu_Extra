@@ -1,12 +1,17 @@
 @forelse ($students as $s)
     <tr class="border-b border-slate-100 hover:bg-slate-50/70 transition-colors">
-        <td class="py-3 px-3 font-semibold text-slate-900">{{ $s->nis }}</td>
+        <td class="py-3 px-3 w-10 text-center">
+            <input type="checkbox" class="student-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer h-4 w-4" value="{{ $s->id }}" data-nama="{{ $s->nama }}" data-nis="{{ $s->nis }}" onchange="updateSelectedCount()">
+        </td>
+        <td class="py-3 px-3 font-semibold text-slate-900 font-mono text-xs">{{ $s->nis }}</td>
         <td class="py-3 px-3 font-mono text-xs text-slate-500">{{ $s->nisn ?? '—' }}</td>
         <td class="py-3 px-3 font-medium text-slate-800">{{ $s->nama }}</td>
-        <td class="py-3 px-3 text-slate-700">{{ $s->kelas }}</td>
-        <td class="py-3 px-3 text-slate-600">{{ $s->jurusan?->short() ?? $s->jurusan }}</td>
         <td class="py-3 px-3">
-            <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold {{ $s->status === 'AKTIF' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
+            <span class="inline-flex items-center rounded-lg bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 border border-blue-200/80 font-mono">{{ $s->kelas }}</span>
+        </td>
+        <td class="py-3 px-3 text-slate-600 text-xs">{{ $s->jurusan?->short() ?? $s->jurusan }}</td>
+        <td class="py-3 px-3">
+            <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold {{ $s->status === 'AKTIF' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
                 {{ $s->status }}
             </span>
         </td>
@@ -59,21 +64,17 @@
                         <span>Cetak Kartu</span>
                     </a>
                     <div class="my-1 border-t border-slate-100"></div>
-                    <form method="POST" action="{{ route('admin.students.destroy', $s) }}" onsubmit="return confirm('Hapus permanen data siswa {{ $s->nama }} (NIS: {{ $s->nis }})?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="flex w-full items-center gap-2 rounded-xl px-2.5 py-2 hover:bg-rose-50 text-rose-600 font-medium text-left">
-                            <x-icon name="trash" class="h-3.5 w-3.5 text-rose-500" />
-                            <span>Hapus Siswa</span>
-                        </button>
-                    </form>
+                    <button type="button" onclick="confirmDeleteSingle('{{ $s->id }}', '{{ addslashes($s->nama) }}', '{{ $s->nis }}')" class="flex w-full items-center gap-2 rounded-xl px-2.5 py-2 hover:bg-rose-50 text-rose-600 font-medium text-left">
+                        <x-icon name="trash" class="h-3.5 w-3.5 text-rose-500" />
+                        <span>Hapus Siswa</span>
+                    </button>
                 </div>
             </details>
         </td>
     </tr>
 @empty
     <tr>
-        <td colspan="8" class="py-10 px-3 text-center text-slate-400">
+        <td colspan="9" class="py-10 px-3 text-center text-slate-400">
             <div class="mx-auto flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-slate-400 mb-2">
                 <x-icon name="search" class="h-5 w-5" />
             </div>

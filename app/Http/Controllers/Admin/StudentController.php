@@ -17,38 +17,84 @@ use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
-    public function index(Request $request)
+    protected function filterStudentsQuery(Request $request)
     {
-        $query = Student::with('user')->orderBy('kelas')->orderBy('nama');
+        $query = Student::query();
 
         if ($request->filled('q')) {
-            $q = $request->query('q');
+            $q = trim((string) $request->input('q'));
             $query->where(function ($w) use ($q) {
-                $w->where('nis', 'like', "%{$q}%")->orWhere('nisn', 'like', "%{$q}%")->orWhere('nama', 'like', "%{$q}%");
+                $w->where('nis', 'like', "%{$q}%")
+                  ->orWhere('nisn', 'like', "%{$q}%")
+                  ->orWhere('nama', 'like', "%{$q}%");
+            });
+        }
+
+        if ($request->filled('tingkat')) {
+            $tingkat = trim((string) $request->input('tingkat'));
+            $romawiMap = ['10' => 'X', '11' => 'XI', '12' => 'XII'];
+            $romawi = $romawiMap[$tingkat] ?? $tingkat;
+            $query->where(function ($w) use ($tingkat, $romawi) {
+                $w->where('kelas', 'like', "{$tingkat} %")
+                  ->orWhere('kelas', 'like', "{$romawi} %")
+                  ->orWhere('kelas', 'like', "{$tingkat}-%")
+                  ->orWhere('kelas', 'like', "{$romawi}-%")
+                  ->orWhere('kelas', '=', $tingkat)
+                  ->orWhere('kelas', '=', $romawi);
             });
         }
 
         if ($request->filled('kelas')) {
-            $query->where('kelas', $request->query('kelas'));
+            $kelas = trim((string) $request->input('kelas'));
+            $norm = \App\Support\Kelas::normalisasi($kelas);
+            $query->where(function ($w) use ($kelas, $norm) {
+                $w->where('kelas', $kelas);
+                if ($norm && $norm !== $kelas) {
+                    $w->orWhere('kelas', $norm);
+                }
+            });
         }
 
         if ($request->filled('jurusan')) {
-            $query->where('jurusan', $request->query('jurusan'));
+            $query->where('jurusan', $request->input('jurusan'));
         }
 
         if ($request->filled('status')) {
-            $query->where('status', $request->query('status'));
+            $query->where('status', $request->input('status'));
         }
+
+        return $query;
+    }
+
+    public function index(Request $request)
+    {
+        $query = $this->filterStudentsQuery($request)
+            ->with('user')
+            ->orderBy('kelas')
+            ->orderBy('nama');
 
         $students = $query->paginate(20)->withQueryString();
         $jurusanList = Jurusan::cases();
         $statusList = ['AKTIF', 'LULUS', 'PINDAH', 'NONAKTIF', 'ALUMNI'];
+        $tingkatList = ['10', '11', '12'];
+
+        $kelasList = Student::query()
+            ->whereNotNull('kelas')
+            ->where('kelas', '!=', '')
+            ->distinct()
+            ->pluck('kelas')
+            ->sort(SORT_NATURAL)
+            ->values();
 
         if ($request->ajax()) {
-            return view('admin.students.partials.rows', compact('students'));
+            return response()->json([
+                'rows' => view('admin.students.partials.rows', compact('students'))->render(),
+                'pagination' => $students->links()->toHtml(),
+                'total' => $students->total(),
+            ]);
         }
 
-        return view('admin.students.index', compact('students', 'jurusanList', 'statusList'));
+        return view('admin.students.index', compact('students', 'jurusanList', 'statusList', 'tingkatList', 'kelasList'));
     }
 
     public function create()
@@ -149,6 +195,100 @@ class StudentController extends Controller
         AdminLog::record('student.delete', 'student', $student->id, "Menghapus siswa NIS {$nis}");
 
         return redirect()->route('admin.students.index')->with('status', 'Data siswa berhasil dihapus.');
+    }
+
+    public function bulkToken(Request $request)
+    {
+        $mode = $request->input('mode', 'untokenized'); // 'untokenized', 'all', or 'selected'
+        $selectedIds = (array) $request->input('ids', []);
+
+        if ($mode === 'selected') {
+            if (empty($selectedIds)) {
+                return back()->with('error', 'Pilih minimal satu data siswa.');
+            }
+            $students = Student::with('user')->whereIn('id', $selectedIds)->get();
+        } else {
+            $students = $this->filterStudentsQuery($request)->with('user')->get();
+        }
+
+        $count = 0;
+        foreach ($students as $student) {
+            $user = $student->user;
+
+            // Jika mode 'untokenized', lewati jika token sudah aktif
+            if ($mode === 'untokenized' && $user && $user->login_token && $user->login_token_revoked_at === null) {
+                continue;
+            }
+
+            if (! $user) {
+                $user = User::create([
+                    'name' => $student->nama,
+                    'email' => $student->nis.'@siswa.local',
+                    'username' => $student->nis,
+                    'password' => Hash::make(Str::random(16)),
+                    'role' => Role::STUDENT,
+                    'student_status' => $student->status ?? 'AKTIF',
+                ]);
+
+                $student->update(['user_id' => $user->id]);
+            }
+
+            LoginToken::issue($user);
+            $count++;
+        }
+
+        AdminLog::record('student.bulk_token', 'student', null, "Generate token massal untuk {$count} siswa (Mode: {$mode})");
+
+        $message = "Berhasil menerbitkan/memperbarui token login untuk {$count} siswa.";
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'count' => $count,
+                'message' => $message,
+            ]);
+        }
+
+        return redirect()->back()->with('status', $message);
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $mode = $request->input('mode', 'selected'); // 'selected' or 'filter'
+        $selectedIds = (array) $request->input('ids', []);
+
+        if ($mode === 'selected') {
+            if (empty($selectedIds)) {
+                return back()->with('error', 'Pilih minimal satu data siswa untuk dihapus.');
+            }
+            $students = Student::whereIn('id', $selectedIds)->get();
+        } else {
+            $students = $this->filterStudentsQuery($request)->get();
+        }
+
+        $count = $students->count();
+
+        if ($count === 0) {
+            return back()->with('warning', 'Tidak ada data siswa yang cocok untuk dihapus.');
+        }
+
+        foreach ($students as $student) {
+            $student->delete();
+        }
+
+        AdminLog::record('student.bulk_delete', 'student', null, "Menghapus {$count} data siswa secara massal");
+
+        $message = "Berhasil menghapus {$count} data siswa secara permanen.";
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'count' => $count,
+                'message' => $message,
+            ]);
+        }
+
+        return redirect()->back()->with('status', $message);
     }
 
     public function importForm()
