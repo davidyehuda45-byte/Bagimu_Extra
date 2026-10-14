@@ -4,10 +4,9 @@
 
 Sudah disiapkan permanen (tersimpan di file, tidak hilang saat restart):
 
-1. Virtual-host `C:\laragon\etc\apache2\sites-enabled\auto.bagimuextra.test.conf`
-   menunjuk ke `C:\DavidYehudaSurbakti\Bagimu_Extra\public`.
-2. Saat Laragon Start, Laragon otomatis menambahkan `127.0.0.1 bagimuextra.test`
-   ke file `hosts` (butuh jalankan Laragon sebagai Administrator minimal 1x).
+1. Folder proyek sudah dihubungkan permanen ke `C:\laragon\www\bagimuextra` via Directory Junction Windows (tidak hilang saat restart/shutdown).
+2. Virtual-host `C:\laragon\etc\apache2\sites-enabled\auto.bagimuextra.test.conf` otomatis aktif.
+3. Saat Laragon Start, Laragon otomatis menambahkan `127.0.0.1 bagimuextra.test` ke file `hosts` (pastikan shortcut Laragon diatur "Run as Administrator").
 
 Langkah tiap menyalakan laptop:
 
