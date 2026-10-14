@@ -1,0 +1,66 @@
+services:
+  bagimu-extra:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bagimu-extra:latest
+    container_name: bagimu-extra
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - PORT=${PORT:-80}
+    volumes:
+      - bagimu-storage:/var/www/html/storage
+      - bagimu-database:/var/www/html/database
+    networks:
+      - backend
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.bagimu-extra.rule=Host(`${ORIGIN}`)"
+      - "traefik.http.routers.bagimu-extra.entrypoints=websecure"
+      - "traefik.http.routers.bagimu-extra.tls.certresolver=myresolver"
+      - "traefik.http.routers.bagimu-extra.priority=1"
+      - "traefik.http.services.bagimu-extra.loadbalancer.server.port=${PORT}"
+
+  seeder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bagimu-extra:latest
+    container_name: bagimu-extra-seeder
+    profiles:
+      - seed
+    restart: "no"
+    env_file:
+      - .env
+    environment:
+      - ALLOW_PROD_SEED=true
+    volumes:
+      - bagimu-storage:/var/www/html/storage
+      - bagimu-database:/var/www/html/database
+    networks:
+      - backend
+    command:
+      - sh
+      - -c
+      - |
+        echo "[1/3] Menjalankan migrasi database..."
+        php artisan migrate --force
+        echo "[2/3] Menjalankan seeder data awal..."
+        php artisan db:seed --force
+        echo "[3/3] Seeder data awal selesai dijalankan!"
+
+networks:
+  backend:
+    external: true
+  proxy:
+    external: true
+
+volumes:
+  bagimu-storage:
+    name: bagimu-storage
+  bagimu-database:
+    name: bagimu-database
