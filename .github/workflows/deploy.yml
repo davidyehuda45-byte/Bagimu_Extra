@@ -51,20 +51,41 @@ jobs:
 
     steps:
       - name: Deploy via SSH to VPS
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT || 22 }}
-          script_stop: true
-          script: |
-            set -e
+        env:
+          SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          SSH_HOST: ${{ secrets.VPS_HOST }}
+          SSH_USER: ${{ secrets.VPS_USERNAME }}
+          SSH_PORT: ${{ secrets.VPS_PORT || '22' }}
+          PROJECT_PATH: ${{ secrets.VPS_PROJECT_PATH }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
 
-            # Masuk ke direktori proyek di VPS
-            PROJECT_DIR="${{ secrets.VPS_PROJECT_PATH }}"
-            echo "==> Pindah ke direktori: $PROJECT_DIR"
-            cd "$PROJECT_DIR"
+          # Sanitasi private key dari DOS carriage returns (\r)
+          printf "%s\n" "$SSH_KEY" | tr -d '\r' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+          # Bersihkan variabel dari trailing whitespace / newline
+          CLEAN_HOST=$(echo "$SSH_HOST" | tr -d '\r\n' | xargs)
+          CLEAN_PORT=$(echo "${SSH_PORT:-22}" | tr -d '\r\n' | xargs)
+          CLEAN_USER=$(echo "$SSH_USER" | tr -d '\r\n' | xargs)
+          CLEAN_PATH=$(echo "$PROJECT_PATH" | tr -d '\r\n' | xargs)
+
+          # Scan host key
+          ssh-keyscan -p "$CLEAN_PORT" -H "$CLEAN_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+          # Eksekusi deployment secara remote dengan native OpenSSH
+          ssh -i ~/.ssh/deploy_key -p "$CLEAN_PORT" -o StrictHostKeyChecking=accept-new "$CLEAN_USER@$CLEAN_HOST" "bash -s" -- "$CLEAN_PATH" << 'EOF'
+            set -e
+            TARGET_DIR="$1"
+
+            if [ -z "$TARGET_DIR" ]; then
+              echo "ERROR: Target directory kosong. Pastikan secret VPS_PROJECT_PATH sudah diatur di GitHub Secrets."
+              exit 1
+            fi
+
+            echo "==> Pindah ke direktori: $TARGET_DIR"
+            eval cd "$TARGET_DIR"
 
             # Update repository jika menggunakan git di VPS
             if [ -d .git ]; then
@@ -81,7 +102,7 @@ jobs:
             echo "==> Pulling image terbaru rizzzdev/bagimu-extra:latest..."
             docker compose pull
 
-            # Jalankan container (migration service akan otomatis jalan terlebih dahulu sampai selesai, baru bagimu-extra start)
+            # Jalankan container (migration dan seeder otomatis jalan via entrypoint.sh)
             echo "==> Menjalankan container dengan Docker Compose..."
             docker compose up -d --remove-orphans
 
@@ -96,3 +117,4 @@ jobs:
             # Cek status kesehatan container
             echo "==> Memeriksa status container dan healthcheck..."
             docker compose ps bagimu-extra
+          EOF
