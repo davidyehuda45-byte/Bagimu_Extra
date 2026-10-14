@@ -3,294 +3,420 @@
 @section('title', $existing ? 'Status Pendaftaran' : 'Pilih Ekstrakurikuler')
 
 @section('content')
-<div class="space-y-5 w-full">
-    <div class="flex items-center justify-between">
-        <h1 class="text-xl font-bold text-slate-900">{{ $existing ? 'Pendaftaran Selesai' : 'Pilih Ekstrakurikuler' }}</h1>
-        @if ($existing)
-            <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold bg-emerald-100 text-emerald-800">
-                <x-icon name="check" class="h-3.5 w-3.5" />
-                Resmi Terdaftar
+<div class="space-y-6 w-full max-w-4xl mx-auto">
+    {{-- Header Halaman & Identitas Siswa --}}
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl border border-slate-200/80 p-5 shadow-xs">
+        <div class="flex items-center gap-3.5">
+            <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white font-black text-lg shadow-md shadow-blue-500/20">
+                {{ strtoupper(substr($user->name ?? 'S', 0, 1)) }}
             </span>
-        @endif
-    </div>
-
-    @if (!$periode)
-        <div class="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-500 mb-3">
-                <x-icon name="clock" class="h-6 w-6" />
-            </div>
-            <p class="font-bold text-base text-slate-900">Belum Ada Periode Pendaftaran yang Dibuka</p>
-            <p class="mt-1 text-sm text-slate-500">Silakan hubungi bagian kesiswaan atau TU untuk informasi periode aktif.</p>
-        </div>
-    @elseif (!$windowOpen && !$existing)
-        <div class="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-amber-700 mb-3">
-                <x-icon name="clock" class="h-6 w-6" />
-            </div>
-            <p class="font-bold text-base text-slate-900">Pendaftaran Belum Dibuka</p>
-            <p class="mt-1 text-sm text-slate-500">{{ $windowLabel }}</p>
-        </div>
-    @else
-        {{-- Profil akun siswa --}}
-        <div class="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div class="flex items-center gap-3 min-w-0">
-                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-100 text-base font-bold text-blue-800">
-                    {{ strtoupper(substr($user->name ?? '?', 0, 1)) }}
-                </span>
-                <div class="min-w-0 leading-tight">
-                    <p class="truncate font-bold text-slate-900">{{ $user->name }}</p>
-                    <p class="truncate text-xs text-slate-500 font-mono">NIS: {{ $user->student?->nis ?? $user->username }}</p>
+            <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                    <h1 class="text-base sm:text-lg font-bold text-slate-900 truncate">{{ $user->name }}</h1>
+                    @if ($existing)
+                        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold bg-emerald-100 text-emerald-800">
+                            <x-icon name="check" class="h-3 w-3" />
+                            Terdaftar
+                        </span>
+                    @else
+                        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold bg-blue-100 text-blue-800">
+                            Siswa
+                        </span>
+                    @endif
+                </div>
+                <div class="flex flex-wrap items-center gap-2 mt-0.5 text-xs text-slate-500">
+                    <span class="font-mono bg-slate-100 px-2 py-0.5 rounded-md text-slate-700 font-semibold">NIS: {{ $user->student?->nis ?? $user->username }}</span>
+                    @if ($periode)
+                        <span class="text-slate-400">•</span>
+                        <span class="text-blue-700 font-medium">T.A. {{ $periode->periode }}</span>
+                    @endif
                 </div>
             </div>
-            <form method="POST" action="{{ route('logout') }}">
+        </div>
+        <div class="flex items-center gap-2 self-end sm:self-center">
+            @if ($existing)
+                <a href="{{ route('siswa.status') }}" class="inline-flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-3.5 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100 transition-colors">
+                    <x-icon name="id-card" class="h-3.5 w-3.5" />
+                    <span>Kartu Digital</span>
+                </a>
+            @endif
+            <form method="POST" action="{{ route('logout') }}" class="inline-block m-0">
                 @csrf
-                <button type="submit" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition-colors">
+                <button type="submit" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-colors cursor-pointer" title="Keluar">
                     <x-icon name="logout" class="h-3.5 w-3.5" />
                     <span>Keluar</span>
                 </button>
             </form>
         </div>
+    </div>
 
+    @if (!$periode)
+        {{-- Periode Tidak Aktif --}}
+        <div class="rounded-3xl border border-slate-200 bg-white p-10 text-center shadow-xs">
+            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400 mb-3">
+                <x-icon name="clock" class="h-7 w-7" />
+            </div>
+            <h2 class="font-bold text-lg text-slate-900">Belum Ada Periode Pendaftaran Aktif</h2>
+            <p class="mt-1 text-xs text-slate-500 max-w-md mx-auto">Pendaftaran ekstrakurikuler saat ini belum dibuka oleh pihak sekolah. Silakan hubungi bagian kesiswaan atau wali kelas Anda.</p>
+        </div>
+    @elseif (!$windowOpen && !$existing)
+        {{-- Jadwal Pendaftaran Tertutup --}}
+        <div class="rounded-3xl border border-amber-200 bg-amber-50/70 p-10 text-center shadow-xs">
+            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 text-amber-700 mb-3">
+                <x-icon name="clock" class="h-7 w-7" />
+            </div>
+            <h2 class="font-bold text-lg text-amber-950">Pendaftaran Sedang Ditutup</h2>
+            <p class="mt-1 text-xs text-amber-800 max-w-md mx-auto">{{ $windowLabel }}</p>
+        </div>
+    @else
         @if ($existing)
-            {{-- Halaman sukses siswa setelah mendaftar --}}
-            <div class="rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50/80 via-white to-emerald-50/50 p-6 sm:p-8 shadow-sm">
-                <div class="flex items-center gap-4">
-                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-md shadow-emerald-600/20">
-                        <x-icon name="check" class="h-8 w-8" />
+            {{-- Halaman Sukses: Siswa Sudah Mendaftar --}}
+            <div class="rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50/80 via-white to-emerald-50/40 p-6 sm:p-8 shadow-xs">
+                <div class="flex items-start gap-4">
+                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-md shadow-emerald-600/25">
+                        <x-icon name="check" class="h-7 w-7" />
                     </span>
-                    <div>
-                        <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold bg-emerald-100 text-emerald-800">
-                            Otomatis Diterima
+                    <div class="min-w-0">
+                        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold bg-emerald-100 text-emerald-800">
+                            Pendaftaran Berhasil & Diterima
                         </span>
-                        <h2 class="mt-1 text-2xl font-extrabold text-slate-900">{{ $existing->eskul_utama }}</h2>
-                        <p class="text-xs text-slate-500">Periode Akademik {{ $periode->periode }}</p>
+                        <h2 class="mt-1.5 text-2xl font-black text-slate-900">{{ $existing->eskul_utama }}</h2>
+                        <p class="text-xs text-slate-500">Tahun Ajaran {{ $periode->periode }} • SMK Bagimu Negeriku</p>
                     </div>
                 </div>
 
-                {{-- Detail jadwal & pembina eskul yang dipilih --}}
-                <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
-                    <h3 class="font-bold text-sm text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
+                {{-- Detail Rincian Eskul --}}
+                <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs space-y-4">
+                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-500 flex items-center gap-2 border-b border-slate-100 pb-3">
                         <x-icon name="calendar" class="h-4 w-4 text-blue-600" />
                         Rincian Kegiatan Ekstrakurikuler
                     </h3>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                        <div class="rounded-xl bg-slate-50 p-3.5">
-                            <span class="text-xs font-semibold uppercase text-slate-400">Pembina Eskul</span>
-                            <p class="mt-1 font-bold text-slate-900">{{ $existingEskul?->pembina?->name ?? 'Belum ditentukan' }}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div class="rounded-xl bg-slate-50 p-3.5 border border-slate-100">
+                            <span class="font-semibold text-slate-400 uppercase text-[10px]">Pembina Ekstrakurikuler:</span>
+                            <p class="mt-1 font-bold text-slate-900 text-sm">{{ $existingEskul?->pembina?->name ?? 'Belum ditentukan' }}</p>
                         </div>
-                        <div class="rounded-xl bg-slate-50 p-3.5">
-                            <span class="text-xs font-semibold uppercase text-slate-400">Status Keikutsertaan</span>
-                            <p class="mt-1 font-bold text-emerald-700">Resmi Terdaftar (Aktif)</p>
+                        <div class="rounded-xl bg-slate-50 p-3.5 border border-slate-100">
+                            <span class="font-semibold text-slate-400 uppercase text-[10px]">Status Keikutsertaan:</span>
+                            <p class="mt-1 font-bold text-emerald-700 text-sm">Resmi Terdaftar (Aktif)</p>
                         </div>
                     </div>
 
-                    <div class="rounded-xl bg-slate-50 p-3.5 text-sm">
-                        <span class="text-xs font-semibold uppercase text-slate-400">Jadwal & Tempat Latihan</span>
+                    <div class="rounded-xl bg-slate-50 p-3.5 border border-slate-100 text-xs">
+                        <span class="font-semibold text-slate-400 uppercase text-[10px]">Jadwal & Tempat Pertemuan:</span>
                         @if ($existingEskul && $existingEskul->jadwals->isNotEmpty())
-                            <ul class="mt-2 space-y-1.5">
+                            <ul class="mt-2 space-y-2">
                                 @foreach ($existingEskul->jadwals as $j)
-                                    <li class="flex items-center gap-2 text-slate-800 font-medium">
-                                        <x-icon name="clock" class="h-4 w-4 text-slate-400 shrink-0" />
-                                        <span><b>{{ ucfirst(strtolower($j->hari)) }}</b>, {{ $j->jam_mulai }}–{{ $j->jam_selesai }} WIB</span>
-                                        <span class="text-xs text-slate-500 font-normal">({{ $j->tempat }})</span>
+                                    <li class="flex items-center gap-2 text-slate-800">
+                                        <span class="inline-flex items-center justify-center rounded-lg bg-blue-100 text-blue-800 font-bold px-2 py-0.5 text-[11px]">
+                                            {{ ucfirst(strtolower($j->hari)) }}
+                                        </span>
+                                        <span class="font-semibold">{{ $j->jam_mulai }}–{{ $j->jam_selesai }} WIB</span>
+                                        <span class="text-slate-500">di {{ $j->tempat }}</span>
                                     </li>
                                 @endforeach
                             </ul>
                         @else
-                            <p class="mt-1 text-slate-600">Jadwal latihan menyusul dari pembina.</p>
+                            <p class="mt-1 text-slate-500 italic">Jadwal latihan akan diinformasikan oleh pembina.</p>
                         @endif
                     </div>
 
                     @if ($existing->eskul_cadangan)
-                        <div class="text-xs text-slate-500">
-                            Pilihan cadangan: <span class="font-semibold text-slate-700">{{ $existing->eskul_cadangan }}</span>
+                        <div class="text-xs text-slate-500 pt-1 border-t border-slate-100">
+                            Pilihan eskul cadangan: <strong class="text-slate-700">{{ $existing->eskul_cadangan }}</strong>
                         </div>
                     @endif
                 </div>
 
-                {{-- Keterangan final --}}
-                <div class="mt-5 rounded-2xl bg-blue-50 border border-blue-200 p-4 text-xs text-blue-900 leading-relaxed">
-                    <p class="font-bold">Pendaftaran Telah Selesai</p>
-                    <p class="mt-1">Pilihan eskul bersifat final dan tidak dapat diubah lagi. Anda dapat keluar dari sistem sekarang atau melihat bukti kartu digital.</p>
+                {{-- Alert Informasi Selesai --}}
+                <div class="mt-5 rounded-2xl bg-blue-50/80 border border-blue-200 p-4 text-xs text-blue-900 leading-relaxed">
+                    <p class="font-bold">Informasi Penting:</p>
+                    <p class="mt-0.5">Pendaftaran Anda telah disimpan secara permanen. Anda dapat mencetak atau menyimpan bukti pendaftaran kartu digital sekarang.</p>
                 </div>
 
-                {{-- Aksi Logout Utama --}}
+                {{-- Tombol Aksi --}}
                 <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                    <form method="POST" action="{{ route('logout') }}" class="flex-1">
+                    <a href="{{ route('siswa.status') }}" class="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-700 px-6 py-3.5 text-xs font-bold text-white shadow-md shadow-blue-700/20 hover:bg-blue-800 transition-colors">
+                        <x-icon name="id-card" class="h-4 w-4" />
+                        <span>Lihat Bukti Pendaftaran (E-Card)</span>
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}" class="sm:w-auto">
                         @csrf
-                        <button type="submit" class="w-full flex items-center justify-center gap-2 rounded-2xl bg-rose-600 px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-rose-600/20 hover:bg-rose-700 transition-colors">
+                        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3.5 text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-colors cursor-pointer">
                             <x-icon name="logout" class="h-4 w-4" />
-                            Keluar dari Sistem (Logout)
+                            <span>Keluar dari Akun</span>
                         </button>
                     </form>
-                    <a href="{{ route('siswa.status') }}" class="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3.5 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors">
-                        <x-icon name="id-card" class="h-4 w-4 text-slate-500" />
-                        Lihat Status & E-Card
-                    </a>
                 </div>
             </div>
         @elseif ($windowOpen)
-            {{-- Form Pemilihan Eskul Siswa --}}
-            <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-900">
-                <p class="font-bold">Pemberitahuan:</p>
-                <p class="mt-0.5">Pendaftaran eskul hanya dilakukan <b>satu kali</b> dan langsung diterima. Pilihan yang sudah dikirim tidak dapat diubah lagi.</p>
+            {{-- Pemberitahuan Pendaftaran --}}
+            <div class="flex items-start gap-3.5 rounded-2xl border border-amber-200 bg-amber-50/80 p-4 text-xs text-amber-900 shadow-2xs">
+                <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-amber-200 text-amber-900 font-bold text-xs mt-0.5">
+                    !
+                </div>
+                <div class="leading-relaxed">
+                    <strong class="font-bold text-amber-950">Pemberitahuan Penting:</strong>
+                    <p class="mt-0.5">Pendaftaran ekstrakurikuler hanya dapat dilakukan <b>1 (satu) kali</b> dan langsung resmi diterima. Pastikan data dan pilihan eskul Anda sudah benar sebelum dikirim, karena data yang telah terkirim <b>tidak dapat diubah kembali</b>.</p>
+                </div>
             </div>
 
-            <form id="form-pendaftaran" method="POST" action="{{ route('siswa.daftar.store') }}" class="space-y-5 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7 shadow-sm">
+            {{-- Formulir Pendaftaran --}}
+            <form id="form-pendaftaran" method="POST" action="{{ route('siswa.daftar.store') }}" class="space-y-6 rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-xs">
                 @csrf
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                    <div class="sm:col-span-2">
-                        <label for="kelas" class="block font-semibold text-slate-700 mb-1">Kelas <span class="text-rose-500">*</span></label>
-                        <input id="kelas" name="kelas" type="text" value="{{ old('kelas', $user->student?->kelas ?? '') }}" required placeholder="Contoh: 10 RPL 1 atau XI RPL 1"
-                               class="w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <p class="mt-1 text-[11px] text-slate-400">Format: 10/11/12 + jurusan + nomor (cth: 10 RPL 1).</p>
-                    </div>
-
-                    <div>
-                        <label for="jurusan" class="block font-semibold text-slate-700 mb-1">Jurusan <span class="text-rose-500">*</span></label>
-                        <select id="jurusan" name="jurusan" required class="w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                            <option value="">— Pilih Jurusan —</option>
-                            @foreach ($jurusans as $j)
-                                <option value="{{ $j->value }}" @selected(old('jurusan', $user->student?->jurusan?->value) === $j->value)>{{ $j->label() }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="usia" class="block font-semibold text-slate-700 mb-1">Usia <span class="text-rose-500">*</span></label>
-                        <input id="usia" name="usia" type="number" min="13" max="20" value="{{ old('usia', 16) }}" required
-                               class="w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    </div>
-
-                    <div>
-                        <label for="no_absen" class="block font-semibold text-slate-700 mb-1">No. Absen <span class="text-rose-500">*</span></label>
-                        <input id="no_absen" name="no_absen" type="number" min="1" max="99" value="{{ old('no_absen', $user->student?->no_absen ?? '') }}" required
-                               class="w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    </div>
-
-                    <div>
-                        <label for="nama_wali_kelas" class="block font-semibold text-slate-700 mb-1">Nama Wali Kelas</label>
-                        <input id="nama_wali_kelas" name="nama_wali_kelas" type="text" value="{{ old('nama_wali_kelas') }}" placeholder="Opsional"
-                               class="w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    </div>
-
-                    <div class="sm:col-span-2">
-                        <span class="block font-semibold text-slate-700 mb-1">Jenis Kelamin <span class="text-rose-500">*</span></span>
-                        <div class="flex gap-6 mt-1">
-                            @foreach ($genders as $g)
-                                <label class="inline-flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
-                                    <input type="radio" name="gender" value="{{ $g->value }}" required
-                                           @checked(old('gender', $user->student?->gender?->value) === $g->value)
-                                           class="rounded-full border-slate-300 text-blue-700 focus:ring-blue-500">
-                                    {{ $g->label() }}
-                                </label>
-                            @endforeach
+                {{-- Bagian 1: Identitas & Akademik Siswa --}}
+                <div>
+                    <div class="flex items-center gap-2 pb-3 mb-4 border-b border-slate-100">
+                        <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+                            <x-icon name="user" class="h-4 w-4" />
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-bold text-slate-900">Data Identitas & Akademik Siswa</h2>
+                            <p class="text-[11px] text-slate-400">Pastikan data rombel dan kontak Anda sesuai untuk kebutuhan koordinasi ekstrakurikuler.</p>
                         </div>
                     </div>
 
-                    <div class="sm:col-span-2">
-                        <label for="whatsapp" class="block font-semibold text-slate-700 mb-1">No. WhatsApp Siswa</label>
-                        <input id="whatsapp" name="whatsapp" type="text" value="{{ old('whatsapp') }}" placeholder="Contoh: 081234567890"
-                               class="w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                        {{-- Kelas / Rombel --}}
+                        <div>
+                            <label for="kelas" class="block font-bold text-slate-700 mb-1">
+                                Kelas / Rombel <span class="text-rose-500">*</span>
+                            </label>
+                            <input id="kelas" name="kelas" type="text" value="{{ old('kelas', $user->student?->kelas ?? '') }}" required placeholder="Contoh: 10 RPL 1 atau 11 DKV 2"
+                                   class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 font-medium">
+                            <p class="mt-1 text-[10px] text-slate-400">Format: Tingkat (10/11/12) + Jurusan + Rombel.</p>
+                        </div>
+
+                        {{-- Jurusan --}}
+                        <div>
+                            <label for="jurusan" class="block font-bold text-slate-700 mb-1">
+                                Jurusan <span class="text-rose-500">*</span>
+                            </label>
+                            <select id="jurusan" name="jurusan" required class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 pr-8 font-medium">
+                                <option value="">— Pilih Jurusan —</option>
+                                @foreach ($jurusans as $j)
+                                    <option value="{{ $j->value }}" @selected(old('jurusan', $user->student?->jurusan?->value) === $j->value)>
+                                        {{ $j->label() }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Usia & No. Absen --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label for="usia" class="block font-bold text-slate-700 mb-1">
+                                    Usia (Tahun) <span class="text-rose-500">*</span>
+                                </label>
+                                <input id="usia" name="usia" type="number" min="13" max="22" value="{{ old('usia', 16) }}" required
+                                       class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 font-medium">
+                            </div>
+                            <div>
+                                <label for="no_absen" class="block font-bold text-slate-700 mb-1">
+                                    No. Absen <span class="text-rose-500">*</span>
+                                </label>
+                                <input id="no_absen" name="no_absen" type="number" min="1" max="99" value="{{ old('no_absen', $user->student?->no_absen ?? '') }}" required placeholder="1-50"
+                                       class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 font-medium">
+                            </div>
+                        </div>
+
+                        {{-- Nama Wali Kelas --}}
+                        <div>
+                            <label for="nama_wali_kelas" class="block font-bold text-slate-700 mb-1">
+                                Nama Wali Kelas <span class="text-slate-400 font-normal">(Opsional)</span>
+                            </label>
+                            <input id="nama_wali_kelas" name="nama_wali_kelas" type="text" value="{{ old('nama_wali_kelas') }}" placeholder="Nama lengkap wali kelas"
+                                   class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+
+                        {{-- Jenis Kelamin --}}
+                        <div>
+                            <span class="block font-bold text-slate-700 mb-1">
+                                Jenis Kelamin <span class="text-rose-500">*</span>
+                            </span>
+                            <div class="grid grid-cols-2 gap-2 mt-1">
+                                @foreach ($genders as $g)
+                                    <label class="gender-pill flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 px-3 text-xs font-semibold text-slate-700 cursor-pointer hover:bg-slate-50 transition-all has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 has-[:checked]:text-blue-900">
+                                        <input type="radio" name="gender" value="{{ $g->value }}" required
+                                               @checked(old('gender', $user->student?->gender?->value) === $g->value)
+                                               class="h-3.5 w-3.5 text-blue-600 focus:ring-blue-500 border-slate-300">
+                                        <span>{{ $g->label() }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- Nomor WhatsApp --}}
+                        <div>
+                            <label for="whatsapp" class="block font-bold text-slate-700 mb-1">
+                                Nomor WhatsApp Siswa <span class="text-slate-400 font-normal">(Opsional)</span>
+                            </label>
+                            <input id="whatsapp" name="whatsapp" type="text" value="{{ old('whatsapp') }}" placeholder="Contoh: 081234567890"
+                                   class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500">
+                            <p class="mt-1 text-[10px] text-slate-400">Untuk mempermudah pembina mengundang Anda ke grup ekstrakurikuler.</p>
+                        </div>
                     </div>
                 </div>
 
-                {{-- Pemilihan Eskul & Detail Jadwal Interaktif --}}
-                <div class="border-t border-slate-100 pt-5 space-y-4">
-                    <div>
-                        <label for="eskul_utama" class="block font-semibold text-slate-900 mb-1">Pilih Ekstrakurikuler <span class="text-rose-500">*</span></label>
-                        <select id="eskul_utama" name="eskul_utama" required class="w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 pr-10">
-                            <option value="">— Pilih Salah Satu Eskul —</option>
-                            @foreach ($eskuls as $o)
-                                <option value="{{ $o['name'] }}"
-                                    @selected(old('eskul_utama') === $o['name'])
-                                    @disabled($o['penuh'])
-                                    data-pembina="{{ $o['pembina_nama'] }}"
-                                    data-jadwal="{{ $o['jadwal'] }}"
-                                    data-jadwals='@json($o['jadwals'])'
-                                    data-kuota="{{ $o['kuota_aktif'] ? $o['terisi'].'/'.$o['kuota'].($o['penuh'] ? ' (Penuh)' : '') : 'Bebas' }}"
-                                    data-desc="{{ $o['description'] }}">
-                                    {{ $o['name'] }} @if($o['kuota_aktif'] && $o['penuh']) [PENUH] @endif
-                                </option>
-                            @endforeach
-                        </select>
+                {{-- Bagian 2: Pemilihan Ekstrakurikuler --}}
+                <div class="pt-2">
+                    <div class="flex items-center gap-2 pb-3 mb-4 border-b border-slate-100">
+                        <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
+                            <x-icon name="trophy" class="h-4 w-4" />
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-bold text-slate-900">Pilihan Ekstrakurikuler</h2>
+                            <p class="text-[11px] text-slate-400">Tentukan eskul utama yang diminati serta eskul cadangan jika kuota utama penuh.</p>
+                        </div>
                     </div>
 
-                    {{-- Box detail eskul terpilih (Jadwal & Pembina dari Master Eskul) --}}
-                    <div id="detail-eskul-box" class="hidden rounded-2xl border border-blue-200 bg-blue-50/70 p-4 text-sm text-slate-800 transition-all">
-                        <div class="flex items-center justify-between border-b border-blue-200/60 pb-2.5 mb-2.5">
-                            <p class="font-bold text-blue-900" id="detail-eskul-title">Detail Eskul</p>
-                            <span class="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800" id="detail-eskul-kuota"></span>
+                    <div class="space-y-4 text-xs">
+                        {{-- Eskul Utama --}}
+                        <div>
+                            <label for="eskul_utama" class="block font-bold text-slate-900 mb-1">
+                                Pilih Ekstrakurikuler Utama <span class="text-rose-500">*</span>
+                            </label>
+                            <select id="eskul_utama" name="eskul_utama" required class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 pr-10 py-2.5 font-bold text-slate-900">
+                                <option value="">— Silakan Pilih Salah Satu Ekstrakurikuler —</option>
+                                @foreach ($eskuls as $o)
+                                    <option value="{{ $o['name'] }}"
+                                        @selected(old('eskul_utama') === $o['name'])
+                                        @disabled($o['penuh'])
+                                        data-pembina="{{ $o['pembina_nama'] }}"
+                                        data-jadwal="{{ $o['jadwal'] }}"
+                                        data-jadwals='@json($o['jadwals'])'
+                                        data-kuota-aktif="{{ $o['kuota_aktif'] ? '1' : '0' }}"
+                                        data-kuota="{{ $o['kuota'] }}"
+                                        data-terisi="{{ $o['terisi'] }}"
+                                        data-kuota-text="{{ $o['kuota_aktif'] ? $o['terisi'].'/'.$o['kuota'].($o['penuh'] ? ' (Penuh)' : '') : 'Bebas' }}"
+                                        data-desc="{{ $o['description'] }}">
+                                        {{ $o['name'] }} @if($o['kuota_aktif']) [Kuota: {{ $o['terisi'] }}/{{ $o['kuota'] }} @if($o['penuh']) - PENUH @endif] @endif
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                            <div>
-                                <span class="font-semibold text-slate-500 uppercase tracking-wider text-[10px]">Pembina:</span>
-                                <p class="text-slate-900 font-bold text-sm mt-0.5" id="detail-eskul-pembina">-</p>
+
+                        {{-- Card Detail Eskul Terpilih (Interaktif & Modern) --}}
+                        <div id="detail-eskul-box" class="hidden rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50/90 via-slate-50/50 to-blue-50/40 p-5 shadow-2xs transition-all animate-fade-in">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-blue-100 pb-3 mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600 text-white font-bold text-xs">★</span>
+                                    <h4 class="font-extrabold text-blue-950 text-sm" id="detail-eskul-title">Detail Eskul</h4>
+                                </div>
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-bold text-blue-800 border border-blue-200 shadow-2xs self-start sm:self-auto" id="detail-eskul-kuota"></span>
                             </div>
-                            <div>
-                                <span class="font-semibold text-slate-500 uppercase tracking-wider text-[10px]">Deskripsi:</span>
-                                <p class="text-slate-700 mt-0.5 line-clamp-2" id="detail-eskul-desc">-</p>
+
+                            {{-- Kuota Progress Bar (Muncul jika ada kuota) --}}
+                            <div id="kuota-progress-wrap" class="hidden mb-3">
+                                <div class="flex items-center justify-between text-[11px] font-semibold text-slate-600 mb-1">
+                                    <span>Kapasitas Kuota Peserta</span>
+                                    <span id="kuota-progress-percent">0%</span>
+                                </div>
+                                <div class="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+                                    <div id="kuota-progress-bar" class="h-full bg-blue-600 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                <div class="rounded-xl bg-white p-3 border border-blue-100 shadow-2xs">
+                                    <span class="font-bold text-slate-400 uppercase tracking-wider text-[10px] block">Guru Pembina:</span>
+                                    <p class="text-slate-900 font-bold text-xs mt-0.5" id="detail-eskul-pembina">-</p>
+                                </div>
+                                <div class="rounded-xl bg-white p-3 border border-blue-100 shadow-2xs">
+                                    <span class="font-bold text-slate-400 uppercase tracking-wider text-[10px] block">Deskripsi Kegiatan:</span>
+                                    <p class="text-slate-600 text-xs mt-0.5 line-clamp-2" id="detail-eskul-desc">-</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-3.5 pt-3 border-t border-blue-100">
+                                <span class="font-bold text-slate-400 uppercase tracking-wider text-[10px] block mb-1.5">Jadwal & Lokasi Latihan:</span>
+                                <div id="detail-eskul-jadwal-list" class="space-y-1.5"></div>
                             </div>
                         </div>
-                        <div class="mt-3 pt-2.5 border-t border-blue-200/60">
-                            <span class="font-semibold text-slate-500 uppercase tracking-wider text-[10px]">Jadwal & Tempat:</span>
-                            <div class="mt-1" id="detail-eskul-jadwal-list"></div>
+
+                        {{-- Eskul Cadangan --}}
+                        <div>
+                            <label for="eskul_cadangan" class="block font-bold text-slate-700 mb-1">
+                                Eskul Cadangan <span class="text-slate-400 font-normal">(Opsional)</span>
+                            </label>
+                            <select id="eskul_cadangan" name="eskul_cadangan" class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 pr-10 py-2.5 font-medium text-slate-700">
+                                <option value="">— Tidak Ada Pilihan Cadangan —</option>
+                                @foreach ($eskuls as $o)
+                                    <option value="{{ $o['name'] }}" @selected(old('eskul_cadangan') === $o['name'])>
+                                        {{ $o['name'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <p class="mt-1 text-[10px] text-slate-400">Pilihan cadangan dipertimbangkan apabila kuota pada eskul utama telah penuh saat pendaftaran diproses.</p>
                         </div>
-                    </div>
 
-                    <div>
-                        <label for="eskul_cadangan" class="block font-semibold text-slate-700 mb-1">Eskul Cadangan (opsional)</label>
-                        <select id="eskul_cadangan" name="eskul_cadangan" class="w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 pr-10">
-                            <option value="">— Tidak Ada Pilihan Cadangan —</option>
-                            @foreach ($eskuls as $o)
-                                <option value="{{ $o['name'] }}" @selected(old('eskul_cadangan') === $o['name'])>
-                                    {{ $o['name'] }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <p class="mt-1 text-[11px] text-slate-400">Cadangan akan digunakan jika eskul utama tiba-tiba penuh saat pendaftaran diproses.</p>
-                    </div>
-
-                    <div>
-                        <label for="alasan" class="block font-semibold text-slate-700 mb-1">Alasan Memilih (opsional)</label>
-                        <textarea id="alasan" name="alasan" rows="2" maxlength="1000" placeholder="Ceritakan motivasi atau minat Anda..."
-                                  class="w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('alasan') }}</textarea>
+                        {{-- Alasan / Motivasi --}}
+                        <div>
+                            <label for="alasan" class="block font-bold text-slate-700 mb-1">
+                                Alasan / Motivasi Memilih <span class="text-slate-400 font-normal">(Opsional)</span>
+                            </label>
+                            <textarea id="alasan" name="alasan" rows="3" maxlength="1000" placeholder="Ceritakan motivasi, minat, bakat, atau harapan Anda mengikuti kegiatan ekstrakurikuler ini..."
+                                      class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 leading-relaxed">{{ old('alasan') }}</textarea>
+                        </div>
                     </div>
                 </div>
 
                 {{-- Tombol Buka Konfirmasi Modal --}}
-                <div class="pt-2">
-                    <button type="button" onclick="bukaModalKonfirmasi()" class="w-full rounded-2xl bg-blue-700 px-6 py-4 text-base font-bold text-white shadow-md shadow-blue-700/20 hover:bg-blue-800 transition-colors">
-                        Daftar Ekstrakurikuler Sekarang
+                <div class="pt-4 border-t border-slate-100">
+                    <button type="button" onclick="bukaModalKonfirmasi()" class="w-full flex items-center justify-center gap-2 rounded-2xl bg-blue-700 px-6 py-4 text-sm font-bold text-white shadow-lg shadow-blue-700/25 hover:bg-blue-800 hover:shadow-blue-800/30 transition-all cursor-pointer">
+                        <x-icon name="clipboard" class="h-4 w-4" />
+                        <span>Daftar Ekstrakurikuler Sekarang</span>
                     </button>
+                    <p class="text-center text-[11px] text-slate-400 mt-2">Dengan mendaftar, Anda berkomitmen untuk aktif mengikuti jadwal kegiatan ekstrakurikuler terpilih.</p>
                 </div>
             </form>
 
-            {{-- Dialog Modal Konfirmasi Pendaftaran --}}
-            <div id="modal-konfirmasi" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in" aria-modal="true" role="dialog">
-                <div class="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl border border-slate-100 transform transition-all">
-                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-700 mb-4">
-                        <x-icon name="clipboard" class="h-7 w-7" />
+            {{-- Dialog Modal Konfirmasi Pendaftaran (Ala E-Voting) --}}
+            <div id="modal-konfirmasi" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4" aria-modal="true" role="dialog">
+                <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs" onclick="tutupModalKonfirmasi()"></div>
+                <div class="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl border border-slate-100 text-left">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-700 border border-blue-200">
+                            <x-icon name="clipboard" class="h-6 w-6" />
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900">Konfirmasi Pilihan Eskul</h3>
+                            <p class="text-[11px] text-slate-500">Periksa kembali data Anda sebelum mengirimkan pendaftaran.</p>
+                        </div>
                     </div>
 
-                    <h3 class="text-center text-lg font-bold text-slate-900">Konfirmasi Pilihan Eskul</h3>
-                    <p class="mt-2 text-center text-sm text-slate-600 leading-relaxed">
-                        Apakah Anda yakin dengan pilihan ini? Eskul tidak dapat diubah setelah pendaftaran.
-                    </p>
-
-                    <div class="mt-4 rounded-2xl bg-slate-50 border border-slate-200/80 p-3.5 text-center">
-                        <span class="text-xs text-slate-400 uppercase font-semibold">Eskul yang Dipilih:</span>
-                        <p id="modal-eskul-target" class="text-lg font-extrabold text-blue-900 mt-0.5">-</p>
+                    {{-- Ringkasan Pilihan --}}
+                    <div class="rounded-2xl bg-slate-50 border border-slate-200/80 p-4 space-y-2.5 text-xs mb-4">
+                        <div class="flex justify-between items-center pb-2 border-b border-slate-200/60">
+                            <span class="text-slate-500">Nama Siswa:</span>
+                            <span class="font-bold text-slate-900">{{ $user->name }}</span>
+                        </div>
+                        <div class="flex justify-between items-center pb-2 border-b border-slate-200/60">
+                            <span class="text-slate-500">Kelas / Rombel:</span>
+                            <span class="font-bold text-slate-900" id="modal-review-kelas">-</span>
+                        </div>
+                        <div class="flex justify-between items-center pb-2 border-b border-slate-200/60">
+                            <span class="text-slate-500">Eskul Utama:</span>
+                            <span class="font-extrabold text-blue-700 text-sm" id="modal-review-eskul-utama">-</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-500">Eskul Cadangan:</span>
+                            <span class="font-semibold text-slate-700" id="modal-review-eskul-cadangan">-</span>
+                        </div>
                     </div>
 
-                    <div class="mt-6 flex gap-3">
-                        <button type="button" onclick="tutupModalKonfirmasi()" class="flex-1 rounded-xl border border-slate-300 bg-white py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
-                            Batal
+                    <div class="rounded-xl bg-amber-50 p-3 text-[11px] text-amber-900 border border-amber-200/80 mb-5 leading-relaxed">
+                        ⚠️ <strong>Penting:</strong> Pendaftaran bersifat permanen dan <strong>tidak dapat diubah</strong> setelah formulir dikirim.
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button type="button" onclick="tutupModalKonfirmasi()" class="flex-1 rounded-xl border border-slate-300 bg-white py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer">
+                            Periksa Lagi
                         </button>
-                        <button type="button" onclick="submitPendaftaran()" class="flex-1 rounded-xl bg-blue-700 py-3 text-sm font-bold text-white shadow hover:bg-blue-800 transition-colors">
-                            Ya, Daftar
+                        <button type="button" id="btn-submit-pendaftaran" onclick="submitPendaftaran()" class="flex-1 rounded-xl bg-blue-700 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-700/20 hover:bg-blue-800 transition-colors cursor-pointer">
+                            Ya, Kirim Sekarang
                         </button>
                     </div>
                 </div>
@@ -305,6 +431,9 @@
                 const pembina = document.getElementById('detail-eskul-pembina');
                 const desc = document.getElementById('detail-eskul-desc');
                 const jadwalList = document.getElementById('detail-eskul-jadwal-list');
+                const progressWrap = document.getElementById('kuota-progress-wrap');
+                const progressBar = document.getElementById('kuota-progress-bar');
+                const progressPercent = document.getElementById('kuota-progress-percent');
 
                 function updateDetail() {
                     const opt = sel.options[sel.selectedIndex];
@@ -314,31 +443,57 @@
                     }
 
                     title.textContent = opt.value;
-                    kuota.textContent = 'Kuota: ' + (opt.getAttribute('data-kuota') || 'Bebas');
+                    kuota.textContent = 'Kuota: ' + (opt.getAttribute('data-kuota-text') || 'Bebas');
                     pembina.textContent = opt.getAttribute('data-pembina') || 'Belum ditentukan';
-                    desc.textContent = opt.getAttribute('data-desc') || 'Tidak ada deskripsi.';
+                    desc.textContent = opt.getAttribute('data-desc') || 'Tidak ada deskripsi eskul.';
 
+                    // Progress kuota
+                    const isKuotaAktif = opt.getAttribute('data-kuota-aktif') === '1';
+                    if (isKuotaAktif) {
+                        const total = parseInt(opt.getAttribute('data-kuota') || '0', 10);
+                        const terisi = parseInt(opt.getAttribute('data-terisi') || '0', 10);
+                        if (total > 0) {
+                            const pct = Math.min(100, Math.round((terisi / total) * 100));
+                            progressBar.style.width = pct + '%';
+                            progressPercent.textContent = pct + '% (' + (total - terisi) + ' kursi tersisa)';
+                            if (pct >= 90) {
+                                progressBar.className = 'h-full bg-rose-600 rounded-full transition-all duration-300';
+                            } else if (pct >= 70) {
+                                progressBar.className = 'h-full bg-amber-500 rounded-full transition-all duration-300';
+                            } else {
+                                progressBar.className = 'h-full bg-blue-600 rounded-full transition-all duration-300';
+                            }
+                            progressWrap.classList.remove('hidden');
+                        } else {
+                            progressWrap.classList.add('hidden');
+                        }
+                    } else {
+                        progressWrap.classList.add('hidden');
+                    }
+
+                    // Render Jadwal
                     let jadwals = [];
                     try {
                         jadwals = JSON.parse(opt.getAttribute('data-jadwals') || '[]');
                     } catch (e) {}
 
                     if (jadwals && jadwals.length > 0) {
-                        jadwalList.innerHTML = '<ul class="space-y-1">' + jadwals.map(j =>
-                            '<li class="flex items-center gap-1.5 text-xs text-slate-800">' +
-                            '<b>' + j.hari + ':</b> ' + j.jam + ' WIB ' +
-                            (j.tempat ? '<span class="text-slate-500">(' + j.tempat + ')</span>' : '') +
-                            '</li>'
-                        ).join('') + '</ul>';
+                        jadwalList.innerHTML = jadwals.map(j =>
+                            '<div class="flex items-center gap-2 text-xs text-slate-800 bg-white/80 border border-blue-100 rounded-lg p-2">' +
+                            '<span class="inline-flex items-center rounded-md bg-blue-100 px-2 py-0.5 text-[11px] font-bold text-blue-800">' + j.hari + '</span>' +
+                            '<span class="font-semibold">' + j.jam + ' WIB</span>' +
+                            (j.tempat ? '<span class="text-slate-500">di ' + j.tempat + '</span>' : '') +
+                            '</div>'
+                        ).join('');
                     } else {
-                        jadwalList.innerHTML = '<p class="text-xs text-slate-500">' + (opt.getAttribute('data-jadwal') || 'Jadwal menyusul.') + '</p>';
+                        jadwalList.innerHTML = '<p class="text-xs text-slate-500 italic">' + (opt.getAttribute('data-jadwal') || 'Jadwal latihan menyusul.') + '</p>';
                     }
 
                     box.classList.remove('hidden');
                 }
 
                 sel.addEventListener('change', updateDetail);
-                updateDetail();
+                if (sel.value) updateDetail();
             })();
 
             function bukaModalKonfirmasi() {
@@ -348,25 +503,43 @@
                     return;
                 }
 
-                const sel = document.getElementById('eskul_utama');
-                const namaEskul = sel.options[sel.selectedIndex]?.value;
-                if (!namaEskul) {
-                    sel.focus();
+                const selUtama = document.getElementById('eskul_utama');
+                const namaEskulUtama = selUtama.options[selUtama.selectedIndex]?.value;
+                if (!namaEskulUtama) {
+                    selUtama.focus();
                     return;
                 }
 
-                document.getElementById('modal-eskul-target').textContent = namaEskul;
-                document.getElementById('modal-konfirmasi').classList.remove('hidden');
+                const selCadangan = document.getElementById('eskul_cadangan');
+                const namaCadangan = selCadangan.options[selCadangan.selectedIndex]?.value || 'Tidak ada';
+
+                const kelasInput = document.getElementById('kelas').value.trim();
+
+                document.getElementById('modal-review-kelas').textContent = kelasInput || '-';
+                document.getElementById('modal-review-eskul-utama').textContent = namaEskulUtama;
+                document.getElementById('modal-review-eskul-cadangan').textContent = namaCadangan;
+
+                const modal = document.getElementById('modal-konfirmasi');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
             }
 
             function tutupModalKonfirmasi() {
-                document.getElementById('modal-konfirmasi').classList.add('hidden');
+                const modal = document.getElementById('modal-konfirmasi');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
             }
 
             function submitPendaftaran() {
-                tutupModalKonfirmasi();
+                const btn = document.getElementById('btn-submit-pendaftaran');
+                btn.disabled = true;
+                btn.innerHTML = `<svg class="animate-spin h-3.5 w-3.5 text-white inline mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Mengirim...`;
                 document.getElementById('form-pendaftaran').submit();
             }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') tutupModalKonfirmasi();
+            });
             </script>
         @endif
     @endif
