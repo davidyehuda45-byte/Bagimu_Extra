@@ -97,9 +97,13 @@
                 Data Kesiswaan
             </div>
             <div class="space-y-0.5">
-                <a href="{{ route('admin.students.index') }}" class="{{ $link(Route::is('admin.students.*')) }}">
+                <a href="{{ route('admin.students.index') }}" class="{{ $link(Route::is('admin.students.index') || Route::is('admin.students.create') || Route::is('admin.students.edit') || Route::is('admin.students.show')) }}">
                     <x-icon name="users" class="h-4 w-4 shrink-0" />
                     <span>Direktori Siswa</span>
+                </a>
+                <a href="{{ route('admin.students.status-rombel') }}" class="{{ $link(Route::is('admin.students.status-rombel') || Route::is('admin.students.cetak-kartu-rombel')) }}">
+                    <x-icon name="chart" class="h-4 w-4 shrink-0" />
+                    <span>Status Rombel</span>
                 </a>
                 <a href="{{ route('admin.kelas.index') }}" class="{{ $link(Route::is('admin.kelas.*')) }}">
                     <x-icon name="grad" class="h-4 w-4 shrink-0" />

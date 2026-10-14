@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\Gender;
 use App\Enums\Jurusan;
+use App\Enums\PeriodeStatus;
 use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Models\AdminLog;
+use App\Models\Periode;
 use App\Models\Student;
 use App\Models\User;
 use App\Support\LoginToken;
@@ -63,13 +65,41 @@ class StudentController extends Controller
             $query->where('status', $request->input('status'));
         }
 
+        if ($request->filled('eskul_status')) {
+            $eskulStatus = $request->input('eskul_status');
+            $activePeriode = Periode::where('status', PeriodeStatus::DIBUKA)->orderByDesc('periode')->first()
+                ?? Periode::orderByDesc('periode')->first();
+
+            if ($activePeriode) {
+                if ($eskulStatus === 'terdaftar') {
+                    $query->whereHas('user.registrations', function ($r) use ($activePeriode) {
+                        $r->where('periode', $activePeriode->periode);
+                    });
+                } elseif ($eskulStatus === 'belum') {
+                    $query->where(function ($q) use ($activePeriode) {
+                        $q->whereNull('user_id')
+                          ->orWhereDoesntHave('user.registrations', function ($r) use ($activePeriode) {
+                              $r->where('periode', $activePeriode->periode);
+                          });
+                    });
+                }
+            }
+        }
+
         return $query;
     }
 
     public function index(Request $request)
     {
+        $periode = Periode::where('status', PeriodeStatus::DIBUKA)->orderByDesc('periode')->first()
+            ?? Periode::orderByDesc('periode')->first();
+
         $query = $this->filterStudentsQuery($request)
-            ->with('user')
+            ->with(['user.registrations' => function ($q) use ($periode) {
+                if ($periode) {
+                    $q->where('periode', $periode->periode);
+                }
+            }])
             ->orderBy('kelas')
             ->orderBy('nama');
 
@@ -88,13 +118,13 @@ class StudentController extends Controller
 
         if ($request->ajax()) {
             return response()->json([
-                'rows' => view('admin.students.partials.rows', compact('students'))->render(),
+                'rows' => view('admin.students.partials.rows', compact('students', 'periode'))->render(),
                 'pagination' => $students->links()->toHtml(),
                 'total' => $students->total(),
             ]);
         }
 
-        return view('admin.students.index', compact('students', 'jurusanList', 'statusList', 'tingkatList', 'kelasList'));
+        return view('admin.students.index', compact('students', 'jurusanList', 'statusList', 'tingkatList', 'kelasList', 'periode'));
     }
 
     public function create()
@@ -289,6 +319,229 @@ class StudentController extends Controller
         }
 
         return redirect()->back()->with('status', $message);
+    }
+
+    public function statusRombel(Request $request)
+    {
+        $periode = Periode::where('status', PeriodeStatus::DIBUKA)->orderByDesc('periode')->first()
+            ?? Periode::orderByDesc('periode')->first();
+
+        $tingkatFilter = trim((string) $request->input('tingkat'));
+        $jurusanFilter = trim((string) $request->input('jurusan'));
+
+        $studentsQuery = Student::query();
+
+        if ($tingkatFilter) {
+            $romawiMap = ['10' => 'X', '11' => 'XI', '12' => 'XII'];
+            $romawi = $romawiMap[$tingkatFilter] ?? $tingkatFilter;
+            $studentsQuery->where(function ($w) use ($tingkatFilter, $romawi) {
+                $w->where('kelas', 'like', "{$tingkatFilter} %")
+                  ->orWhere('kelas', 'like', "{$romawi} %")
+                  ->orWhere('kelas', 'like', "{$tingkatFilter}-%")
+                  ->orWhere('kelas', 'like', "{$romawi}-%")
+                  ->orWhere('kelas', '=', $tingkatFilter)
+                  ->orWhere('kelas', '=', $romawi);
+            });
+        }
+
+        if ($jurusanFilter) {
+            $studentsQuery->where('jurusan', $jurusanFilter);
+        }
+
+        $allStudents = $studentsQuery->with(['user.registrations' => function ($q) use ($periode) {
+            if ($periode) {
+                $q->where('periode', $periode->periode);
+            }
+        }])->get();
+
+        $groupedByKelas = $allStudents->groupBy('kelas')->sortKeys(SORT_NATURAL);
+
+        $rombelStats = [];
+        $totalSemuaSiswa = 0;
+        $totalSemuaTerdaftar = 0;
+
+        foreach ($groupedByKelas as $kelasName => $studentsInKelas) {
+            $totalInKelas = $studentsInKelas->count();
+            $registeredStudents = $studentsInKelas->filter(function ($s) use ($periode) {
+                return $s->user && $s->user->registrations->isNotEmpty();
+            });
+
+            $unregisteredStudents = $studentsInKelas->filter(function ($s) use ($periode) {
+                return ! $s->user || $s->user->registrations->isEmpty();
+            });
+
+            $registeredCount = $registeredStudents->count();
+            $unregisteredCount = $totalInKelas - $registeredCount;
+            $percent = $totalInKelas > 0 ? round(($registeredCount / $totalInKelas) * 100) : 0;
+
+            $totalSemuaSiswa += $totalInKelas;
+            $totalSemuaTerdaftar += $registeredCount;
+
+            $rombelStats[] = [
+                'kelas' => $kelasName,
+                'total' => $totalInKelas,
+                'terdaftar' => $registeredCount,
+                'belum' => $unregisteredCount,
+                'persentase' => $percent,
+                'unregistered_samples' => $unregisteredStudents->take(5)->pluck('nama')->all(),
+            ];
+        }
+
+        $tingkatList = ['10', '11', '12'];
+        $jurusanList = Jurusan::cases();
+
+        return view('admin.students.status-rombel', compact(
+            'rombelStats',
+            'periode',
+            'totalSemuaSiswa',
+            'totalSemuaTerdaftar',
+            'tingkatList',
+            'jurusanList',
+            'tingkatFilter',
+            'jurusanFilter'
+        ));
+    }
+
+    public function cetakKartuRombel(Request $request)
+    {
+        $kelas = $request->query('kelas');
+        if (! $kelas) {
+            return redirect()->route('admin.students.index')->with('error', 'Pilih kelas terlebih dahulu.');
+        }
+
+        $students = Student::with('user')
+            ->where('kelas', $kelas)
+            ->orderBy('nama')
+            ->get();
+
+        if ($students->isEmpty()) {
+            return redirect()->route('admin.students.index')->with('warning', "Tidak ada siswa di kelas {$kelas}.");
+        }
+
+        $cardsData = [];
+        foreach ($students as $student) {
+            $user = $student->user;
+            if (! $user) {
+                $user = User::create([
+                    'name' => $student->nama,
+                    'email' => $student->nis.'@siswa.local',
+                    'username' => $student->nis,
+                    'password' => Hash::make(Str::random(16)),
+                    'role' => Role::STUDENT,
+                    'student_status' => $student->status ?? 'AKTIF',
+                ]);
+                $student->update(['user_id' => $user->id]);
+            }
+
+            $plainToken = ($user->login_token && $user->login_token_revoked_at === null)
+                ? $user->login_token
+                : LoginToken::issue($user);
+
+            $cardsData[] = [
+                'student' => $student,
+                'token' => $plainToken,
+            ];
+        }
+
+        AdminLog::record('student.kartu_rombel', 'student', null, "Mencetak kartu login massal kelas {$kelas} ({$students->count()} siswa)");
+
+        return view('admin.students.kartu-rombel', compact('kelas', 'cardsData'));
+    }
+
+    public function export(Request $request)
+    {
+        $format = strtolower((string) $request->query('format', 'xlsx'));
+        $periode = Periode::where('status', PeriodeStatus::DIBUKA)->orderByDesc('periode')->first()
+            ?? Periode::orderByDesc('periode')->first();
+
+        $students = $this->filterStudentsQuery($request)
+            ->with(['user.registrations' => function ($q) use ($periode) {
+                if ($periode) {
+                    $q->where('periode', $periode->periode);
+                }
+            }])
+            ->orderBy('kelas')
+            ->orderBy('nama')
+            ->get();
+
+        $headers = [
+            'No',
+            'NIS',
+            'NISN',
+            'Nama Lengkap',
+            'Kelas',
+            'Jurusan',
+            'Status Siswa',
+            'No. Absen',
+            'Gender',
+            'No. WhatsApp',
+            'Token Login',
+            'Status Eskul',
+            'Eskul Terpilih',
+        ];
+
+        $rows = [];
+        $no = 1;
+        foreach ($students as $s) {
+            $reg = $s->user?->registrations->first();
+            $wa = $s->wali_kontak ?: ($reg?->whatsapp ?? '');
+            $token = ($s->user?->login_token && $s->user?->login_token_revoked_at === null) ? $s->user->login_token : '';
+            $statusEskul = $reg ? 'Terdaftar' : 'Belum Memilih';
+            $eskulUtama = $reg ? $reg->eskul_utama : '';
+
+            $rows[] = [
+                $no++,
+                (string) $s->nis,
+                (string) ($s->nisn ?? ''),
+                $s->nama,
+                $s->kelas,
+                $s->jurusan?->short() ?? (string) $s->jurusan,
+                $s->status,
+                $s->no_absen ?? '',
+                $s->gender?->value ?? '',
+                $wa,
+                $token,
+                $statusEskul,
+                $eskulUtama,
+            ];
+        }
+
+        $filename = 'data-siswa-' . date('Ymd_His');
+
+        if ($format === 'csv') {
+            return \App\Support\CsvExport::download($filename . '.csv', $headers, $rows);
+        }
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Direktori Siswa');
+
+        $sheet->fromArray([$headers, ...$rows], null, 'A1', true);
+
+        $headerStyle = [
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '1E40AF'],
+            ],
+            'alignment' => [
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+        $sheet->getStyle('A1:M1')->applyFromArray($headerStyle);
+        $sheet->getRowDimension(1)->setRowHeight(26);
+
+        foreach (range('A', 'M') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        return response()->streamDownload(function () use ($spreadsheet) {
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $writer->save('php://output');
+            $spreadsheet->disconnectWorksheets();
+        }, $filename . '.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
     }
 
     public function importForm()

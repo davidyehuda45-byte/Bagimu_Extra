@@ -3,7 +3,10 @@
 namespace Tests\Feature;
 
 use App\Enums\Jurusan;
+use App\Enums\PeriodeStatus;
 use App\Enums\Role;
+use App\Models\Periode;
+use App\Models\Registration;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -221,5 +224,156 @@ class StudentDirectoryFeatureTest extends TestCase
         );
         $res->assertSee('jurusan=RPL');
         $res->assertSee('page=2');
+    }
+
+    public function test_status_rombel_renders_and_computes_ratios(): void
+    {
+        $admin = $this->admin();
+        Periode::create([
+            'periode' => '2024-1',
+            'nama' => 'Ganjil 2024/2025',
+            'tahun_ajaran' => '2024/2025',
+            'semester' => 'GANJIL',
+            'tgl_mulai' => now()->subDay(),
+            'tgl_selesai' => now()->addMonth(),
+            'status' => PeriodeStatus::DIBUKA,
+        ]);
+
+        $user = User::factory()->create(['role' => Role::STUDENT, 'username' => '1001']);
+        Student::create([
+            'user_id' => $user->id,
+            'nis' => '1001',
+            'nama' => 'Budi Santoso',
+            'kelas' => '10 RPL 1',
+            'jurusan' => 'RPL',
+            'status' => 'AKTIF',
+        ]);
+        Student::create([
+            'nis' => '1002',
+            'nama' => 'Ani Wijaya',
+            'kelas' => '10 RPL 1',
+            'jurusan' => 'RPL',
+            'status' => 'AKTIF',
+        ]);
+
+        Registration::create([
+            'user_id' => $user->id,
+            'periode' => '2024-1',
+            'kelas' => '10 RPL 1',
+            'nis' => '1001',
+            'nama_wali_kelas' => 'Guru A',
+            'jurusan' => Jurusan::RPL,
+            'usia' => 16,
+            'gender' => \App\Enums\Gender::LAKI_LAKI,
+            'whatsapp' => '08123456789',
+            'eskul_utama' => 'Robotik',
+            'status' => \App\Enums\Status::PENDING,
+        ]);
+
+        $res = $this->actingAs($admin)->get(route('admin.students.status-rombel'));
+        $res->assertOk();
+        $res->assertSee('Status Pendaftaran Per Rombel');
+        $res->assertSee('10 RPL 1');
+        $res->assertSee('50%');
+        $res->assertSee('1 siswa belum memilih');
+        $res->assertSee('Cetak Kartu');
+    }
+
+    public function test_cetak_kartu_rombel_generates_tokens_and_renders(): void
+    {
+        $admin = $this->admin();
+        $s1 = Student::create([
+            'nis' => '1001',
+            'nama' => 'Budi Santoso',
+            'kelas' => '10 RPL 1',
+            'jurusan' => 'RPL',
+            'status' => 'AKTIF',
+        ]);
+
+        $res = $this->actingAs($admin)->get(route('admin.students.cetak-kartu-rombel', ['kelas' => '10 RPL 1']));
+        $res->assertOk();
+        $res->assertSee('Lembar Cetak Kartu Login Siswa');
+        $res->assertSee('Budi Santoso');
+        $res->assertSee('1001');
+
+        $s1->refresh();
+        $this->assertNotNull($s1->user);
+        $this->assertNotNull($s1->user->login_token);
+        $this->assertEquals(8, strlen($s1->user->login_token));
+    }
+
+    public function test_export_csv_and_xlsx(): void
+    {
+        $admin = $this->admin();
+        Student::create([
+            'nis' => '1001',
+            'nama' => 'Budi Santoso',
+            'kelas' => '10 RPL 1',
+            'jurusan' => 'RPL',
+            'status' => 'AKTIF',
+        ]);
+
+        $csvRes = $this->actingAs($admin)->get(route('admin.students.export', ['format' => 'csv']));
+        $csvRes->assertOk();
+        $this->assertStringContainsString('text/csv', $csvRes->headers->get('content-type'));
+
+        $xlsxRes = $this->actingAs($admin)->get(route('admin.students.export', ['format' => 'xlsx']));
+        $xlsxRes->assertOk();
+        $this->assertStringContainsString('spreadsheetml', $xlsxRes->headers->get('content-type'));
+    }
+
+    public function test_filter_by_eskul_status(): void
+    {
+        $admin = $this->admin();
+        Periode::create([
+            'periode' => '2024-1',
+            'nama' => 'Ganjil 2024/2025',
+            'tahun_ajaran' => '2024/2025',
+            'semester' => 'GANJIL',
+            'tgl_mulai' => now()->subDay(),
+            'tgl_selesai' => now()->addMonth(),
+            'status' => PeriodeStatus::DIBUKA,
+        ]);
+
+        $user = User::factory()->create(['role' => Role::STUDENT, 'username' => '1001']);
+        Student::create([
+            'user_id' => $user->id,
+            'nis' => '1001',
+            'nama' => 'Siswa Terdaftar',
+            'kelas' => '10 RPL 1',
+            'jurusan' => 'RPL',
+            'status' => 'AKTIF',
+        ]);
+        Student::create([
+            'nis' => '1002',
+            'nama' => 'Siswa Belum Terdaftar',
+            'kelas' => '10 RPL 1',
+            'jurusan' => 'RPL',
+            'status' => 'AKTIF',
+        ]);
+
+        Registration::create([
+            'user_id' => $user->id,
+            'periode' => '2024-1',
+            'kelas' => '10 RPL 1',
+            'nis' => '1001',
+            'nama_wali_kelas' => 'Guru A',
+            'jurusan' => Jurusan::RPL,
+            'usia' => 16,
+            'gender' => \App\Enums\Gender::LAKI_LAKI,
+            'whatsapp' => '08123456789',
+            'eskul_utama' => 'Robotik',
+            'status' => \App\Enums\Status::PENDING,
+        ]);
+
+        $res1 = $this->actingAs($admin)->get(route('admin.students.index', ['eskul_status' => 'terdaftar']));
+        $res1->assertOk();
+        $res1->assertSee('Siswa Terdaftar');
+        $res1->assertDontSee('Siswa Belum Terdaftar');
+
+        $res2 = $this->actingAs($admin)->get(route('admin.students.index', ['eskul_status' => 'belum']));
+        $res2->assertOk();
+        $res2->assertSee('Siswa Belum Terdaftar');
+        $res2->assertDontSee('Siswa Terdaftar');
     }
 }

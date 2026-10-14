@@ -14,8 +14,26 @@
         <p class="text-xs text-slate-500 mt-1">Kelola data induk siswa, kredensial token login, dan kartu login sekolah.</p>
     </div>
     <div class="flex flex-wrap items-center gap-2">
+        {{-- Tombol Cek Status Pendaftaran Per Rombel (Ala E-Voting) --}}
+        <a href="{{ route('admin.students.status-rombel') }}" class="inline-flex items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-3.5 py-2.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100 shadow-2xs transition-all" title="Monitoring Progress Pendaftaran Per Rombel">
+            <x-icon name="chart" class="h-3.5 w-3.5 text-indigo-600 shrink-0" />
+            <span>Cek Status Rombel</span>
+        </a>
+
+        {{-- Export Excel & CSV --}}
+        <div class="inline-flex rounded-xl border border-slate-300 bg-white p-0.5 shadow-2xs">
+            <button type="button" onclick="exportData('xlsx')" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-emerald-700 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer" title="Unduh data dalam format Excel (.xlsx)">
+                <x-icon name="file" class="h-3.5 w-3.5 text-emerald-600" />
+                <span>Export Excel</span>
+            </button>
+            <div class="w-px bg-slate-200 my-1"></div>
+            <button type="button" onclick="exportData('csv')" class="inline-flex items-center gap-1.5 px-2.5 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer" title="Unduh data dalam format CSV mentah">
+                <span>CSV</span>
+            </button>
+        </div>
+
         {{-- Tombol Generate Semua Token --}}
-        <button type="button" onclick="openBulkTokenModal()" class="inline-flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3.5 py-2.5 text-xs font-bold text-amber-800 hover:bg-amber-100 shadow-xs transition-all cursor-pointer" title="Generate token login otomatis untuk siswa">
+        <button type="button" onclick="openBulkTokenModal()" class="inline-flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3.5 py-2.5 text-xs font-bold text-amber-800 hover:bg-amber-100 shadow-2xs transition-all cursor-pointer" title="Generate token login otomatis untuk siswa">
             <x-icon name="key" class="h-3.5 w-3.5 text-amber-600 shrink-0" />
             <span>Generate Semua Token</span>
         </button>
@@ -24,7 +42,7 @@
         <form id="direct-student-import-form" method="POST" action="{{ route('admin.students.import.store') }}" enctype="multipart/form-data" class="inline-block m-0">
             @csrf
             <input type="file" id="direct-student-file-input" name="file" accept=".csv,.txt,.xlsx,.xls,.ods,.pdf" class="hidden" onchange="handleDirectStudentUpload(this)">
-            <button type="button" onclick="document.getElementById('direct-student-file-input').click()" id="btn-import-trigger" class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs transition-all hover:border-blue-500 hover:text-blue-700 cursor-pointer" title="Impor Data Siswa (Excel, CSV, PDF, dsb.)">
+            <button type="button" onclick="document.getElementById('direct-student-file-input').click()" id="btn-import-trigger" class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition-all hover:border-blue-500 hover:text-blue-700 cursor-pointer" title="Impor Data Siswa (Excel, CSV, PDF, dsb.)">
                 <x-icon name="download" class="h-3.5 w-3.5 text-blue-600 shrink-0" />
                 <span>Impor Siswa</span>
                 <span class="hidden sm:inline-flex items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-600 border border-slate-200">
@@ -33,7 +51,7 @@
             </button>
         </form>
 
-        <a href="{{ route('admin.students.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-blue-700 px-4 py-2.5 text-xs font-bold text-white hover:bg-blue-800 shadow-xs transition-colors">
+        <a href="{{ route('admin.students.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-blue-700 px-4 py-2.5 text-xs font-bold text-white hover:bg-blue-800 shadow-2xs transition-colors">
             <x-icon name="plus" class="h-3.5 w-3.5" />
             <span>Tambah Siswa</span>
         </a>
@@ -70,7 +88,7 @@
 @endif
 
 {{-- Filter & Real-Time Live Search --}}
-<form id="filter-siswa-form" method="GET" action="{{ route('admin.students.index') }}" class="rounded-2xl border border-slate-200 bg-white p-4 mb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-sm shadow-xs">
+<form id="filter-siswa-form" method="GET" action="{{ route('admin.students.index') }}" class="rounded-2xl border border-slate-200 bg-white p-4 mb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 text-sm shadow-xs">
     {{-- Pencarian --}}
     <div class="relative sm:col-span-2 lg:col-span-1">
         <label for="q-search-input" class="block font-semibold mb-1 text-slate-700 text-xs">Pencarian (Nama / NIS)</label>
@@ -117,6 +135,16 @@
             @foreach ($jurusanList as $j)
                 <option value="{{ $j->value }}" @selected(request('jurusan') === $j->value)>{{ $j->label() }}</option>
             @endforeach
+        </select>
+    </div>
+
+    {{-- Status Pendaftaran Eskul --}}
+    <div>
+        <label for="eskul-status-filter" class="block font-semibold mb-1 text-slate-700 text-xs">Status Eskul</label>
+        <select id="eskul-status-filter" name="eskul_status" class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500 pr-8">
+            <option value="">Semua Siswa</option>
+            <option value="terdaftar" @selected(request('eskul_status') === 'terdaftar')>Sudah Terdaftar</option>
+            <option value="belum" @selected(request('eskul_status') === 'belum')>Belum Mendaftar</option>
         </select>
     </div>
 
@@ -234,6 +262,7 @@
             <input type="hidden" name="kelas" id="bulk-token-kelas" value="{{ request('kelas') }}">
             <input type="hidden" name="jurusan" id="bulk-token-jurusan" value="{{ request('jurusan') }}">
             <input type="hidden" name="status" id="bulk-token-status" value="{{ request('status') }}">
+            <input type="hidden" name="eskul_status" id="bulk-token-eskul-status" value="{{ request('eskul_status') }}">
 
             <div class="space-y-3 mb-4">
                 <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
@@ -265,6 +294,48 @@
                 </button>
             </div>
         </form>
+    </div>
+</div>
+
+{{-- Modal Kirim Token via WhatsApp (Ala E-Voting) --}}
+<div id="modal-wa-token" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs" onclick="closeWaModal()"></div>
+    <div class="relative w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl text-left">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200">
+                <span class="text-xl">💬</span>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-slate-900">Kirim Token via WhatsApp</h3>
+                <p class="text-xs text-slate-500">Kirim kredensial login langsung ke nomor siswa / orang tua.</p>
+            </div>
+        </div>
+
+        <div class="space-y-3.5 my-4">
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Siswa</label>
+                <div id="wa-student-name" class="rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-800"></div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor WhatsApp (Siswa / Wali)</label>
+                <input type="tel" id="wa-phone-input" class="w-full rounded-xl border-slate-300 text-sm focus:border-emerald-500 focus:ring-emerald-500 font-mono" placeholder="08xxxxxxxxxx atau 628xxxxxxxxxx">
+                <span class="text-[11px] text-slate-400 mt-1 block">Nomor akan otomatis diformat ke format internasional (628...).</span>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Preview Pesan</label>
+                <textarea id="wa-message-preview" rows="5" class="w-full rounded-xl border-slate-200 bg-slate-50 text-xs font-mono text-slate-700 focus:ring-0 focus:border-slate-300 resize-none" readonly></textarea>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2">
+            <button type="button" onclick="closeWaModal()" class="rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer">
+                Batal
+            </button>
+            <button type="button" onclick="submitWaSend()" class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition cursor-pointer shadow-xs">
+                <span>Buka WhatsApp</span>
+                <x-icon name="arrow-right" class="h-3.5 w-3.5" />
+            </button>
+        </div>
     </div>
 </div>
 
@@ -325,6 +396,10 @@ function openBulkTokenModal() {
     document.getElementById('bulk-token-kelas').value = document.getElementById('kelas-filter').value;
     document.getElementById('bulk-token-jurusan').value = document.getElementById('jurusan-filter').value;
     document.getElementById('bulk-token-status').value = document.getElementById('status-filter').value;
+    const eskulEl = document.getElementById('eskul-status-filter');
+    if (eskulEl && document.getElementById('bulk-token-eskul-status')) {
+        document.getElementById('bulk-token-eskul-status').value = eskulEl.value;
+    }
 
     const modal = document.getElementById('modal-bulk-token');
     modal.classList.remove('hidden');
@@ -341,6 +416,7 @@ document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
         closeConfirmModal();
         closeBulkTokenModal();
+        closeWaModal();
     }
 });
 
@@ -472,12 +548,92 @@ function confirmBulkTokenSelected() {
     );
 }
 
+// Export Data Multi-Format (Ala E-Voting)
+function getStudentFilterQuery() {
+    const params = new URLSearchParams();
+    const search = document.getElementById('q-search-input')?.value.trim();
+    const tingkat = document.getElementById('tingkat-filter')?.value;
+    const kelas = document.getElementById('kelas-filter')?.value;
+    const jurusan = document.getElementById('jurusan-filter')?.value;
+    const eskul = document.getElementById('eskul-status-filter')?.value;
+    const status = document.getElementById('status-filter')?.value;
+
+    if (search) params.set('q', search);
+    if (tingkat) params.set('tingkat', tingkat);
+    if (kelas) params.set('kelas', kelas);
+    if (jurusan) params.set('jurusan', jurusan);
+    if (eskul) params.set('eskul_status', eskul);
+    if (status) params.set('status', status);
+
+    return params.toString();
+}
+
+function exportData(format) {
+    const query = getStudentFilterQuery();
+    const url = "{{ route('admin.students.export') }}" + `?format=${format}` + (query ? `&${query}` : '');
+    window.location.href = url;
+}
+
+// Kirim Token via WhatsApp (Ala E-Voting)
+let currentWaPayload = null;
+
+function sendTokenViaWa(nama, nis, token, defaultPhone = '') {
+    currentWaPayload = { nama, nis, token };
+    document.getElementById('wa-student-name').textContent = `${nama} (NIS: ${nis})`;
+    document.getElementById('wa-phone-input').value = defaultPhone || '';
+
+    const loginUrl = "{{ url('/siswa/login') }}";
+    const msg = `Halo *${nama}* (NIS: *${nis}*),\n\nBerikut adalah kredensial token login untuk pemilihan Ekstrakurikuler SMK Bagimu Negeriku:\n\n🔑 *Token Login:* ${token}\n🌐 *Tautan Login:* ${loginUrl}\n\nSilakan simpan token ini dengan baik untuk login ke portal siswa.\nTerima kasih.`;
+
+    document.getElementById('wa-message-preview').value = msg;
+
+    const modal = document.getElementById('modal-wa-token');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    setTimeout(() => document.getElementById('wa-phone-input').focus(), 100);
+}
+
+function closeWaModal() {
+    const modal = document.getElementById('modal-wa-token');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    currentWaPayload = null;
+}
+
+function submitWaSend() {
+    let phone = document.getElementById('wa-phone-input').value.trim();
+    if (!phone) {
+        alert('Silakan masukkan nomor WhatsApp tujuan!');
+        document.getElementById('wa-phone-input').focus();
+        return;
+    }
+
+    phone = phone.replace(/[^0-9]/g, '');
+    if (phone.startsWith('0')) {
+        phone = '62' + phone.substring(1);
+    } else if (phone.startsWith('8')) {
+        phone = '62' + phone;
+    }
+
+    if (phone.length < 9) {
+        alert('Nomor WhatsApp tidak valid. Masukkan nomor yang benar (contoh: 081234567890).');
+        return;
+    }
+
+    const message = document.getElementById('wa-message-preview').value;
+    const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+    window.open(waUrl, '_blank');
+    closeWaModal();
+}
+
 // Live Search & Filter AJAX with History & Pagination Sync
 (function() {
     const searchInput = document.getElementById('q-search-input');
     const tingkatSelect = document.getElementById('tingkat-filter');
     const kelasSelect = document.getElementById('kelas-filter');
     const jurusanSelect = document.getElementById('jurusan-filter');
+    const eskulSelect = document.getElementById('eskul-status-filter');
     const statusSelect = document.getElementById('status-filter');
     const tbody = document.getElementById('students-table-body');
     const pagination = document.getElementById('students-pagination');
@@ -487,13 +643,7 @@ function confirmBulkTokenSelected() {
     let debounceTimer;
 
     function buildQuery() {
-        const params = new URLSearchParams();
-        if (searchInput.value.trim()) params.set('q', searchInput.value.trim());
-        if (tingkatSelect.value) params.set('tingkat', tingkatSelect.value);
-        if (kelasSelect.value) params.set('kelas', kelasSelect.value);
-        if (jurusanSelect.value) params.set('jurusan', jurusanSelect.value);
-        if (statusSelect.value) params.set('status', statusSelect.value);
-        return params.toString();
+        return getStudentFilterQuery();
     }
 
     async function performSearch(targetUrl = null) {
@@ -540,6 +690,7 @@ function confirmBulkTokenSelected() {
     if (tingkatSelect) tingkatSelect.addEventListener('change', () => performSearch());
     if (kelasSelect) kelasSelect.addEventListener('change', () => performSearch());
     if (jurusanSelect) jurusanSelect.addEventListener('change', () => performSearch());
+    if (eskulSelect) eskulSelect.addEventListener('change', () => performSearch());
     if (statusSelect) statusSelect.addEventListener('change', () => performSearch());
 
     // Intercept klik pada pagination agar filter tetap terjaga dan tidak reset!

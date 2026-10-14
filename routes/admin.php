@@ -69,6 +69,9 @@ Route::middleware(['auth', 'role:admin,operator,kepala_sekolah', \App\Http\Middl
 
     Route::post('students/bulk-token', [StudentController::class, 'bulkToken'])->name('students.bulk-token');
     Route::post('students/bulk-delete', [StudentController::class, 'bulkDelete'])->name('students.bulk-delete');
+    Route::get('students/status-rombel', [StudentController::class, 'statusRombel'])->name('students.status-rombel');
+    Route::get('students/cetak-kartu-rombel', [StudentController::class, 'cetakKartuRombel'])->name('students.cetak-kartu-rombel');
+    Route::get('students/export', [StudentController::class, 'export'])->name('students.export');
     Route::get('students/import', [StudentController::class, 'importForm'])->name('students.import');
     Route::get('students/import/template', [StudentController::class, 'template'])->name('students.import.template');
     Route::post('students/import', [StudentController::class, 'import'])->name('students.import.store');

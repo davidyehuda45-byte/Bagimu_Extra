@@ -5,7 +5,20 @@
         </td>
         <td class="py-3 px-3 font-semibold text-slate-900 font-mono text-xs">{{ $s->nis }}</td>
         <td class="py-3 px-3 font-mono text-xs text-slate-500">{{ $s->nisn ?? '—' }}</td>
-        <td class="py-3 px-3 font-medium text-slate-800">{{ $s->nama }}</td>
+        <td class="py-3 px-3">
+            <div class="font-medium text-slate-800">{{ $s->nama }}</div>
+            @php $reg = $s->user?->registrations?->first(); @endphp
+            @if ($reg)
+                <div class="flex items-center gap-1 mt-0.5">
+                    <span class="inline-flex items-center gap-1 rounded-md bg-blue-50 text-blue-800 border border-blue-200/70 px-1.5 py-0.5 text-[10px] font-bold">
+                        <x-icon name="trophy" class="h-2.5 w-2.5 text-blue-600" />
+                        <span>{{ $reg->eskul_utama }}</span>
+                    </span>
+                </div>
+            @else
+                <span class="inline-block text-[10px] text-amber-600 font-medium mt-0.5 italic">Belum mendaftar eskul</span>
+            @endif
+        </td>
         <td class="py-3 px-3">
             <span class="inline-flex items-center rounded-lg bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 border border-blue-200/80 font-mono">{{ $s->kelas }}</span>
         </td>
@@ -17,10 +30,13 @@
         </td>
         <td class="py-3 px-3">
             @if ($s->user?->login_token && !$s->user?->login_token_revoked_at)
-                <div class="inline-flex items-center gap-1.5 font-mono font-bold text-xs bg-blue-50 text-blue-900 px-2 py-1 rounded-lg border border-blue-200">
+                @php $waNum = $s->wali_kontak ?: ($reg?->whatsapp ?? ''); @endphp
+                <div class="inline-flex items-center gap-1 font-mono font-bold text-xs bg-blue-50 text-blue-900 px-2 py-1 rounded-lg border border-blue-200">
                     <span class="tracking-widest">{{ $s->user->login_token }}</span>
                     <button type="button" onclick="navigator.clipboard.writeText('{{ $s->user->login_token }}'); this.innerText='✓'; setTimeout(()=>this.innerText='❐', 1200)"
-                            class="text-blue-400 hover:text-blue-700 font-normal text-[11px] px-1" title="Salin Token">❐</button>
+                            class="text-blue-400 hover:text-blue-700 font-normal text-[11px] px-0.5" title="Salin Token">❐</button>
+                    <button type="button" onclick="sendTokenViaWa('{{ addslashes($s->nama) }}', '{{ $s->nis }}', '{{ $s->user->login_token }}', '{{ $waNum }}')"
+                            class="text-emerald-600 hover:text-emerald-800 font-bold text-xs px-1 hover:scale-110 transition-transform" title="Kirim Token via WhatsApp">💬</button>
                 </div>
                 @if ($s->user?->password_set_at)
                     <span class="block text-[10px] text-slate-400 font-medium mt-0.5">+ Password aktif</span>
@@ -34,7 +50,7 @@
                 <summary class="flex h-8 w-8 list-none items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 cursor-pointer [&::-webkit-details-marker]:hidden focus:outline-none focus:ring-2 focus:ring-blue-500/20" title="Menu Opsi">
                     <x-icon name="more-vertical" class="h-4 w-4" />
                 </summary>
-                <div class="absolute right-0 z-30 mt-1 w-44 origin-top-right rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl ring-1 ring-black/5 text-xs text-slate-700">
+                <div class="absolute right-0 z-30 mt-1 w-48 origin-top-right rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl ring-1 ring-black/5 text-xs text-slate-700">
                     <a href="{{ route('admin.students.show', $s) }}" class="flex items-center gap-2 rounded-xl px-2.5 py-2 hover:bg-slate-50 font-medium text-slate-700">
                         <x-icon name="eye" class="h-3.5 w-3.5 text-slate-400" />
                         <span>Lihat Detail</span>
@@ -51,6 +67,10 @@
                         </button>
                     </form>
                     @if ($s->user?->login_token && !$s->user?->login_token_revoked_at)
+                        <button type="button" onclick="sendTokenViaWa('{{ addslashes($s->nama) }}', '{{ $s->nis }}', '{{ $s->user->login_token }}', '{{ $waNum }}')" class="flex w-full items-center gap-2 rounded-xl px-2.5 py-2 hover:bg-emerald-50 text-emerald-700 font-medium text-left">
+                            <span class="text-sm">💬</span>
+                            <span>Kirim Token ke WA</span>
+                        </button>
                         <form method="POST" action="{{ route('admin.students.revoke', $s) }}">
                             @csrf
                             <button type="submit" class="flex w-full items-center gap-2 rounded-xl px-2.5 py-2 hover:bg-amber-50 text-amber-700 font-medium text-left">
