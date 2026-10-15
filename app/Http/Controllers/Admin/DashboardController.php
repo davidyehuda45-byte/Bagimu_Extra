@@ -114,7 +114,6 @@ class DashboardController extends Controller
             'rejected',
             'distEskul',
             'maxEskul',
-            'sakit',
             'distJurusan',
             'maxJurusan',
             'tugas',

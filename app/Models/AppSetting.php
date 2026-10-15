@@ -26,4 +26,5 @@ class AppSetting extends Model
     {
         self::updateOrCreate(['key' => $key], ['value' => $value]);
     }
+    
 }
