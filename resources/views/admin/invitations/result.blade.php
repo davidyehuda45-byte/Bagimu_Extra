@@ -15,6 +15,9 @@
         <div class="flex justify-between gap-3"><dt class="text-slate-500">Nama</dt><dd class="font-semibold">{{ $user->name }}</dd></div>
         <div class="flex justify-between gap-3"><dt class="text-slate-500">Email</dt><dd class="font-semibold">{{ $user->email }}</dd></div>
         <div class="flex justify-between gap-3"><dt class="text-slate-500">Peran</dt><dd class="font-semibold">{{ $user->role->label() }}</dd></div>
+        @if (! empty($ditugaskan))
+            <div class="flex justify-between gap-3"><dt class="text-slate-500">Mengampu eskul</dt><dd class="font-semibold text-right">{{ implode(', ', $ditugaskan) }}</dd></div>
+        @endif
         <div class="flex justify-between gap-3"><dt class="text-slate-500">Username</dt><dd class="font-mono font-bold" id="cred-user">{{ $username }}</dd></div>
         <div class="flex justify-between gap-3"><dt class="text-slate-500">Password</dt><dd class="font-mono font-bold tracking-widest" id="cred-pass">{{ $password }}</dd></div>
         <div class="flex justify-between gap-3"><dt class="text-slate-500">Link login</dt><dd><a href="{{ $loginUrl }}" class="font-medium text-blue-600 hover:underline break-all">{{ $loginUrl }}</a></dd></div>

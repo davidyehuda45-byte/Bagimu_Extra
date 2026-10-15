@@ -66,6 +66,19 @@ class SiswaLoginTest extends TestCase
         $response->assertSessionHasErrors('token');
     }
 
+    public function test_login_mengabaikan_intended_halaman_admin(): void
+    {
+        $master = $this->master();
+        $user = User::factory()->create(['username' => '10001', 'role' => Role::STUDENT]);
+        $token = LoginToken::issue($user);
+
+        $response = $this->withSession(['url.intended' => 'http://localhost/admin/dashboard'])
+            ->post('/siswa/login', ['nis' => '10001', 'token' => $token]);
+
+        $this->assertAuthenticatedAs($user);
+        $response->assertRedirect('/siswa/daftar');
+    }
+
     public function test_nis_nonaktif_ditolak(): void
     {
         $this->master(['status' => 'NONAKTIF']);

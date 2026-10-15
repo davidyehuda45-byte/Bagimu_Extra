@@ -176,7 +176,12 @@
     </div>
 
     <div class="rounded-lg border bg-white p-4 shadow-sm">
-        <h2 class="font-semibold mb-3">Absensi (hanya anggota disetujui)</h2>
+        <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <h2 class="font-semibold">Absensi (hanya anggota disetujui)</h2>
+            <a href="{{ route('pembina.scan.show', $eskul) }}" class="inline-flex items-center gap-1.5 rounded-xl bg-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-blue-800">
+                <x-icon name="qr" class="h-4 w-4" /> Scan Presensi
+            </a>
+        </div>
         <form method="GET" action="{{ route('pembina.eskul.show', $eskul) }}" class="mb-3 flex flex-wrap gap-2 items-end text-sm">
             <div>
                 <label class="block text-xs font-medium">Tanggal</label>

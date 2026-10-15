@@ -96,6 +96,18 @@ class StaffLoginController extends Controller
             'reason' => null,
         ]);
 
+        // Pembina tidak punya akses /admin/*: bila halaman tujuan login
+        // adalah halaman admin (mis. dari bookmark), arahkan ke dashboard pembina.
+        if ($user->role === Role::PEMBINA) {
+            $tujuan = session()->pull('url.intended', route('pembina.dashboard'));
+            $path = parse_url((string) $tujuan, PHP_URL_PATH) ?? '';
+            if (str_starts_with($path, '/admin')) {
+                $tujuan = route('pembina.dashboard');
+            }
+
+            return redirect()->to($tujuan);
+        }
+
         return redirect()->intended('/dashboard');
     }
 

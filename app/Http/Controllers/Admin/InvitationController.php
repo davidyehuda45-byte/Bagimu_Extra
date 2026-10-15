@@ -17,7 +17,9 @@ class InvitationController extends Controller
 {
     public function index()
     {
-        return view('admin.invitations.index');
+        $eskuls = \App\Models\Eskul::orderBy('name')->get(['id', 'name', 'pembina_id']);
+
+        return view('admin.invitations.index', compact('eskuls'));
     }
 
     public function store(Request $request)
@@ -29,6 +31,8 @@ class InvitationController extends Controller
                 Role::ADMIN->value, Role::OPERATOR->value,
                 Role::PEMBINA->value, Role::KEPALA_SEKOLAH->value,
             ])],
+            'eskul_ids' => ['nullable', 'array'],
+            'eskul_ids.*' => ['integer', 'exists:eskuls,id'],
         ]);
 
         $dasar = Str::slug(Str::before(strtolower($data['email']), '@'), '');
@@ -51,6 +55,11 @@ class InvitationController extends Controller
 
         $loginUrl = route('admin.login');
 
+        $ditugaskan = [];
+        if ($data['role'] === Role::PEMBINA->value && ! empty($data['eskul_ids'])) {
+            $ditugaskan = UserController::tugaskanEskul($user, $data['eskul_ids']);
+        }
+
         try {
             Mail::to($user->email)->send(new UndanganAdmin(
                 $user->name, $username, $password,
@@ -63,6 +72,6 @@ class InvitationController extends Controller
 
         AdminLog::record('invitation.create', 'User', $user->id, "Undang {$user->email} sebagai {$data['role']} (email: {$mailStatus}).");
 
-        return view('admin.invitations.result', compact('user', 'username', 'password', 'loginUrl', 'mailStatus'));
+        return view('admin.invitations.result', compact('user', 'username', 'password', 'loginUrl', 'mailStatus', 'ditugaskan'));
     }
 }

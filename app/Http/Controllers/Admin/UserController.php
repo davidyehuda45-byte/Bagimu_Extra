@@ -15,10 +15,13 @@ class UserController extends Controller
     public function index()
     {
         $users = User::whereIn('role', [Role::ADMIN, Role::OPERATOR, Role::PEMBINA, Role::KEPALA_SEKOLAH])
+            ->with('eskulDiampu')
             ->orderBy('name')
             ->paginate(20);
 
-        return view('admin.users.index', compact('users'));
+        $eskuls = \App\Models\Eskul::orderBy('name')->get(['id', 'name', 'pembina_id']);
+
+        return view('admin.users.index', compact('users', 'eskuls'));
     }
 
     public function store(Request $request)
@@ -29,6 +32,8 @@ class UserController extends Controller
             'username' => ['nullable', 'string', 'max:30', 'unique:users,username'],
             'password' => ['required', 'string', 'min:8', 'max:100'],
             'role' => ['required', Rule::in([Role::ADMIN->value, Role::OPERATOR->value, Role::PEMBINA->value, Role::KEPALA_SEKOLAH->value])],
+            'eskul_ids' => ['nullable', 'array'],
+            'eskul_ids.*' => ['integer', 'exists:eskuls,id'],
         ]);
 
         $user = User::create([
@@ -39,9 +44,36 @@ class UserController extends Controller
             'role' => $data['role'],
         ]);
 
+        $ditugaskan = [];
+        if ($data['role'] === Role::PEMBINA->value && ! empty($data['eskul_ids'])) {
+            $ditugaskan = $this->tugaskanEskul($user, $data['eskul_ids']);
+        }
+
         AdminLog::record('user.create', 'User', $user->id, "Membuat akun {$user->email} ({$user->role->value}).");
 
-        return back()->with('status', "Akun {$user->email} dibuat. Tugaskan eskul via Master Eskul bila pembina.");
+        $pesan = "Akun {$user->email} dibuat.";
+        if ($ditugaskan !== []) {
+            $pesan .= ' Ditugaskan mengampu: '.implode(', ', $ditugaskan).'.';
+        }
+
+        return back()->with('status', $pesan);
+    }
+
+    /**
+     * Tetapkan eskul yang diampu pembina. Kembalikan nama eskul yang berhasil ditugaskan.
+     */
+    public static function tugaskanEskul(User $user, array $eskulIds): array
+    {
+        $names = [];
+        foreach (array_unique($eskulIds) as $id) {
+            $eskul = \App\Models\Eskul::find($id);
+            if ($eskul) {
+                $eskul->update(['pembina_id' => $user->id]);
+                $names[] = $eskul->name;
+            }
+        }
+
+        return $names;
     }
 
     public function updateRole(Request $request, User $user)
@@ -61,7 +93,13 @@ class UserController extends Controller
             return back()->withErrors(['role' => 'Tidak dapat menurunkan admin terakhir.']);
         }
 
+        $peranLama = $user->role->value;
         $user->update(['role' => $data['role']]);
+
+        // Bila bukan pembina lagi, lepaskan eskul yang diampunya agar tidak yatim.
+        if ($peranLama === Role::PEMBINA->value && $data['role'] !== Role::PEMBINA->value) {
+            \App\Models\Eskul::where('pembina_id', $user->id)->update(['pembina_id' => null]);
+        }
 
         AdminLog::record('user.role', 'User', $user->id, "Ubah peran {$user->email} ke {$data['role']}.");
 

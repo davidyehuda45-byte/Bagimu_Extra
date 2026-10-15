@@ -293,4 +293,58 @@ class SmokeTest extends TestCase
             ->assertRedirect('/siswa/daftar');
         $this->assertAuthenticatedAs($user);
     }
+
+    public function test_scan_presensi_ecard(): void
+    {
+        $this->periodeTerbuka();
+        $pembina = $this->pembina();
+        $eskul = $this->eskul('Futsal', $pembina);
+        $siswa = $this->siswa('10001');
+        $reg = $this->registrasi($siswa, 'APPROVED');
+        $reg->update(['verify_token' => bin2hex(random_bytes(32))]);
+
+        // Halaman scan bisa dibuka pembina pemilik.
+        $this->actingAs($pembina)->get("/pembina/eskul/{$eskul->id}/scan")->assertOk();
+
+        // Scan QR (URL verify) tercatat HADIR.
+        $this->actingAs($pembina)
+            ->postJson("/pembina/eskul/{$eskul->id}/scan", [
+                'kode' => route('verify.show', $reg->fresh()->verify_token),
+                'tanggal' => today()->toDateString(),
+            ])
+            ->assertOk()
+            ->assertJson(['ok' => true]);
+        $this->assertDatabaseHas('kehadiran', [
+            'eskul_id' => $eskul->id,
+            'registration_id' => $reg->id,
+            'status' => 'HADIR',
+        ]);
+
+        // Scan ulang tetap ok (idempoten).
+        $this->actingAs($pembina)
+            ->postJson("/pembina/eskul/{$eskul->id}/scan", [
+                'kode' => $reg->fresh()->kode(),
+                'tanggal' => today()->toDateString(),
+            ])
+            ->assertOk()
+            ->assertJson(['ok' => true, 'sudah' => true]);
+
+        // Eskul lain ditolak.
+        $eskulLain = $this->eskul('Basket', $this->pembina());
+        $this->actingAs($pembina)
+            ->postJson("/pembina/eskul/{$eskulLain->id}/scan", [
+                'kode' => $reg->fresh()->kode(),
+                'tanggal' => today()->toDateString(),
+            ])
+            ->assertForbidden();
+
+        // Kartu dicabut ditolak.
+        $reg->update(['card_revoked_at' => now()]);
+        $this->actingAs($pembina)
+            ->postJson("/pembina/eskul/{$eskul->id}/scan", [
+                'kode' => $reg->fresh()->kode(),
+                'tanggal' => today()->toDateString(),
+            ])
+            ->assertStatus(422);
+    }
 }

@@ -31,6 +31,20 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect('/dashboard');
     }
 
+    public function test_pembina_login_diarahkan_ke_dashboard_pembina(): void
+    {
+        $user = User::factory()->create(['role' => Role::PEMBINA]);
+
+        $response = $this->withSession(['url.intended' => 'http://localhost/admin/dashboard'])
+            ->post('/admin/login', [
+                'login' => $user->email,
+                'password' => 'password',
+            ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('pembina.dashboard'));
+    }
+
     public function test_staf_bisa_login_pakai_username(): void
     {
         $user = User::factory()->create(['role' => Role::OPERATOR, 'username' => 'operator1']);

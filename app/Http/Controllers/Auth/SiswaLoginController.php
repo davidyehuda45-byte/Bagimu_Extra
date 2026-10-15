@@ -104,7 +104,14 @@ class SiswaLoginController extends Controller
             'reason' => null,
         ]);
 
-        return redirect()->intended('/siswa/daftar');
+        // Siswa tidak punya akses /admin/* dan /pembina/*: kembalikan ke pilih eskul.
+        $tujuan = session()->pull('url.intended', '/siswa/daftar');
+        $path = parse_url((string) $tujuan, PHP_URL_PATH) ?? '';
+        if (str_starts_with($path, '/admin') || str_starts_with($path, '/pembina')) {
+            $tujuan = '/siswa/daftar';
+        }
+
+        return redirect()->to($tujuan);
     }
 
     private function fail(
