@@ -7,6 +7,7 @@ use App\Http\Controllers\Pembina\JadwalController;
 use App\Http\Controllers\Pembina\KegiatanController;
 use App\Http\Controllers\Pembina\KehadiranController;
 use App\Http\Controllers\Pembina\NilaiController;
+use App\Http\Controllers\Pembina\PertemuanController;
 use App\Http\Controllers\Pembina\ScanController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +26,8 @@ Route::middleware(['auth', 'role:pembina', \App\Http\Middleware\MaintenanceMode:
     Route::post('eskul/{eskul}/kehadiran/lock', [KehadiranController::class, 'lock'])->name('kehadiran.lock');
     Route::get('eskul/{eskul}/scan', [ScanController::class, 'show'])->name('scan.show');
     Route::post('eskul/{eskul}/scan', [ScanController::class, 'store'])->name('scan.store');
+    Route::post('eskul/{eskul}/pertemuan', [PertemuanController::class, 'store'])->name('pertemuan.store');
+    Route::delete('pertemuan/{pertemuan}', [PertemuanController::class, 'destroy'])->name('pertemuan.destroy');
     Route::post('eskul/{eskul}/nilai', [NilaiController::class, 'store'])->name('nilai.store');
 
     Route::post('izin/{izin}/approve', [IzinController::class, 'approve'])->name('izin.approve');

@@ -31,7 +31,9 @@ class ScanController extends Controller
 
         $tanggal = $request->query('tanggal', today()->toDateString());
 
-        return view('pembina.scan', compact('eskul', 'tanggal'));
+        $pertemuan = $eskul->pertemuans()->whereDate('tanggal', $tanggal)->first();
+
+        return view('pembina.scan', compact('eskul', 'tanggal', 'pertemuan'));
     }
 
     public function store(Request $request, Eskul $eskul)

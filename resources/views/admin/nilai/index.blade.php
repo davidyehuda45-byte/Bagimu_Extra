@@ -8,7 +8,7 @@
     <p class="text-sm text-gray-600">Kelola nilai akhir anggota yang disetujui.</p>
 </div>
 
-<form method="GET" action="{{ route('admin.nilai.index') }}" class="mb-4 flex flex-wrap gap-3 items-end bg-white border rounded-lg p-4">
+<form method="GET" action="{{ route('admin.nilai.index') }}" class="no-print mb-4 flex flex-wrap gap-3 items-end bg-white border rounded-lg p-4">
     <div>
         <label for="eskul_id" class="block text-xs font-medium text-gray-700">Ekstrakurikuler</label>
         <select name="eskul_id" id="eskul_id" class="mt-1 border rounded px-3 py-2 text-sm">
@@ -19,6 +19,13 @@
     </div>
     <button class="px-4 py-2 rounded bg-gray-900 text-white text-sm">Tampilkan</button>
     <span class="text-xs text-gray-500">Periode aktif: {{ $periodeAktif?->periode ?? '-' }}</span>
+    @if ($eskul)
+        <span class="ms-auto flex flex-wrap gap-2">
+            <a href="{{ route('admin.nilai.export', ['eskul_id' => $eskul->id]) }}" class="inline-flex items-center gap-1.5 rounded border px-3 py-2 text-xs font-semibold hover:bg-gray-50"><x-icon name="download" class="h-3.5 w-3.5" />CSV</a>
+            <a href="{{ route('admin.nilai.export', ['eskul_id' => $eskul->id, 'format' => 'excel']) }}" class="inline-flex items-center gap-1.5 rounded border px-3 py-2 text-xs font-semibold hover:bg-gray-50"><x-icon name="download" class="h-3.5 w-3.5" />Excel</a>
+            <button type="button" onclick="window.print()" class="inline-flex items-center gap-1.5 rounded border px-3 py-2 text-xs font-semibold hover:bg-gray-50"><x-icon name="printer" class="h-3.5 w-3.5" />Cetak</button>
+        </span>
+    @endif
 </form>
 
 @if (! $eskul)
@@ -60,7 +67,7 @@
             </table>
         </div>
         @if ($pendaftar->isNotEmpty() && !auth()->user()->hasRole(\App\Enums\Role::KEPALA_SEKOLAH))
-            <div class="p-4 border-t flex items-center gap-3">
+            <div class="p-4 border-t flex items-center gap-3 no-print">
                 <button class="px-4 py-2 rounded bg-gray-900 text-white text-sm">Simpan Nilai</button>
                 <span class="text-xs text-gray-500">Predikat otomatis bila kosong: ≥85 A, ≥70 B, ≥55 C, lainnya D.</span>
             </div>

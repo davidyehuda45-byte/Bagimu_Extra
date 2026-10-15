@@ -78,7 +78,16 @@ class EskulSayaController extends Controller
 
         $locked = $peta->isNotEmpty() && $peta->every(fn ($k) => $k->isLocked());
 
-        return view('pembina.eskul.show', compact('eskul', 'pendaftar', 'jadwals', 'izinPending', 'tanggal', 'disetujui', 'peta', 'locked'));
+        $pertemuans = $eskul->pertemuans()->orderByDesc('nomor')->get()->map(function ($p) use ($eskul) {
+            $p->hadir_count = Kehadiran::where('eskul_id', $eskul->id)
+                ->whereDate('tanggal', $p->tanggal)
+                ->where('status', KehadiranStatus::HADIR)
+                ->count();
+
+            return $p;
+        });
+
+        return view('pembina.eskul.show', compact('eskul', 'pendaftar', 'jadwals', 'izinPending', 'tanggal', 'disetujui', 'peta', 'locked', 'pertemuans'));
     }
 
     public function export(Request $request, Eskul $eskul)

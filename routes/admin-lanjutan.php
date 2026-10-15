@@ -23,6 +23,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
         // Nilai
         Route::get('nilai', [NilaiController::class, 'index'])->name('nilai.index');
+        Route::get('nilai/export', [NilaiController::class, 'export'])->name('nilai.export');
         Route::post('nilai', [NilaiController::class, 'store'])->name('nilai.store');
 
         // Izin

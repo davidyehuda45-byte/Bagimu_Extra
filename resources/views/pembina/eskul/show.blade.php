@@ -177,6 +177,67 @@
 
     <div class="rounded-lg border bg-white p-4 shadow-sm">
         <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <div>
+                <h2 class="font-semibold">Daftar Pertemuan</h2>
+                <p class="text-[11px] text-slate-400">Pertemuan dibuat saat latihan dimulai — tanggal & nomor terisi otomatis hari ini.</p>
+            </div>
+            <form method="POST" action="{{ route('pembina.pertemuan.store', $eskul) }}" class="flex flex-wrap items-center gap-2">
+                @csrf
+                <input type="text" name="keterangan" maxlength="200" placeholder="Keterangan (opsional)" class="rounded border px-2 py-1.5 text-sm w-48">
+                <button class="rounded-xl bg-emerald-700 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-800">+ Buat Pertemuan Hari Ini</button>
+            </form>
+        </div>
+        @error('tanggal')
+            <p class="mb-2 text-xs font-medium text-rose-600">{{ $message }}</p>
+        @enderror
+        @error('pertemuan')
+            <p class="mb-2 text-xs font-medium text-rose-600">{{ $message }}</p>
+        @enderror
+        @if ($pertemuans->isEmpty())
+            <p class="text-sm text-gray-500">Belum ada pertemuan. Buat Pertemuan 1 saat latihan pertama dimulai.</p>
+        @else
+            <div class="grid gap-2 sm:grid-cols-2">
+                @foreach ($pertemuans as $p)
+                    <div class="flex items-center gap-3 rounded-2xl border border-slate-200 p-3 {{ $p->isLocked() ? 'bg-slate-50' : 'bg-white' }}">
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl {{ $p->isLocked() ? 'bg-slate-200 text-slate-500' : 'bg-blue-100 text-blue-800' }} text-sm font-extrabold">
+                            {{ $p->nomor }}
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-bold text-slate-900">Pertemuan {{ $p->nomor }}</p>
+                            <p class="text-[11px] text-slate-500">{{ $p->tanggal->format('l, d M Y') }}{{ $p->keterangan ? ' • '.$p->keterangan : '' }}</p>
+                            <p class="text-[11px] {{ $p->isLocked() ? 'text-slate-400' : 'text-emerald-600' }}">
+                                {{ $p->isLocked() ? 'Disahkan' : $p->hadir_count.' hadir' }}
+                            </p>
+                        </div>
+                        <div class="flex shrink-0 flex-col gap-1">
+                            @unless ($p->isLocked())
+                                <a href="{{ route('pembina.scan.show', ['eskul' => $eskul->id, 'tanggal' => $p->tanggal->toDateString()]) }}" class="inline-flex items-center gap-1 rounded-lg bg-blue-700 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-blue-800">
+                                    <x-icon name="qr" class="h-3 w-3" /> Scan
+                                </a>
+                                <a href="{{ route('pembina.eskul.show', ['eskul' => $eskul->id, 'tanggal' => $p->tanggal->toDateString()]) }}" class="rounded-lg border px-2.5 py-1 text-center text-[11px] font-semibold hover:bg-slate-50">Absen</a>
+                            @endunless
+                            @if (! $p->isLocked())
+                                <form method="POST" action="{{ route('pembina.kehadiran.lock', $eskul) }}" onsubmit="return confirm('Sahkan Pertemuan {{ $p->nomor }}? Data terkunci dan tidak dapat diubah.')">
+                                    @csrf
+                                    <input type="hidden" name="eskul_id" value="{{ $eskul->id }}">
+                                    <input type="hidden" name="tanggal" value="{{ $p->tanggal->toDateString() }}">
+                                    <button class="w-full rounded-lg border px-2.5 py-1 text-[11px] font-semibold hover:bg-slate-50">Sahkan</button>
+                                </form>
+                                <form method="POST" action="{{ route('pembina.pertemuan.destroy', $p) }}" onsubmit="return confirm('Hapus Pertemuan {{ $p->nomor }}?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="w-full rounded-lg px-2.5 py-1 text-[11px] font-semibold text-rose-600 hover:bg-rose-50">Hapus</button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </div>
+
+    <div class="rounded-lg border bg-white p-4 shadow-sm">
+        <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h2 class="font-semibold">Absensi (hanya anggota disetujui)</h2>
             <a href="{{ route('pembina.scan.show', $eskul) }}" class="inline-flex items-center gap-1.5 rounded-xl bg-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-blue-800">
                 <x-icon name="qr" class="h-4 w-4" /> Scan Presensi
@@ -238,35 +299,39 @@
 
     <div class="rounded-lg border bg-white p-4 shadow-sm">
         <h2 class="font-semibold mb-1">Penilaian Akhir Anggota ({{ $disetujui->count() }})</h2>
-        <p class="text-[11px] text-slate-400 mb-3">Predikat otomatis: A ≥ 85, B ≥ 70, C ≥ 55, D &lt; 55. Baris kosong dilewati.</p>
-        <form method="POST" action="{{ route('pembina.nilai.store', $eskul) }}">
-            @csrf
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-sm">
-                    <thead>
-                        <tr class="border-b bg-gray-50 text-left">
-                            <th class="px-3 py-2 font-medium">Nama</th>
-                            <th class="px-3 py-2 font-medium">Kelas</th>
-                            <th class="px-3 py-2 font-medium">Nilai</th>
-                            <th class="px-3 py-2 font-medium">Predikat</th>
-                            <th class="px-3 py-2 font-medium">Catatan</th>
+        <p class="text-[11px] text-slate-400 mb-3">Isi nilai satu per satu lalu tekan Simpan di barisnya. Predikat otomatis: A ≥ 85, B ≥ 70, C ≥ 55, D &lt; 55. Nilai langsung terlihat di panel admin.</p>
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead>
+                    <tr class="border-b bg-gray-50 text-left">
+                        <th class="px-3 py-2 font-medium">Nama</th>
+                        <th class="px-3 py-2 font-medium">Kelas</th>
+                        <th class="px-3 py-2 font-medium">Nilai</th>
+                        <th class="px-3 py-2 font-medium">Predikat</th>
+                        <th class="px-3 py-2 font-medium">Catatan</th>
+                        <th class="px-3 py-2 font-medium">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($disetujui as $r)
+                        <tr class="border-b last:border-0">
+                            <td class="px-3 py-2">{{ $r->user?->name }}</td>
+                            <td class="px-3 py-2">{{ $r->kelas }}</td>
+                            <td class="px-3 py-2"><input type="number" form="nilai-{{ $r->id }}" name="nilai" min="0" max="100" value="{{ $r->nilai }}" placeholder="0–100" class="w-24 rounded border px-2 py-1"></td>
+                            <td class="px-3 py-2">{{ $r->predikat ?? '—' }}</td>
+                            <td class="px-3 py-2"><input type="text" form="nilai-{{ $r->id }}" name="catatan" value="{{ $r->catatan_nilai }}" maxlength="1000" placeholder="Opsional" class="w-full rounded border px-2 py-1 text-sm"></td>
+                            <td class="px-3 py-2">
+                                <form id="nilai-{{ $r->id }}" method="POST" action="{{ route('pembina.nilai.store', $eskul) }}">
+                                    @csrf
+                                    <input type="hidden" name="registration_id" value="{{ $r->id }}">
+                                    <button class="rounded bg-blue-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-700">Simpan</button>
+                                </form>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($disetujui as $r)
-                            <tr class="border-b last:border-0">
-                                <td class="px-3 py-2">{{ $r->user?->name }}</td>
-                                <td class="px-3 py-2">{{ $r->kelas }}</td>
-                                <td class="px-3 py-2"><input type="number" name="nilai[{{ $r->id }}]" min="0" max="100" value="{{ $r->nilai }}" class="w-24 rounded border px-2 py-1"></td>
-                                <td class="px-3 py-2">{{ $r->predikat ?? '—' }}</td>
-                                <td class="px-3 py-2"><input type="text" name="catatan[{{ $r->id }}]" value="{{ $r->catatan_nilai }}" maxlength="1000" class="w-full rounded border px-2 py-1 text-sm"></td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            <button class="mt-3 rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">Simpan Semua Nilai</button>
-        </form>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div class="rounded-lg border bg-white p-4 shadow-sm">

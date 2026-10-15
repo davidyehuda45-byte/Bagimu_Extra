@@ -51,6 +51,45 @@ class NilaiController extends Controller
         ]);
     }
 
+    public function export(Request $request)
+    {
+        $eskul = Eskul::findOrFail($request->query('eskul_id'));
+        $periodeAktif = Periode::where('status', PeriodeStatus::DIBUKA)->orderByDesc('periode')->first();
+
+        $q = Registration::with('user')
+            ->where('status', Status::APPROVED)
+            ->where('eskul_utama', $eskul->name)
+            ->orderBy('kelas')->orderBy('nis');
+
+        if ($periodeAktif) {
+            $q->where('periode', $periodeAktif->periode);
+        }
+
+        $headers = ['No', 'Nama', 'NIS', 'Kelas', 'Jurusan', 'Eskul', 'Periode', 'Nilai', 'Predikat', 'Catatan'];
+        $rows = $q->get()->map(fn ($r, $i) => [
+            $i + 1,
+            $r->user?->name ?? '-',
+            $r->nis ?? '-',
+            $r->kelas,
+            $r->jurusan?->label() ?? '-',
+            $r->eskul_utama,
+            $r->periode,
+            $r->nilai ?? '-',
+            $r->predikat ?? '-',
+            $r->catatan_nilai ?? '-',
+        ]);
+
+        AdminLog::record('nilai.export', 'Eskul', (string) $eskul->id, "Export nilai {$eskul->name}.");
+
+        $namaBerkas = 'nilai-'.strtolower(preg_replace('/[^a-z0-9]+/i', '-', $eskul->name)).'-'.date('Y-m-d');
+
+        if ($request->query('format') === 'excel') {
+            return \App\Support\ExcelExport::xls($namaBerkas.'.xls', $headers, $rows);
+        }
+
+        return \App\Support\CsvExport::download($namaBerkas.'.csv', $headers, $rows);
+    }
+
     public function store(Request $request)
     {
         // Predikat kosong dari form ("Otomatis") → null agar dihitung otomatis.

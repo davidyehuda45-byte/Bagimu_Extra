@@ -43,6 +43,11 @@ class Eskul extends Model
         return $this->hasMany(EskulJadwal::class);
     }
 
+    public function pertemuans(): HasMany
+    {
+        return $this->hasMany(Pertemuan::class)->orderBy('nomor');
+    }
+
     public function kehadiran(): HasMany
     {
         return $this->hasMany(Kehadiran::class);

@@ -347,4 +347,58 @@ class SmokeTest extends TestCase
             ])
             ->assertStatus(422);
     }
+
+    public function test_pertemuan_otomatis_realtime(): void
+    {
+        $this->periodeTerbuka();
+        $pembina = $this->pembina();
+        $eskul = $this->eskul('Futsal', $pembina);
+
+        // Buat pertemuan: nomor + tanggal otomatis hari ini.
+        $this->actingAs($pembina)
+            ->post("/pembina/eskul/{$eskul->id}/pertemuan", ['keterangan' => 'Latihan dasar'])
+            ->assertRedirect();
+        $this->assertDatabaseHas('pertemuans', [
+            'eskul_id' => $eskul->id,
+            'nomor' => 1,
+        ]);
+        $this->assertSame(today()->toDateString(), \App\Models\Pertemuan::first()->tanggal->toDateString());
+
+        // Hari yang sama tidak bisa buat lagi.
+        $this->actingAs($pembina)
+            ->post("/pembina/eskul/{$eskul->id}/pertemuan", [])
+            ->assertSessionHasErrors('tanggal');
+
+        // Halaman eskul tampilkan Pertemuan 1.
+        $this->actingAs($pembina)->get("/pembina/eskul/{$eskul->id}")
+            ->assertOk()->assertSee('Pertemuan 1');
+    }
+
+    public function test_nilai_satuan_pembina_dan_export_admin(): void
+    {
+        $this->periodeTerbuka();
+        $pembina = $this->pembina();
+        $eskul = $this->eskul('Futsal', $pembina);
+        $siswa = $this->siswa('10001');
+        $reg = $this->registrasi($siswa, 'APPROVED');
+
+        // Pembina simpan nilai satu siswa.
+        $this->actingAs($pembina)
+            ->post("/pembina/eskul/{$eskul->id}/nilai", [
+                'registration_id' => $reg->id,
+                'nilai' => 90,
+                'catatan' => 'Bagus',
+            ])
+            ->assertRedirect();
+        $this->assertDatabaseHas('registrations', ['id' => $reg->id, 'nilai' => 90, 'predikat' => 'A']);
+
+        // Admin langsung lihat + bisa export CSV/Excel.
+        $admin = $this->admin();
+        $this->actingAs($admin)->get("/admin/nilai?eskul_id={$eskul->id}")
+            ->assertOk()->assertSee('90');
+        $this->actingAs($admin)->get("/admin/nilai/export?eskul_id={$eskul->id}")
+            ->assertOk();
+        $this->actingAs($admin)->get("/admin/nilai/export?eskul_id={$eskul->id}&format=excel")
+            ->assertOk();
+    }
 }

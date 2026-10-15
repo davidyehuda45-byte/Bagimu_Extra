@@ -8,6 +8,11 @@
         <a href="{{ route('pembina.eskul.show', $eskul) }}" class="text-sm font-medium text-blue-600 hover:text-blue-700">← Kembali ke {{ $eskul->name }}</a>
         <h1 class="mt-1 text-xl font-bold text-slate-900">Scan Presensi E-Card</h1>
         <p class="text-sm text-slate-500">{{ $eskul->name }} • hasil scan otomatis tercatat HADIR dan tersambung ke absensi.</p>
+        @if (! empty($pertemuan))
+            <p class="mt-1 inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800">
+                <x-icon name="calendar-check" class="h-3.5 w-3.5" /> Pertemuan {{ $pertemuan->nomor }} • {{ $pertemuan->tanggal->format('d M Y') }}
+            </p>
+        @endif
     </div>
 
     <x-card>

@@ -18,16 +18,17 @@
             <button onclick="window.print()" class="rounded-xl bg-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-blue-800">Cetak / PDF</button>
         </div>
 
-        {{-- E-Card --}}
+        {{-- E-Card Presensi --}}
         <div id="ecard-print-area" class="print-area overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div class="bg-blue-900 px-5 py-4 text-white">
                 <div class="flex items-center justify-between gap-2">
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-widest text-blue-300">{{ config('app.name', 'Bagimu Extra') }}</p>
-                        <p class="font-extrabold">E-Card Bukti Pendaftaran</p>
+                        <p class="font-extrabold">E-Card Presensi</p>
                     </div>
                     <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap bg-emerald-100 text-emerald-800">Terdaftar</span>
                 </div>
+                <p class="mt-1 text-[11px] text-blue-200">Tunjukkan QR ini ke pembina setiap latihan untuk presensi.</p>
             </div>
 
             <div class="p-5">
@@ -93,7 +94,7 @@
                     <div class="mt-4 flex flex-col items-center rounded-xl bg-slate-50 p-4 text-center">
                         {!! SimpleQr::size(180)->generate(route('verify.show', $aktif->verify_token)) !!}
                         <p class="mt-2 font-mono text-sm font-bold tracking-widest text-slate-800">{{ $aktif->kode() }}</p>
-                        <p class="text-[11px] text-slate-500">QR verifikasi E-Card (bukan QR login). Scan dengan kamera. Jika QR buram saat cetak, ketik kode di atas pada halaman verifikasi.</p>
+                        <p class="text-[11px] text-slate-500">QR presensi — pindai oleh pembina setiap latihan. Jika QR buram saat cetak, pembina bisa ketik kode di atas secara manual.</p>
                     </div>
                 @endif
 
