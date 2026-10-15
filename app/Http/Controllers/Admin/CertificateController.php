@@ -14,14 +14,34 @@ use Illuminate\Support\Str;
 
 class CertificateController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pendaftar = Registration::with(['user', 'certificate'])
-            ->where('status', Status::APPROVED)
-            ->latest()->paginate(20);
+        $query = Registration::with(['user', 'certificate']);
+
+        if ($request->filled('periode')) {
+            $query->where('periode', $request->query('periode'));
+        }
+
+        if ($request->filled('q')) {
+            $q = trim($request->query('q'));
+            $query->where(function ($w) use ($q) {
+                $w->where('nis', 'like', "%{$q}%")
+                    ->orWhere('eskul_utama', 'like', "%{$q}%")
+                    ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$q}%"))
+                    ->orWhereHas('certificate', fn ($c) => $c->where('nomor', 'like', "%{$q}%"));
+            });
+        }
+
+        $pendaftar = $query->where('status', Status::APPROVED)
+            ->latest()->paginate(20)->withQueryString();
+
+        $periodes = Registration::select('periode')->distinct()->orderByDesc('periode')->pluck('periode');
 
         return view('admin.certificates.index', [
             'pendaftar' => $pendaftar,
+            'periodes' => $periodes,
+            'filterPeriode' => $request->query('periode', ''),
+            'filterQ' => $request->query('q', ''),
         ]);
     }
 
@@ -38,24 +58,36 @@ class CertificateController extends Controller
         }
 
         if ($reg->certificate) {
-            return back()->withErrors(['registration_id' => 'Pendaftar ini sudah memiliki sertifikat.']);
+            return back()->with('status', "Sudah memiliki sertifikat {$reg->certificate->nomor}.");
         }
 
-        $cert = DB::transaction(function () use ($reg) {
-            $nomor = self::nomorBaru();
+        try {
+            $cert = DB::transaction(function () use ($reg) {
+                $reg->lockForUpdate()->first();
+                if ($reg->fresh()->certificate) {
+                    return $reg->fresh()->certificate;
+                }
+                $nomor = self::nomorBaru();
 
-            if (empty($reg->verify_token)) {
-                $reg->verify_token = bin2hex(random_bytes(32));
-                $reg->save();
+                if (empty($reg->verify_token)) {
+                    $reg->verify_token = bin2hex(random_bytes(32));
+                    $reg->save();
+                }
+
+                return Certificate::create([
+                    'registration_id' => $reg->id,
+                    'nomor' => $nomor,
+                    'doc_version' => 1,
+                    'diterbitkan_oleh' => auth()->user()->email,
+                ]);
+            });
+        } catch (\Illuminate\Database\QueryException $e) {
+            $reg->refresh();
+            if ($reg->certificate) {
+                return back()->with('status', "Sudah memiliki sertifikat {$reg->certificate->nomor}.");
             }
-
-            return Certificate::create([
-                'registration_id' => $reg->id,
-                'nomor' => $nomor,
-                'doc_version' => 1,
-                'diterbitkan_oleh' => auth()->user()->email,
-            ]);
-        });
+            throw $e;
+        }
 
         AdminLog::record('certificates.store', 'Certificate', (string) $cert->id, "Terbit sertifikat {$cert->nomor} untuk registrasi #{$reg->id}.");
 

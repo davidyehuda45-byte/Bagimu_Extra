@@ -46,7 +46,8 @@ class IzinController extends Controller
             'decided_at' => now(),
         ]);
 
-        // Sinkron ke presensi: SAKIT→SAKIT, lainnya→IZIN (abaikan bila terkunci).
+        // Sinkron ke presensi: SAKIT→SAKIT, lainnya→IZIN (DISPENSASI tidak ada di enum hadir,
+        // jadi disimpan sebagai IZIN dengan keterangan jenis asli). Abaikan bila terkunci.
         $baris = Kehadiran::where('eskul_id', $izin->eskul_id)
             ->where('registration_id', $izin->registration_id)
             ->whereDate('tanggal', $izin->tanggal)
@@ -61,7 +62,7 @@ class IzinController extends Controller
                 ],
                 [
                     'status' => $izin->jenis->value === 'SAKIT' ? KehadiranStatus::SAKIT : KehadiranStatus::IZIN,
-                    'keterangan' => 'Izin disetujui: '.$izin->alasan,
+                    'keterangan' => $izin->jenis->label().' disetujui: '.$izin->alasan,
                 ]
             );
         }
@@ -78,6 +79,20 @@ class IzinController extends Controller
             'decided_by' => auth()->user()->email,
             'decided_at' => now(),
         ]);
+
+        // Bersihkan baris hadir otomatis dari approve sebelumnya (bila belum terkunci),
+        // agar tidak ada status IZIN/SAKIT basi setelah ditolak.
+        $baris = Kehadiran::where('eskul_id', $izin->eskul_id)
+            ->where('registration_id', $izin->registration_id)
+            ->whereDate('tanggal', $izin->tanggal)
+            ->first();
+
+        if ($baris && ! $baris->isLocked()) {
+            $ket = (string) $baris->keterangan;
+            if (str_starts_with($ket, 'Izin disetujui:') || str_starts_with($ket, 'Sakit disetujui:') || str_starts_with($ket, 'Dispensasi disetujui:')) {
+                $baris->delete();
+            }
+        }
 
         AdminLog::record('izin.reject', 'Izin', (string) $izin->id, "Izin #{$izin->id} ditolak.");
 

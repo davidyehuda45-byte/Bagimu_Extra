@@ -92,13 +92,22 @@
         </div>
     </main>
 
-    {{-- Footer dengan link akses admin rapi --}}
+    {{-- Footer dengan link akses rapi --}}
     <footer class="w-full border-t border-slate-200/80 bg-white/70 py-4 px-4 sm:px-8 text-center text-xs text-slate-500">
         <div class="w-full flex flex-col sm:flex-row items-center justify-between gap-2">
             <span>© {{ date('Y') }} {{ config('app.name', 'Bagimu Extra') }} — {{ $sekolah }}</span>
-            <div>
+            <div class="flex flex-wrap items-center justify-center gap-4">
+                <a href="{{ route('home') }}" class="text-slate-400 hover:text-blue-700 hover:underline transition">
+                    Beranda
+                </a>
+                <a href="{{ route('siswa.login') }}" class="text-slate-400 hover:text-blue-700 hover:underline transition">
+                    Portal Siswa
+                </a>
+                <a href="{{ route('verify.form') }}" class="text-slate-400 hover:text-blue-700 hover:underline transition">
+                    Verifikasi
+                </a>
                 <a href="{{ route('admin.login') }}" class="text-slate-400 hover:text-blue-700 hover:underline transition">
-                    Pintu Masuk Admin &rarr;
+                    Pintu Masuk Staf &rarr;
                 </a>
             </div>
         </div>

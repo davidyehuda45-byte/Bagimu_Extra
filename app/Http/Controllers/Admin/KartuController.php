@@ -12,7 +12,7 @@ class KartuController extends Controller
     public function index(Request $request)
     {
         if (auth()->user()->hasRole(Role::KEPALA_SEKOLAH)) {
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('admin.dashboard')->with('error', 'Kepala sekolah tidak memiliki akses Kartu Login.');
         }
 
         $q = trim($request->query('q', ''));

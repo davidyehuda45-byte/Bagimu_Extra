@@ -102,11 +102,13 @@
                         <td class="py-2 px-3">
                             <div class="flex items-center gap-1.5">
                                 <a href="{{ route('admin.registrations.show', $r) }}" class="rounded-lg border border-slate-300 px-2.5 py-1 text-xs font-semibold hover:bg-slate-50">Detail</a>
-                                <form method="POST" action="{{ route('admin.registrations.destroy', $r) }}" onsubmit="return confirm('Hapus permanen data pendaftaran ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="rounded-lg px-2.5 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50">Hapus</button>
-                                </form>
+                                @if (! auth()->user()->hasRole(\App\Enums\Role::KEPALA_SEKOLAH))
+                                    <form method="POST" action="{{ route('admin.registrations.destroy', $r) }}" onsubmit="return confirm('Hapus permanen data pendaftaran ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="rounded-lg px-2.5 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50">Hapus</button>
+                                    </form>
+                                @endif
                             </div>
                         </td>
                     </tr>

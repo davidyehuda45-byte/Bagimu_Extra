@@ -22,7 +22,10 @@
 
         <div>
             <label for="tanggal" class="block text-sm font-semibold mb-1">Tanggal</label>
-            <input id="tanggal" name="tanggal" type="date" value="{{ old('tanggal') }}" required class="w-full rounded-xl border-slate-300 px-3.5 py-2.5 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            <input id="tanggal" name="tanggal" type="date" value="{{ old('tanggal') }}" required min="{{ now()->subDays(7)->toDateString() }}" max="{{ now()->addDays(30)->toDateString() }}" class="w-full rounded-xl border-slate-300 px-3.5 py-2.5 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            @error('tanggal')
+                <p class="mt-1 text-xs font-medium text-rose-600">{{ $message }}</p>
+            @enderror
         </div>
 
         <div>

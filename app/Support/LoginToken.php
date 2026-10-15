@@ -6,8 +6,10 @@ use App\Models\User;
 
 /**
  * Token login 8 digit (ala e-voting): kredensial cetak untuk siswa.
- * Hanya hash (HMAC-SHA256 + app key) yang disimpan; plaintext
- * ditampilkan sekali saat diterbitkan (untuk dicetak ke kartu).
+ * Hash (HMAC-SHA256 + app key) dipakai untuk verifikasi; plaintext
+ * juga disimpan di kolom login_token agar kartu bisa dicetak ulang.
+ * Plaintext ditampilkan sekali saat diterbitkan dan wajib disampaikan
+ * langsung ke siswa karena tidak ada kanal email untuk akun NIS.
  */
 class LoginToken
 {
@@ -27,9 +29,9 @@ class LoginToken
     }
 
     /**
-     * Terbitkan token baru untuk user. Mengembalikan plaintext
-     * (tampilkan/cetak sekali; plaintext juga disimpan untuk
-     * pencetakan ulang kartu, token lama hangus saat reset).
+     * Terbitkan token baru untuk user. Mengembalikan plaintext.
+     * Plaintext disimpan di login_token untuk pencetakan ulang kartu;
+     * token lama hangus saat reset. Sampaikan langsung ke siswa.
      */
     public static function issue(User $user): string
     {

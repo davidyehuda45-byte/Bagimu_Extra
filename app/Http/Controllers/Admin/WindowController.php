@@ -28,7 +28,7 @@ class WindowController extends Controller
         $data = $request->validate([
             'buka' => ['nullable', 'boolean'],
             'tgl_buka' => ['nullable', 'date'],
-            'tgl_tutup' => ['nullable', 'date'],
+            'tgl_tutup' => ['nullable', 'date', 'after:tgl_buka'],
         ]);
 
         PendaftaranWindow::updateOrCreate(

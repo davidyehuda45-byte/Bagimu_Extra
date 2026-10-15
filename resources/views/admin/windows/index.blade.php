@@ -18,7 +18,7 @@
                 <p class="font-extrabold {{ $buka ? 'text-emerald-800' : 'text-rose-700' }}">
                     {{ $buka ? 'DIBUKA — Siswa bisa daftar' : 'DITUTUP — Formulir terkunci' }}
                 </p>
-                <p class="text-sm {{ $buka ? 'text-emerald-700' : 'text-rose-600' }}">Periode {{ $periode->periode }} • {{ $window && $window->exists ? $window->label() : 'Jendela default (terbuka)' }}</p>
+                <p class="text-sm {{ $buka ? 'text-emerald-700' : 'text-rose-600' }}">Periode {{ $periode->periode }} • {{ $window && $window->exists ? $window->label() : 'Belum diatur (tertutup)' }}</p>
             </div>
             <form method="POST" action="{{ route('admin.windows.update', $periode->periode) }}" class="ms-auto">
                 @csrf

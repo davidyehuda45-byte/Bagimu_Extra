@@ -53,12 +53,22 @@ class NilaiController extends Controller
 
     public function store(Request $request)
     {
+        // Predikat kosong dari form ("Otomatis") → null agar dihitung otomatis.
+        $predikatInput = $request->input('predikat', []);
+        if (is_array($predikatInput)) {
+            foreach ($predikatInput as $k => $v) {
+                if ($v === '') {
+                    $request->merge(["predikat.{$k}" => null]);
+                }
+            }
+        }
+
         $data = $request->validate([
             'eskul_id' => ['required', 'exists:eskuls,id'],
             'nilai' => ['required', 'array'],
             'nilai.*' => ['nullable', 'integer', 'min:0', 'max:100'],
             'predikat' => ['nullable', 'array'],
-            'predikat.*' => ['nullable', 'string', 'max:2'],
+            'predikat.*' => ['nullable', 'string', 'in:A,B,C,D'],
             'catatan' => ['nullable', 'array'],
             'catatan.*' => ['nullable', 'string', 'max:1000'],
         ]);
@@ -94,6 +104,7 @@ class NilaiController extends Controller
             if (($predikat === null || $predikat === '') && $nilai !== null) {
                 $predikat = $this->predikatOtomatis((int) $nilai);
             }
+            $predikat = $predikat ?: $this->predikatOtomatis((int) $nilai);
 
             $reg->update([
                 'nilai' => $nilai,

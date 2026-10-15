@@ -29,7 +29,14 @@
                         <td class="py-2 px-3">
                             <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold {{ $p->status->value === 'DIBUKA' ? 'bg-emerald-100 text-emerald-800' : ($p->status->value === 'DIARSIPKAN' ? 'bg-slate-200 text-slate-600' : 'bg-amber-100 text-amber-800') }}">{{ $p->status->value === 'DIBUKA' ? 'Aktif' : $p->status->label() }}</span>
                         </td>
-                        <td class="py-2 px-3">{{ $p->window && $p->window->buka ? 'Buka' : 'Tutup' }}</td>
+                        <td class="py-2 px-3">
+                            @php($w = $p->window)
+                            @if ($w && $w->isOpen())
+                                <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold bg-emerald-100 text-emerald-800">Buka</span>
+                            @else
+                                <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold bg-slate-200 text-slate-600">Tutup</span>
+                            @endif
+                        </td>
                         <td class="py-2 px-3">{{ $p->registrations_count }}</td>
                         <td class="py-2 px-3 flex gap-2">
                             <a href="{{ route('admin.periodes.show', $p->periode) }}" class="text-blue-600 hover:underline">Detail</a>

@@ -46,12 +46,19 @@
             {{-- Token Credential Box --}}
             <div class="rounded-2xl border border-blue-100 bg-gradient-to-b from-blue-50/70 to-slate-50 p-4 shadow-inner">
                 <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Token Akses Login</p>
-                <p class="my-1 font-mono text-3xl font-extrabold tracking-[0.25em] text-blue-950 select-all">
-                    {{ $plainToken }}
-                </p>
-                <p class="text-[10px] text-slate-500 leading-relaxed">
-                    Ketik NIS & token ini pada halaman login siswa.
-                </p>
+                @if ($plainToken)
+                    <p class="my-1 font-mono text-3xl font-extrabold tracking-[0.25em] text-blue-950 select-all">
+                        {{ $plainToken }}
+                    </p>
+                    <p class="text-[10px] text-slate-500 leading-relaxed">
+                        Ketik NIS & token ini pada halaman login siswa.
+                    </p>
+                @else
+                    <p class="my-1 font-mono text-xl font-bold tracking-widest text-slate-300">—</p>
+                    <p class="text-[10px] text-slate-400 leading-relaxed">
+                        Belum ada token aktif. Terbitkan dari Direktori Siswa (tombol Token).
+                    </p>
+                @endif
             </div>
 
             {{-- QR Code Login Portal --}}

@@ -11,6 +11,22 @@
         @endif
     </div>
 
+    {{-- Filter eskul --}}
+    @if ($eskulDiikuti->isNotEmpty())
+        <form method="GET" action="{{ route('siswa.kehadiran') }}" class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+            <label for="filter-eskul" class="block text-xs font-semibold text-slate-600">Filter eskul</label>
+            <div class="mt-1 flex gap-2">
+                <select id="filter-eskul" name="eskul" class="min-w-0 flex-1 rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">Semua eskul yang diikuti</option>
+                    @foreach ($eskulDiikuti as $nama)
+                        <option value="{{ $nama }}" @selected($filter === $nama)>{{ $nama }}</option>
+                    @endforeach
+                </select>
+                <button class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white">Tampilkan</button>
+            </div>
+        </form>
+    @endif
+
     {{-- KPI --}}
     <div class="grid grid-cols-4 gap-2 text-center">
         <div class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
@@ -33,15 +49,19 @@
 
     {{-- Bar persen --}}
     <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div class="flex items-center gap-3">
-            <div class="h-2.5 flex-1 overflow-hidden rounded-full bg-slate-100">
-                <div class="{{ $persen >= 85 ? 'bg-emerald-500' : ($persen >= 70 ? 'bg-amber-400' : 'bg-rose-500') }} h-full rounded-full" style="width: {{ min(100, $persen) }}%"></div>
-            </div>
-            <span class="text-sm font-bold text-slate-800">{{ $persen }}%</span>
+        <x-progress :value="$persen" aria-label="Persentase kehadiran {{ $persen }} persen" />
+        <div class="mt-2 flex items-center justify-between">
+            <p class="text-xs text-slate-500">
+                @if ($statistik['total'] === 0)
+                    Belum ada data presensi.
+                @elseif ($persen >= 80)
+                    Kehadiran sangat baik, pertahankan!
+                @else
+                    Kehadiran di bawah 80%, tingkatkan kehadiranmu.
+                @endif
+            </p>
+            <span class="text-sm font-bold tabular-nums text-slate-800">{{ $persen }}%</span>
         </div>
-        <p class="mt-1 text-xs text-slate-500">
-            {{ $persen >= 80 ? 'Kehadiran sangat baik, pertahankan!' : 'Kehadiran di bawah 80%, tingkatkan kehadiranmu.' }}
-        </p>
     </div>
 
     {{-- Ajukan izin --}}

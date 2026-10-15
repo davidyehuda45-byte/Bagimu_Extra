@@ -42,7 +42,7 @@ class PendaftaranController extends Controller
             : null;
 
         $window = $periode ? PendaftaranWindow::find($periode->periode) : null;
-        $windowOpen = $window ? $window->isOpen() : true;
+        $windowOpen = $window ? $window->isOpen() : false;
 
         $eskuls = Eskul::with(['jadwals', 'pembina'])->where('aktif', true)->orderBy('name')->get()
             ->map(fn ($e) => [
@@ -64,6 +64,16 @@ class PendaftaranController extends Controller
         $semuaJadwal = Eskul::with('jadwals')->where('aktif', true)->orderBy('name')->get();
         $existingEskul = $existing ? Eskul::with(['jadwals', 'pembina'])->where('name', $existing->eskul_utama)->first() : null;
 
+        // Deep-link dari katalog publik: ?eskul=Nama → preselect bila tersedia & tidak penuh.
+        $diminta = trim((string) request()->query('eskul', ''));
+        $pilihanAwal = null;
+        if ($diminta !== '' && ! $existing) {
+            $cocok = $eskuls->firstWhere('name', $diminta);
+            if ($cocok && ! $cocok['penuh']) {
+                $pilihanAwal = $cocok['name'];
+            }
+        }
+
         return view('siswa.daftar', [
             'user' => $user,
             'periode' => $periode,
@@ -71,10 +81,11 @@ class PendaftaranController extends Controller
             'existingEskul' => $existingEskul,
             'eskuls' => $eskuls,
             'semuaJadwal' => $semuaJadwal,
+            'pilihanAwal' => $pilihanAwal,
             'jurusans' => Jurusan::cases(),
             'genders' => Gender::cases(),
             'windowOpen' => $windowOpen,
-            'windowLabel' => $window?->label() ?? 'Pendaftaran dibuka.',
+            'windowLabel' => $window?->label() ?? 'Jendela belum diatur admin — pendaftaran ditutup.',
         ]);
     }
 
@@ -96,10 +107,17 @@ class PendaftaranController extends Controller
             ->where('periode', $periode->periode)
             ->first();
 
+        // Batas pendaftaran per siswa per periode (default 1, dari setting periode).
+        $maks = max(1, (int) ($periode->max_eskul_per_siswa ?? 1));
+        $jumlah = Registration::where('user_id', $user->id)
+            ->where('periode', $periode->periode)
+            ->count();
+
         // Pilihan final: tidak dapat diubah lagi setelah terkirim.
-        if ($existing) {
+        if ($jumlah >= $maks) {
+            $sudah = $existing?->eskul_utama ?? 'eskul';
             return redirect()->route('siswa.status')
-                ->with('status', "Anda sudah terdaftar {$existing->eskul_utama} periode {$periode->periode}. Pilihan tidak dapat diubah lagi.");
+                ->with('status', "Anda sudah terdaftar {$sudah} periode {$periode->periode} ({$jumlah}/{$maks}). Pilihan tidak dapat diubah lagi.");
         }
 
         // Syarat kelayakan: akun aktif + tingkat kelas + semester.
@@ -133,41 +151,50 @@ class PendaftaranController extends Controller
         }
 
         $window = PendaftaranWindow::find($periode->periode);
-        if ($window && ! $window->isOpen()) {
+        if (! $window || ! $window->isOpen()) {
             return redirect()->route('siswa.status')->with('status', 'Pendaftaran sedang tidak dibuka.');
         }
 
-        [$registration, $dipakai, $info] = DB::transaction(function () use ($validated, $user, $periode) {
-            [$dipakai, $info] = $this->resolve(
-                $validated['eskul_utama'],
-                $validated['eskul_cadangan'] ?? null,
-                $periode->periode
-            );
+        try {
+            [$registration, $dipakai, $info] = DB::transaction(function () use ($validated, $user, $periode) {
+                [$dipakai, $info] = $this->resolve(
+                    $validated['eskul_utama'],
+                    $validated['eskul_cadangan'] ?? null,
+                    $periode->periode
+                );
 
-            $data = array_merge($validated, [
-                'eskul_utama' => $dipakai,
-                'status' => Status::APPROVED,
-                'alasan_penolakan' => null,
-            ]);
+                $data = array_merge($validated, [
+                    'eskul_utama' => $dipakai,
+                    'status' => Status::APPROVED,
+                    'alasan_penolakan' => null,
+                ]);
 
-            $registration = Registration::create(array_merge($data, [
-                'user_id' => $user->id,
-                'periode' => $periode->periode,
-                'nis' => $user->student?->nis ?? $user->username,
-                'verify_token' => bin2hex(random_bytes(32)),
-            ]));
+                $registration = Registration::create(array_merge($data, [
+                    'user_id' => $user->id,
+                    'periode' => $periode->periode,
+                    'nis' => $user->student?->nis ?? $user->username,
+                    'verify_token' => bin2hex(random_bytes(32)),
+                ]));
 
-            StatusHistory::create([
-                'registration_id' => $registration->id,
-                'old_status' => null,
-                'new_status' => Status::APPROVED,
-                'actor_id' => $user->id,
-                'actor_email' => $user->email,
-                'reason' => 'Pendaftaran baru oleh siswa.',
-            ]);
+                StatusHistory::create([
+                    'registration_id' => $registration->id,
+                    'old_status' => null,
+                    'new_status' => Status::APPROVED,
+                    'actor_id' => $user->id,
+                    'actor_email' => $user->email,
+                    'reason' => 'Pendaftaran baru oleh siswa.',
+                ]);
 
-            return [$registration, $dipakai, $info];
-        });
+                return [$registration, $dipakai, $info];
+            });
+        } catch (\Illuminate\Database\QueryException $e) {
+            $sudah = Registration::where('user_id', $user->id)->where('periode', $periode->periode)->first();
+            if ($sudah) {
+                return redirect()->route('siswa.status')
+                    ->with('status', "Anda sudah terdaftar {$sudah->eskul_utama} periode {$periode->periode}.");
+            }
+            throw $e;
+        }
 
         $pesan = "Pendaftaran berhasil. Anda resmi terdaftar {$dipakai}.";
 

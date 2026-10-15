@@ -27,10 +27,10 @@ class ProfilController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'min:2', 'max:100'],
             'wali_nama' => ['nullable', 'string', 'max:100'],
-            'wali_kontak' => ['nullable', 'string', 'max:20'],
+            'wali_kontak' => ['nullable', 'string', 'max:20', 'regex:/^(\+?62|08)[\d\s\-().]{7,15}$/'],
             'notify_wa' => ['nullable', 'boolean'],
             'notify_email' => ['nullable', 'boolean'],
-            'whatsapp' => ['nullable', 'string', 'max:20'],
+            'whatsapp' => ['nullable', 'string', 'max:20', 'regex:/^(\+?62|08)[\d\s\-().]{7,15}$/'],
         ]);
 
         $user->update([
@@ -47,6 +47,7 @@ class ProfilController extends Controller
                 'wali_kontak' => $validated['wali_kontak'] ?? null,
             ]);
         }
+        // Catatan: WA siswa disimpan di registrasi terakhir (tidak ada kolom di master students).
 
         $terakhir = $user->registrations()->latest()->first();
         if ($terakhir) {

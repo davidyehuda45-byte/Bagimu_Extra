@@ -75,13 +75,27 @@ class IzinController extends Controller
 
         $validated = $request->validate([
             'eskul' => ['required', 'string', Rule::in([$registration->eskul_utama])],
-            'tanggal' => ['required', 'date'],
+            'tanggal' => ['required', 'date', 'after_or_equal:'.$this->batasBawah(), 'before_or_equal:'.$this->batasAtas()],
             'jenis' => ['required', Rule::enum(IzinJenis::class)],
             'alasan' => ['required', 'string', 'min:3', 'max:500'],
-            'bukti' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+            'bukti' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048', Rule::requiredIf($request->input('jenis') === IzinJenis::SAKIT->value)],
         ], [
             'eskul.in' => 'Eskul yang dipilih harus eskul yang sedang Anda ikuti.',
+            'tanggal.after_or_equal' => 'Tanggal izin maksimal 7 hari ke belakang.',
+            'tanggal.before_or_equal' => 'Tanggal izin maksimal 30 hari ke depan.',
+            'bukti.required' => 'Lampiran bukti wajib untuk izin sakit (surat dokter).',
         ]);
+
+        $duplikat = Izin::where('registration_id', $registration->id)
+            ->where('tanggal', $validated['tanggal'])
+            ->whereIn('status', [IzinStatus::PENDING, IzinStatus::APPROVED])
+            ->exists();
+
+        if ($duplikat) {
+            return back()->withInput()->withErrors([
+                'tanggal' => 'Sudah ada pengajuan izin untuk tanggal tersebut.',
+            ]);
+        }
 
         $eskul = Eskul::where('name', $validated['eskul'])->firstOrFail();
 
@@ -102,5 +116,15 @@ class IzinController extends Controller
 
         return redirect()->route('siswa.izin.index')
             ->with('status', 'Pengajuan izin berhasil dikirim dan menunggu persetujuan.');
+    }
+
+    private function batasBawah(): string
+    {
+        return now()->subDays(7)->toDateString();
+    }
+
+    private function batasAtas(): string
+    {
+        return now()->addDays(30)->toDateString();
     }
 }

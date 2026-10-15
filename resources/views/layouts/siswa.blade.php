@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Siswa') — {{ config('app.name', 'Bagimu Extra') }}</title>
     <meta name="theme-color" content="#1e3a8a">
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" /></noscript>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @include('layouts.partials.session-guard')
 </head>
 <body>
+<a href="#konten-utama" class="skip-link">Lewati ke konten utama</a>
 @php
     $pill = fn ($active) => 'flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium '
         .($active ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900');
@@ -23,25 +27,27 @@
             </div>
         </a>
 
-        <nav class="flex min-w-0 items-center gap-1 overflow-x-auto">
-            <a href="{{ route('siswa.daftar') }}" class="{{ $pill(Route::is('siswa.daftar*') || Route::is('siswa.dashboard')) }}"><x-icon name="clipboard" class="h-4 w-4 shrink-0" /><span>Pilih Eskul</span></a>
+        <nav class="flex min-w-0 items-center gap-1 overflow-x-auto" aria-label="Navigasi siswa">
+            <a href="{{ route('siswa.dashboard') }}" class="{{ $pill(Route::is('siswa.dashboard') || Route::is('siswa.pengumuman')) }}"><x-icon name="home" class="h-4 w-4 shrink-0" /><span>Beranda</span></a>
+            <a href="{{ route('siswa.daftar') }}" class="{{ $pill(Route::is('siswa.daftar*')) }}"><x-icon name="clipboard" class="h-4 w-4 shrink-0" /><span>Pilih Eskul</span></a>
             <a href="{{ route('siswa.status') }}" class="{{ $pill(Route::is('siswa.status')) }}"><x-icon name="id-card" class="h-4 w-4 shrink-0" /><span>Status</span></a>
             <a href="{{ route('siswa.profil') }}" class="{{ $pill(Route::is('siswa.profil')) }}"><x-icon name="user" class="h-4 w-4 shrink-0" /><span class="hidden sm:inline">Saya</span></a>
         </nav>
 
         <div class="flex shrink-0 items-center gap-2">
-            <details class="relative">
-                <summary class="relative flex h-9 w-9 list-none items-center justify-center rounded-xl text-slate-600 hover:bg-slate-100 [&::-webkit-details-marker]:hidden" aria-label="Notifikasi">
-                    <x-icon name="bell" class="h-4 w-4" />
-                    @php($belum = \App\Support\Notifier::belumDibaca(auth()->id()))
-                    @if ($belum > 0)
-                        <span class="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
-                            {{ $belum > 9 ? '9+' : $belum }}
-                        </span>
-                    @endif
-                </summary>
+            <x-popover label="Notifikasi" panelClass="w-80">
+                <x-slot:trigger>
+                    <button type="button" class="relative flex h-9 w-9 items-center justify-center rounded-xl text-slate-600 hover:bg-slate-100" aria-label="Notifikasi" aria-haspopup="menu">
+                        <x-icon name="bell" class="h-4 w-4" />
+                        @php($belum = \App\Support\Notifier::belumDibaca(auth()->id()))
+                        @if ($belum > 0)
+                            <span class="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
+                                {{ $belum > 9 ? '9+' : $belum }}
+                            </span>
+                        @endif
+                    </button>
+                </x-slot:trigger>
                 @php($notifs = auth()->user()->inappNotifications()->latest()->take(6)->get())
-                <div class="absolute right-0 top-11 z-50 w-80 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl ring-1 ring-black/5">
                     <div class="flex items-center gap-2 border-b border-slate-100 pb-2">
                         <p class="text-sm font-bold text-slate-900">Notifikasi</p>
                         @if ($belum > 0)
@@ -77,8 +83,7 @@
                     <div class="border-t border-slate-100 pt-2 text-center">
                         <a href="{{ route('siswa.profil') }}" class="text-[11px] font-medium text-slate-500 hover:text-blue-600">Lihat semua di Profil →</a>
                     </div>
-                </div>
-            </details>
+            </x-popover>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" title="Keluar" class="flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 hover:bg-rose-50 hover:text-rose-600">
@@ -89,7 +94,7 @@
     </div>
 </header>
 
-<main class="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+<main id="konten-utama" class="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
     @include('layouts.partials.flash-messages')
     @yield('content')
 </main>

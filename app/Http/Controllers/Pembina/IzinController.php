@@ -44,7 +44,7 @@ class IzinController extends Controller
                 ],
                 [
                     'status' => $izin->jenis->value === 'SAKIT' ? KehadiranStatus::SAKIT : KehadiranStatus::IZIN,
-                    'keterangan' => 'Izin disetujui: '.$izin->alasan,
+                    'keterangan' => $izin->jenis->label().' disetujui: '.$izin->alasan,
                 ]
             );
         }
@@ -63,6 +63,18 @@ class IzinController extends Controller
             'decided_by' => $request->user()->email,
             'decided_at' => now(),
         ]);
+
+        $baris = Kehadiran::where('eskul_id', $izin->eskul_id)
+            ->where('registration_id', $izin->registration_id)
+            ->whereDate('tanggal', $izin->tanggal)
+            ->first();
+
+        if ($baris && ! $baris->isLocked()) {
+            $ket = (string) $baris->keterangan;
+            if (str_starts_with($ket, 'Izin disetujui:') || str_starts_with($ket, 'Sakit disetujui:') || str_starts_with($ket, 'Dispensasi disetujui:')) {
+                $baris->delete();
+            }
+        }
 
         AdminLog::record('pembina.izin.reject', 'Izin', (string) $izin->id, "Izin #{$izin->id} ditolak pembina.");
 

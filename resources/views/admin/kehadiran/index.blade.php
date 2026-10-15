@@ -37,7 +37,7 @@
     @endif
 
     <div class="mb-4 flex flex-wrap gap-2">
-        @if (auth()->user()->hasRole(\App\Enums\Role::ADMIN, \App\Enums\Role::OPERATOR, \App\Enums\Role::PEMBINA))
+        @if (auth()->user()->hasRole(\App\Enums\Role::ADMIN, \App\Enums\Role::OPERATOR, \App\Enums\Role::KEPALA_SEKOLAH))
         <form method="POST" action="{{ route('admin.kehadiran.lock') }}">
             @csrf
             <input type="hidden" name="eskul_id" value="{{ $eskul->id }}">
@@ -52,6 +52,9 @@
             <input type="hidden" name="tanggal" value="{{ $tanggal }}">
             <button class="px-4 py-2 rounded border text-sm hover:bg-gray-50">Buka Kunci</button>
         </form>
+        @endif
+        @if (auth()->user()->hasRole(\App\Enums\Role::PEMBINA))
+            <p class="w-full text-xs text-slate-500">Pembina mengunci presensi lewat halaman <a href="{{ route('pembina.eskul.index') }}" class="font-medium text-blue-600 hover:underline">Eskul Saya</a>, bukan dari halaman admin ini.</p>
         @endif
     </div>
 

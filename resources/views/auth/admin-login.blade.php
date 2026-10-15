@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Login Guru — {{ config('app.name', 'Bagimu Extra') }}</title>
+    <title>Login Staf / Pembina — {{ config('app.name', 'Bagimu Extra') }}</title>
     <meta name="theme-color" content="#1e3a8a">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -68,10 +68,10 @@
             <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
                 <div class="mb-5">
                     <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold bg-blue-50 text-blue-800 ring-1 ring-inset ring-blue-700/10 mb-2">
-                        <x-icon name="shield" class="h-3.5 w-3.5" /> Portal Khusus Guru
+                        <x-icon name="shield" class="h-3.5 w-3.5" /> Portal Staf & Pembina
                     </span>
-                    <h2 class="text-xl font-bold text-slate-900">Login Guru</h2>
-                    <p class="mt-1 text-sm text-slate-500">Masuk menggunakan username atau email akun guru Anda.</p>
+                    <h2 class="text-xl font-bold text-slate-900">Login Staf / Pembina</h2>
+                    <p class="mt-1 text-sm text-slate-500">Masuk menggunakan username atau email akun staf / pembina Anda.</p>
                 </div>
 
                 <x-auth-session-status class="mb-4" :status="session('status')" />
@@ -106,7 +106,7 @@
                     @endif
 
                     <x-primary-button class="w-full justify-center py-3 text-sm font-bold shadow-sm">
-                        Masuk ke Portal Guru
+                        Masuk ke Portal Staf
                     </x-primary-button>
 
                     <div class="mt-4 flex items-center justify-center text-xs text-slate-500 pt-3 border-t border-slate-100">

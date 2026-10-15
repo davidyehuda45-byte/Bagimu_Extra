@@ -30,12 +30,16 @@ class EskulController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255', 'unique:eskuls,name'],
+            'name' => ['required', 'string', 'max:100', 'unique:eskuls,name'],
             'description' => ['nullable', 'string'],
             'kuota' => ['nullable', 'integer', 'min:0'],
             'kuota_aktif' => ['nullable', 'boolean'],
             'aktif' => ['nullable', 'boolean'],
-            'pembina_id' => ['nullable', 'exists:users,id'],
+            'pembina_id' => ['nullable', 'exists:users,id', function ($attr, $val, $fail) {
+                if ($val && ! \App\Models\User::where('id', $val)->where('role', \App\Enums\Role::PEMBINA)->exists()) {
+                    $fail('Pembina harus akun dengan peran pembina.');
+                }
+            }],
         ]);
 
         $data['kuota_aktif'] = $request->boolean('kuota_aktif');
@@ -71,8 +75,14 @@ class EskulController extends Controller
     public function delegasi(Request $request, Eskul $eskul)
     {
         $data = $request->validate([
-            'temp_pembina_id' => ['nullable', 'exists:users,id'],
-            'temp_pembina_sampai' => ['nullable', 'date'],
+            'temp_pembina_id' => ['nullable', 'exists:users,id', function ($attr, $val, $fail) {
+                if ($val && ! \App\Models\User::where('id', $val)->where('role', \App\Enums\Role::PEMBINA)->exists()) {
+                    $fail('Pembina sementara harus akun dengan peran pembina.');
+                }
+            }],
+            'temp_pembina_sampai' => ['nullable', 'date', 'after_or_equal:today', 'required_with:temp_pembina_id'],
+        ], [
+            'temp_pembina_sampai.required_with' => 'Tanggal berakhir wajib diisi bila pembina sementara dipilih.',
         ]);
 
         $eskul->update([
@@ -95,12 +105,16 @@ class EskulController extends Controller
     public function update(Request $request, Eskul $eskul)
     {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255', 'unique:eskuls,name,'.$eskul->id],
+            'name' => ['required', 'string', 'max:100', 'unique:eskuls,name,'.$eskul->id],
             'description' => ['nullable', 'string'],
             'kuota' => ['nullable', 'integer', 'min:0'],
             'kuota_aktif' => ['nullable', 'boolean'],
             'aktif' => ['nullable', 'boolean'],
-            'pembina_id' => ['nullable', 'exists:users,id'],
+            'pembina_id' => ['nullable', 'exists:users,id', function ($attr, $val, $fail) {
+                if ($val && ! \App\Models\User::where('id', $val)->where('role', \App\Enums\Role::PEMBINA)->exists()) {
+                    $fail('Pembina harus akun dengan peran pembina.');
+                }
+            }],
         ]);
 
         $data['kuota_aktif'] = $request->boolean('kuota_aktif');

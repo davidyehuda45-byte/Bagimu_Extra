@@ -18,8 +18,8 @@ use Illuminate\View\View;
 
 class StaffLoginController extends Controller
 {
-    /** Role yang boleh masuk ke panel admin (hanya admin/operator). */
-    private const ADMIN_PANEL_ROLES = [Role::ADMIN, Role::OPERATOR, Role::KEPALA_SEKOLAH];
+    /** Role yang boleh masuk via pintu staf (admin panel + pembina). */
+    private const ADMIN_PANEL_ROLES = [Role::ADMIN, Role::OPERATOR, Role::KEPALA_SEKOLAH, Role::PEMBINA];
 
     public function create(): View
     {
@@ -57,12 +57,12 @@ class StaffLoginController extends Controller
         }
 
         if (! in_array($user->role, self::ADMIN_PANEL_ROLES, true)) {
-            $reason = $user->role === Role::STUDENT ? 'Akun siswa mencoba masuk panel admin' : 'Bukan akun administrator';
+            $reason = $user->role === Role::STUDENT ? 'Akun siswa mencoba masuk panel staf' : 'Bukan akun staf';
             $this->hitAndLog($request, $throttleKey, $user->getAuthIdentifier(), $user->email, $reason);
 
             $pesan = $user->role === Role::STUDENT
-                ? 'Ini halaman login admin. Akun siswa silakan login lewat halaman login siswa.'
-                : 'Hanya administrator yang memiliki akses masuk ke panel ini.';
+                ? 'Ini halaman login staf/pembina. Akun siswa silakan login lewat halaman login siswa.'
+                : 'Hanya staf (admin/operator/kepala sekolah/pembina) yang memiliki akses masuk ke panel ini.';
 
             throw ValidationException::withMessages([
                 'login' => $pesan,
@@ -73,6 +73,7 @@ class StaffLoginController extends Controller
 
         if ($user->totp_enabled) {
             session(['mfa_user_id' => $user->getAuthIdentifier()]);
+            $request->session()->regenerate();
 
             return redirect()->route('admin.mfa');
         }

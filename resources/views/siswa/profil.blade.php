@@ -14,7 +14,7 @@
             </span>
             <div class="min-w-0">
                 <p class="truncate font-bold text-slate-900">{{ $user->name }}</p>
-                <p class="truncate text-xs text-slate-500">{{ $user->email }}</p>
+                <p class="truncate text-xs text-slate-500">NIS {{ $user->student?->nis ?? $user->username }} • Akun siswa</p>
             </div>
         </div>
         <div class="mt-3 flex flex-wrap gap-1.5">
@@ -138,7 +138,7 @@
                 @foreach ($logins as $l)
                     <li class="flex items-center gap-2 py-2 text-xs">
                         <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold {{ $l->success ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">{{ $l->success ? 'Berhasil' : 'Gagal' }}</span>
-                        <span class="text-slate-600">{{ $l->method->value }}@if ($l->reason) • {{ $l->reason }}@endif</span>
+                        <span class="text-slate-600">{{ method_exists($l->method, 'label') ? $l->method->label() : $l->method->value }}@if ($l->reason) • {{ $l->reason }}@endif</span>
                         <span class="ms-auto shrink-0 text-slate-400">{{ $l->created_at->format('d M H:i') }}</span>
                     </li>
                 @endforeach

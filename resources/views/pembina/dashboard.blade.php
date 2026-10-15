@@ -23,9 +23,7 @@
         <div class="rounded-lg border bg-white p-4 shadow-sm">
             <div class="text-sm text-gray-500">Izin Menunggu</div>
             <div class="mt-1 text-3xl font-bold">{{ $izinPending }}</div>
-            @if (Route::has('admin.izin.index'))
-                <a href="{{ route('admin.izin.index') }}" class="mt-2 inline-block text-sm text-blue-600 hover:underline">Kelola perizinan</a>
-            @endif
+            <a href="{{ route('pembina.eskul.index') }}" class="mt-2 inline-block text-sm text-blue-600 hover:underline">Kelola perizinan via Eskul Saya</a>
         </div>
     </div>
 

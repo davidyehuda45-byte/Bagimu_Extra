@@ -96,7 +96,7 @@ class AuthenticationTest extends TestCase
     {
         $response = $this->get('/admin/login');
         $response->assertOk();
-        $response->assertSee('Login Guru');
+        $response->assertSee('Login Staf / Pembina');
         $response->assertDontSee('Login Guru & Staf');
     }
 

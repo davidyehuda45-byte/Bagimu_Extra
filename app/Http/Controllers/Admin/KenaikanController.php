@@ -97,6 +97,11 @@ class KenaikanController extends Controller
                     $baru = 'LULUS';
                     $s->update(['status' => 'LULUS']);
                     $s->user?->update(['student_status' => 'LULUS']);
+                    // Paksa keluar: cabut token login + naikkan versi sesi.
+                    if ($s->user) {
+                        \App\Support\LoginToken::revoke($s->user);
+                        $s->user->increment('session_version');
+                    }
                 }
 
                 if ($s->user_id) {

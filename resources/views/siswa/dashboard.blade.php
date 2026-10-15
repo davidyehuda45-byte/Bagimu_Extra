@@ -5,21 +5,21 @@
 @section('content')
 <div class="space-y-4">
     {{-- Hero --}}
-    <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <x-card>
         <div class="flex items-center justify-between gap-2">
             <div>
                 <p class="text-sm text-slate-500">Halo,</p>
                 <h1 class="text-lg font-extrabold text-slate-900">{{ $user->name }}</h1>
                 <p class="mt-1 text-xs text-slate-500">
                     @if ($periodeAktif)
-                        <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap bg-blue-100 text-blue-800 ring-1 ring-inset ring-blue-600/20">Tahun Ajaran {{ $periodeAktif->periode }}</span>
+                        <x-badge tone="blue">Tahun Ajaran {{ $periodeAktif->periode }}</x-badge>
                     @endif
                     {{ \App\Models\AppSetting::get('school.name', '') }}
                 </p>
             </div>
             <a href="{{ route('siswa.profil') }}" class="shrink-0 rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">Profil & Akun</a>
         </div>
-    </div>
+    </x-card>
 
     {{-- Banner status --}}
     @if (!$pendaftaran)
@@ -32,7 +32,7 @@
         <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
             <div class="flex items-center justify-between gap-2">
                 <p class="font-bold text-slate-900">{{ $pendaftaran->eskul_utama }}</p>
-                <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap bg-emerald-100 text-emerald-800 ring-1 ring-inset ring-emerald-600/20">Terdaftar</span>
+                <x-badge tone="emerald">Terdaftar</x-badge>
             </div>
             <p class="mt-1 text-sm text-slate-600">
                 E-Card & QR verifikasi aktif. Tunjukkan ke pembina saat latihan.
@@ -44,10 +44,10 @@
     @endif
 
     {{-- Jadwal latihan --}}
-    <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <x-card>
         <h2 class="font-bold text-slate-900">Jadwal Latihan</h2>
         @if ($jadwalEskul->isEmpty())
-            <p class="mt-1 text-sm text-slate-500">Belum ada jadwal. Jadwal muncul setelah disetujui dan pembina mengisi jadwal.</p>
+            <x-empty-state icon="calendar" title="Belum ada jadwal" message="Jadwal muncul setelah disetujui dan pembina mengisi jadwal." />
         @else
             <ul class="mt-2 space-y-2 text-sm">
                 @foreach ($jadwalEskul as $e)
@@ -61,28 +61,28 @@
                 @endforeach
             </ul>
         @endif
-    </div>
+    </x-card>
 
     {{-- Presensi & prestasi --}}
-    <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <x-card>
         <div class="flex items-center justify-between">
             <h2 class="font-bold text-slate-900">Presensi & Prestasi</h2>
             <a href="{{ route('siswa.kehadiran') }}" class="text-sm font-medium text-blue-600 hover:text-blue-700">Detail →</a>
         </div>
         <div class="mt-2 flex items-center gap-3">
-            <div class="h-2.5 flex-1 overflow-hidden rounded-full bg-slate-100">
-                <div class="{{ $persenHadir >= 85 ? 'bg-emerald-500' : ($persenHadir >= 70 ? 'bg-amber-400' : 'bg-rose-500') }} h-full rounded-full" style="width: {{ min(100, $persenHadir) }}%"></div>
+            <div class="flex-1">
+                <x-progress :value="$persenHadir" aria-label="Persentase kehadiran {{ $persenHadir }} persen" />
             </div>
-            <span class="text-sm font-bold text-slate-800">{{ $persenHadir }}%</span>
+            <span class="text-sm font-bold tabular-nums text-slate-800">{{ $persenHadir }}%</span>
         </div>
         <p class="mt-1 text-xs text-slate-500">
             Kehadiran {{ $persenHadir >= 80 ? 'sangat baik, pertahankan!' : 'di bawah 80%, tingkatkan kehadiranmu.' }}
             Nilai Akhir: <b class="text-slate-800">{{ $pendaftaran?->nilai ?? '—' }}{{ $pendaftaran?->predikat ? ' ('.$pendaftaran->predikat.')' : '' }}</b>
             @if ($izinPending > 0)
-                <span class="ml-1 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold bg-amber-100 text-amber-800 ring-1 ring-inset ring-amber-600/20">{{ $izinPending }} izin menunggu</span>
+                <x-badge tone="amber" class="ml-1 !text-[11px]">{{ $izinPending }} izin menunggu</x-badge>
             @endif
         </p>
-    </div>
+    </x-card>
 
     {{-- Menu cepat --}}
     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">

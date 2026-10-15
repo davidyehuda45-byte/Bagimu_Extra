@@ -26,10 +26,6 @@ class SiswaLoginController extends Controller
     }
 
     /**
-     * Login siswa memakai NIS (identitas) + token 8 digit (bukti).
-     * Akun dibuat otomatis dari data induk bila belum ada.
-     */
-    /**
      * Login siswa: NIS + token 8 digit, atau NIS + password
      * (bila siswa sudah mengatur password di Profil).
      */
@@ -43,20 +39,21 @@ class SiswaLoginController extends Controller
         // Normalisasi khusus token: buang spasi/strip (password dipakai mentah).
         $normal = preg_replace('/[\s-]+/', '', $data['token']);
 
-        $throttleKey = 'siswa-login:'.$request->ip();
+        $throttleKey = 'siswa-login:'.$request->ip().':'.$data['nis'];
 
-        if (RateLimiter::tooManyAttempts($throttleKey, 30)) {
+        if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
             $seconds = RateLimiter::availableIn($throttleKey);
 
             throw ValidationException::withMessages([
-                'nis' => "Terlalu banyak percobaan. Coba lagi dalam {$seconds} detik.",
+                'token' => "Terlalu banyak percobaan. Coba lagi dalam {$seconds} detik.",
             ]);
         }
 
         $master = Student::where('nis', $data['nis'])->first();
 
         if (! $master || $master->status !== 'AKTIF') {
-            $this->fail($request, null, $data['nis'], 'NIS tidak dikenal', 'NIS tidak terdaftar atau tidak aktif. Hubungi TU.');
+            // Pesan generik sama seperti kredensial salah agar NIS valid tidak bisa dienumerasi.
+            $this->fail($request, $throttleKey, null, null, 'NIS tidak dikenal', 'Token atau password salah. Periksa kembali kartu login Anda, atau hubungi TU bila belum punya token.', 'token');
         }
 
         $user = $master->user ?? User::where('username', $master->nis)->first();
@@ -84,7 +81,7 @@ class SiswaLoginController extends Controller
             && Hash::check($data['token'], $user->password);
 
         if (! $tokenOk && ! $passOk) {
-            $this->fail($request, $user->getAuthIdentifier(), null, 'Kredensial salah', 'NIS, token, atau password salah. Periksa kembali kartu login Anda, atau hubungi TU bila belum punya token.');
+            $this->fail($request, $throttleKey, $user->getAuthIdentifier(), null, 'Kredensial salah', 'Token atau password salah. Periksa kembali kartu login Anda, atau hubungi TU bila belum punya token.', 'token');
         }
 
         RateLimiter::clear($throttleKey);
@@ -102,7 +99,7 @@ class SiswaLoginController extends Controller
             'user_id' => $user->getAuthIdentifier(),
             'email' => $user->email,
             'ip_hash' => hash('sha256', $request->ip().' '.config('app.key')),
-            'method' => LoginMethod::TOKEN,
+            'method' => $tokenOk ? LoginMethod::TOKEN : LoginMethod::PASSWORD,
             'success' => true,
             'reason' => null,
         ]);
@@ -112,12 +109,14 @@ class SiswaLoginController extends Controller
 
     private function fail(
         Request $request,
+        string $throttleKey,
         string|int|null $userId,
         ?string $email,
         string $reason,
         string $message,
+        string $field = 'nis',
     ): never {
-        RateLimiter::hit('siswa-login:'.$request->ip());
+        RateLimiter::hit($throttleKey);
 
         LoginHistory::create([
             'user_id' => $userId,
@@ -128,6 +127,6 @@ class SiswaLoginController extends Controller
             'reason' => $reason,
         ]);
 
-        throw ValidationException::withMessages(['nis' => $message]);
+        throw ValidationException::withMessages([$field => $message]);
     }
 }

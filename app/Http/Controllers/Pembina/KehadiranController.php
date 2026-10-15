@@ -27,17 +27,27 @@ class KehadiranController extends Controller
         $this->pastikanMilik($eskul, $request->user()->id);
 
         $data = $request->validate([
-            'tanggal' => ['required', 'date'],
+            'tanggal' => ['required', 'date', 'before_or_equal:today', 'after_or_equal:'.now()->subYear()->toDateString()],
             'status' => ['required', 'array'],
             'status.*' => ['required', 'in:HADIR,IZIN,SAKIT,ALPA'],
             'keterangan' => ['nullable', 'array'],
             'keterangan.*' => ['nullable', 'string', 'max:200'],
         ]);
 
+        $bolehIds = \App\Models\Registration::where('eskul_utama', $eskul->name)
+            ->where('status', \App\Enums\Status::APPROVED)
+            ->pluck('id')->map(fn ($v) => (string) $v)->all();
+        $boleh = array_flip($bolehIds);
+
         $disimpan = 0;
         $diabaikan = 0;
+        $ditolak = 0;
 
         foreach ($data['status'] as $registrationId => $status) {
+            if (! isset($boleh[(string) $registrationId])) {
+                $ditolak++;
+                continue;
+            }
             $existing = Kehadiran::where('eskul_id', $eskul->id)
                 ->where('registration_id', $registrationId)
                 ->whereDate('tanggal', $data['tanggal'])
@@ -64,7 +74,12 @@ class KehadiranController extends Controller
 
         AdminLog::record('pembina.kehadiran.store', 'Kehadiran', (string) $eskul->id, "Simpan kehadiran {$eskul->name} {$data['tanggal']}: {$disimpan} disimpan.");
 
-        return back()->with('status', "Kehadiran tersimpan ({$disimpan} baris).");
+        $pesan = "Kehadiran tersimpan ({$disimpan} baris).";
+        if ($ditolak > 0) {
+            $pesan .= " {$ditolak} baris ditolak (bukan anggota eskul ini).";
+        }
+
+        return back()->with('status', $pesan);
     }
 
     /**

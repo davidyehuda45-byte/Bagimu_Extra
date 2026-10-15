@@ -38,7 +38,7 @@ class StatusController extends Controller
             $jadwals = Eskul::where('name', $aktif->eskul_utama)->first()?->jadwals ?? collect();
         }
 
-        $kontakPembina = AppSetting::get('school.contact', '6281234567890');
+        $kontakPembina = AppSetting::get('school.contact', '');
 
         return view('siswa.status', compact(
             'user',

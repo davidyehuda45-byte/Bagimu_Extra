@@ -33,6 +33,13 @@ class MfaController extends Controller
             return redirect()->route('admin.login');
         }
 
+        $mfaKey = 'mfa:'.$request->ip().':'.$userId;
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($mfaKey, 10)) {
+            throw ValidationException::withMessages([
+                'code' => 'Terlalu banyak percobaan. Coba lagi nanti.',
+            ]);
+        }
+
         $data = $request->validate([
             'code' => ['required', 'digits:6'],
         ]);
@@ -47,6 +54,7 @@ class MfaController extends Controller
             );
 
         if (! $ok) {
+            \Illuminate\Support\Facades\RateLimiter::hit($mfaKey);
             LoginHistory::create([
                 'user_id' => $userId,
                 'email' => $user?->email,
@@ -63,6 +71,7 @@ class MfaController extends Controller
 
         Auth::login($user);
         $request->session()->regenerate();
+        \Illuminate\Support\Facades\RateLimiter::clear($mfaKey);
         $tabToken = \Illuminate\Support\Str::random(32);
         session([
             'session_version' => $user->getAttribute('session_version'),

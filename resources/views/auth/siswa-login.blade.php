@@ -6,6 +6,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Login Siswa — {{ config('app.name', 'Bagimu Extra') }}</title>
     <meta name="theme-color" content="#1e3a8a">
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" /></noscript>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
@@ -69,13 +72,13 @@
                 <h2 class="text-lg font-bold text-slate-900">Login Siswa</h2>
                 <p class="mt-1 text-sm text-slate-500">Pakai NIS + token 8 digit dari kartu login.</p>
 
-                <form method="POST" action="{{ route('siswa.login') }}" class="mt-4 space-y-4">
+                <form method="POST" action="{{ route('siswa.login') }}" class="mt-4 space-y-4" x-data="{ loading: false }" @submit="loading = true">
                     @csrf
 
                     <div>
                         <x-input-label for="nis" value="NIS" />
                         <x-text-input id="nis" class="mt-1 block w-full text-lg tracking-widest" type="text"
-                                        inputmode="numeric" name="nis" :value="old('nis')"
+                                        inputmode="numeric" autocomplete="username" name="nis" :value="old('nis')"
                                         required autofocus placeholder="cth: 10001" />
                         <x-input-error :messages="$errors->get('nis')" class="mt-2" />
                     </div>
@@ -83,18 +86,23 @@
                     <div>
                         <x-input-label for="token" value="Token / Password" />
                         <x-text-input id="token" class="mt-1 block w-full text-center text-2xl tracking-[0.5em] font-mono"
-                                        type="text" inputmode="numeric" autocomplete="one-time-code"
+                                        type="text" inputmode="text" autocapitalize="off" spellcheck="false" autocomplete="current-password"
                                         name="token" required maxlength="100" placeholder="••••••••" />
                         <x-input-error :messages="$errors->get('token')" class="mt-2" />
-                        <p class="mt-1 text-[11px] text-slate-400">Token 8 digit dari kartu, atau password yang diatur di Profil.</p>
+                        <p class="mt-1 text-[11px] text-slate-400">Token 8 digit angka dari kartu, atau password (huruf/angka/simbol, min. 8) yang diatur di Profil.</p>
                     </div>
 
-                    <x-primary-button class="w-full justify-center py-3">
-                        Masuk
+                    <x-primary-button class="w-full justify-center py-3" ::disabled="loading">
+                        <span x-show="! loading">Masuk</span>
+                        <span x-show="loading" x-cloak class="inline-flex items-center gap-2">
+                            <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"/></svg>
+                            Memproses…
+                        </span>
                     </x-primary-button>
 
-                    <div class="mt-4 flex items-center justify-center text-xs text-slate-500 pt-2 border-t border-slate-100">
-                        <a href="{{ route('home') }}" class="hover:text-blue-700 hover:underline">
+                    <div class="mt-4 space-y-2 border-t border-slate-100 pt-3 text-center text-xs text-slate-500">
+                        <p>Lupa token? Minta token baru ke TU — token lama otomatis hangus.</p>
+                        <a href="{{ route('home') }}" class="inline-block hover:text-blue-700 hover:underline">
                             &larr; Kembali ke Beranda
                         </a>
                     </div>

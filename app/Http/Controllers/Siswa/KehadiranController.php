@@ -60,7 +60,7 @@ class KehadiranController extends Controller
 
         $persen = $statistik['total'] > 0
             ? round($statistik['hadir'] / $statistik['total'] * 100, 1)
-            : 100;
+            : 0;
 
         return view('siswa.kehadiran', compact(
             'kehadiran', 'statistik', 'eskulDiikuti', 'filter',

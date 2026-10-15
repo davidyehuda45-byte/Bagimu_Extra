@@ -6,7 +6,8 @@
 <h1 class="text-xl font-bold text-slate-900 mb-1">Kenaikan Kelas</h1>
 <p class="text-sm text-slate-500 mb-4">
     Kelas 10 naik ke 11 (tetap aktif) • Kelas 11 naik ke 12 (<b>otomatis nonaktif</b> — kelas 12 tidak ikut eskul & tidak bisa login) •
-    Kelas 12 <b>lulus</b> (otomatis nonaktif). Kasus lulus duluan/individual atur manual di Direktori Siswa.
+    Kelas 12 <b>lulus</b> (status LULUS, token dicabut & sesi dipaksa keluar). Status ALUMNI dipakai untuk lulusan lama yang diarsip manual.
+    Kasus lulus duluan/individual atur manual di Direktori Siswa.
 </p>
 
 <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">

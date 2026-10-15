@@ -10,25 +10,26 @@
     @forelse ($rekap as $row)
         @php($e = $row['eskul'])
         @php($penuh = $e->kuota_aktif && $row['count'] >= $e->kuota)
-        <a href="{{ route('admin.rekap.show', ['eskul' => $e->name]) }}" class="block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm hover:bg-slate-50">
+        @php($pct = $e->kuota_aktif ? min(100, round($row['count'] / max(1, $e->kuota) * 100)) : min(100, $row['count'] * 10))
+        <a href="{{ route('admin.rekap.show', ['eskul' => $e->name]) }}" class="block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
             <div class="flex items-center gap-2">
                 <p class="font-bold text-slate-900">{{ $e->name }}</p>
                 @if (! $e->aktif)
-                    <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-500">Nonaktif</span>
+                    <x-badge tone="slate" class="!text-[10px]">Nonaktif</x-badge>
                 @endif
             </div>
             <p class="mt-1 text-sm text-slate-600"><b class="text-slate-900">{{ $row['count'] }}</b> siswa terdaftar</p>
             <p class="text-xs text-slate-500">Kuota: {{ $e->kuota_aktif ? $row['count'].'/'.$e->kuota : $row['count'].' • Bebas' }}</p>
-            <div class="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
-                <div class="{{ $penuh ? 'bg-rose-500' : 'bg-blue-600' }} h-full rounded-full" style="width: {{ $e->kuota_aktif ? min(100, round($row['count'] / max(1, $e->kuota) * 100)) : min(100, $row['count'] * 10) }}%"></div>
-            </div>
+            <x-progress :value="$pct" tone="{{ $penuh ? 'rose' : 'blue' }}" class="mt-2 !h-2" aria-label="Kuota {{ $e->name }} {{ $pct }} persen" />
             @if ($penuh)
                 <p class="mt-1 text-xs font-semibold text-rose-600">Kuota penuh — pendaftaran ditutup</p>
             @endif
             <p class="mt-2 text-xs font-medium text-blue-600">Lihat Siswa →</p>
         </a>
     @empty
-        <p class="text-sm text-slate-500">Belum ada eskul.</p>
+        <div class="sm:col-span-2 lg:col-span-3">
+            <x-card><x-empty-state icon="trophy" title="Belum ada eskul" message="Data rekap akan muncul setelah eskul dibuat." /></x-card>
+        </div>
     @endforelse
 </div>
 @endsection

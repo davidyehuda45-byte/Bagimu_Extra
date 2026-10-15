@@ -17,6 +17,12 @@ class CheckSessionVersion
     {
         $user = $request->user();
 
+        if ($user && ! $request->session()->has('session_version')) {
+            // Sesi lama tanpa cap versi (mis. dari alur register lawas): cap sekarang
+            // agar tidak lolos selamanya, lalu lanjut.
+            $request->session()->put('session_version', $user->getAttribute('session_version'));
+        }
+
         if (
             $user
             && $request->session()->has('session_version')
@@ -26,7 +32,14 @@ class CheckSessionVersion
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect()->route('login')->withErrors([
+            $loginRoute = $user && in_array($user->role, [
+                \App\Enums\Role::ADMIN,
+                \App\Enums\Role::OPERATOR,
+                \App\Enums\Role::PEMBINA,
+                \App\Enums\Role::KEPALA_SEKOLAH,
+            ], true) ? 'admin.login' : 'login';
+
+            return redirect()->route($loginRoute)->withErrors([
                 'email' => 'Sesi Anda telah berakhir. Silakan login kembali.',
             ]);
         }

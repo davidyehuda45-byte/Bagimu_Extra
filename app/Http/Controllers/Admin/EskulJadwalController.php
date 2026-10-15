@@ -16,8 +16,20 @@ class EskulJadwalController extends Controller
             'hari' => ['required', 'in:SENIN,SELASA,RABU,KAMIS,JUMAT,SABTU,MINGGU'],
             'jam_mulai' => ['required', 'date_format:H:i'],
             'jam_selesai' => ['required', 'date_format:H:i', 'after:jam_mulai'],
-            'tempat' => ['nullable', 'string', 'max:255'],
+            'tempat' => ['required', 'string', 'max:100'],
         ]);
+
+        $bentrok = $eskul->jadwals()
+            ->where('hari', $data['hari'])
+            ->where('jam_mulai', '<', $data['jam_selesai'])
+            ->where('jam_selesai', '>', $data['jam_mulai'])
+            ->exists();
+
+        if ($bentrok) {
+            return back()->withInput()->withErrors([
+                'hari' => 'Jadwal bentrok dengan jadwal lain di hari yang sama.',
+            ]);
+        }
 
         $jadwal = $eskul->jadwals()->create($data);
 
@@ -32,8 +44,21 @@ class EskulJadwalController extends Controller
             'hari' => ['required', 'in:SENIN,SELASA,RABU,KAMIS,JUMAT,SABTU,MINGGU'],
             'jam_mulai' => ['required', 'date_format:H:i'],
             'jam_selesai' => ['required', 'date_format:H:i', 'after:jam_mulai'],
-            'tempat' => ['nullable', 'string', 'max:255'],
+            'tempat' => ['required', 'string', 'max:100'],
         ]);
+
+        $bentrok = EskulJadwal::where('eskul_id', $jadwal->eskul_id)
+            ->where('id', '!=', $jadwal->id)
+            ->where('hari', $data['hari'])
+            ->where('jam_mulai', '<', $data['jam_selesai'])
+            ->where('jam_selesai', '>', $data['jam_mulai'])
+            ->exists();
+
+        if ($bentrok) {
+            return back()->withInput()->withErrors([
+                'hari' => 'Jadwal bentrok dengan jadwal lain di hari yang sama.',
+            ]);
+        }
 
         $jadwal->update($data);
         $jadwal->loadMissing('eskul');

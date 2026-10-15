@@ -63,7 +63,7 @@ class SiswaLoginTest extends TestCase
         $response = $this->post('/siswa/login', ['nis' => '99999', 'token' => '12345678']);
 
         $this->assertGuest();
-        $response->assertSessionHasErrors('nis');
+        $response->assertSessionHasErrors('token');
     }
 
     public function test_nis_nonaktif_ditolak(): void
@@ -73,7 +73,7 @@ class SiswaLoginTest extends TestCase
         $response = $this->post('/siswa/login', ['nis' => '10001', 'token' => '12345678']);
 
         $this->assertGuest();
-        $response->assertSessionHasErrors('nis');
+        $response->assertSessionHasErrors('token');
     }
 
     public function test_token_salah_ditolak(): void
@@ -85,7 +85,7 @@ class SiswaLoginTest extends TestCase
         $response = $this->post('/siswa/login', ['nis' => '10001', 'token' => '00000000']);
 
         $this->assertGuest();
-        $response->assertSessionHasErrors('nis');
+        $response->assertSessionHasErrors('token');
     }
 
     public function test_belum_punya_token_ditolak(): void
@@ -96,6 +96,6 @@ class SiswaLoginTest extends TestCase
         $response = $this->post('/siswa/login', ['nis' => '10001', 'token' => '12345678']);
 
         $this->assertGuest();
-        $response->assertSessionHasErrors('nis');
+        $response->assertSessionHasErrors('token');
     }
 }

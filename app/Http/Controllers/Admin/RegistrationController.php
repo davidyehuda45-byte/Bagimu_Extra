@@ -121,7 +121,8 @@ class RegistrationController extends Controller
             ];
 
             if ($tampilkanToken) {
-                $baris[] = $r->user?->login_token ?? '-';
+                $tokenAktif = ($r->user?->login_token && $r->user?->login_token_revoked_at === null) ? $r->user->login_token : '';
+                $baris[] = $tokenAktif !== '' ? $tokenAktif : '-';
             }
 
             return $baris;
@@ -160,7 +161,7 @@ class RegistrationController extends Controller
             'kelas' => ['required', 'string', 'min:3', 'max:50', 'regex:/^(XII|XI|X|10|11|12)\s+(RPL|KULINER|DKV|TP|TKP)\s*\d{0,2}$/i'],
             'jurusan' => ['required', 'in:RPL,KULINER,DKV,TP,TKP'],
             'usia' => ['required', 'integer', 'min:13', 'max:20'],
-            'whatsapp' => ['nullable', 'string', 'max:20'],
+            'whatsapp' => ['nullable', 'string', 'max:20', 'regex:/^(\+?62|08)[\d\s\-().]{7,15}$/'],
             'no_absen' => ['required', 'integer', 'min:1', 'max:99'],
             'nama_wali_kelas' => ['nullable', 'string', 'max:100'],
             'nis' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
@@ -169,6 +170,16 @@ class RegistrationController extends Controller
             'eskul_cadangan' => ['nullable', 'string', 'different:eskul_utama', 'exists:eskuls,name'],
             'alasan' => ['nullable', 'string', 'max:1000'],
         ]);
+
+        // Cegah admin memindahkan ke eskul yang sudah penuh.
+        if ($validated['eskul_utama'] !== $registration->eskul_utama) {
+            $target = Eskul::where('name', $validated['eskul_utama'])->first();
+            if ($target && \App\Support\Kuota::penuh($target, $registration->periode, $registration->id)) {
+                return back()->withInput()->withErrors([
+                    'eskul_utama' => "Kuota {$target->name} sudah penuh ({$target->kuota} siswa).",
+                ]);
+            }
+        }
 
         $validated['kelas'] = \App\Support\Kelas::normalisasi($validated['kelas']);
 
@@ -185,6 +196,10 @@ class RegistrationController extends Controller
             'nilai' => ['required', 'integer', 'min:0', 'max:100'],
             'catatan' => ['nullable', 'string', 'max:1000'],
         ]);
+
+        if ($registration->status !== Status::APPROVED) {
+            return back()->withErrors(['nilai' => 'Hanya pendaftar yang disetujui yang dapat dinilai.']);
+        }
 
         $predikat = match (true) {
             $data['nilai'] >= 85 => 'A',
@@ -225,7 +240,7 @@ class RegistrationController extends Controller
 
         AdminLog::record('registration.revoke_card', 'registration', $registration->id, "Cabut kartu & terbitkan QR baru #{$registration->id}.");
 
-        return back()->with('status', 'Kartu lama dicabut, QR baru diterbitkan.');
+        return back()->with('status', 'Kartu lama dicabut, QR E-Card baru diterbitkan. Sertifikat tetap dapat diverifikasi via nomor SRT.');
     }
 
     public function resetToken(Registration $registration)
@@ -237,10 +252,14 @@ class RegistrationController extends Controller
         }
 
         $plain = LoginToken::issue($user);
+        // Token baru = kredensial baru: hanguskan sesi aktif lain.
+        $user->increment('session_version');
+
+        \App\Support\Notifier::kePengguna($user->id, 'Token login diperbarui', "Admin menerbitkan token baru untuk akun Anda. Token lama hangus. Ambil token baru ke TU bila belum menerimanya.");
 
         AdminLog::record('user.reset_token', 'User', $user->id, "Reset token login {$user->username}.");
 
-        return back()->with('status', "Token baru untuk {$user->name}: {$plain} — sampaikan SEKARANG, token lama hangus.");
+        return back()->with('status', "Token baru untuk {$user->name}: {$plain} — sampaikan SEKARANG, token lama hangus. Siswa juga dapat notifikasi in-app.");
     }
 
     public function resetPassword(Request $request, Registration $registration)
@@ -261,9 +280,11 @@ class RegistrationController extends Controller
         ])->save();
         $user->increment('session_version');
 
+        \App\Support\Notifier::kePengguna($user->id, 'Password diperbarui admin', 'Password akun Anda direset admin. Gunakan password baru untuk login berikutnya.');
+
         AdminLog::record('user.reset_password', 'User', $user->id, "Reset password {$user->username}.");
 
-        return back()->with('status', 'Password direset. Sampaikan password baru ke siswa.');
+        return back()->with('status', 'Password direset. Sampaikan password baru ke siswa (siswa juga dapat notifikasi in-app).');
     }
 
     public function terbitkanSertifikat(Registration $registration)

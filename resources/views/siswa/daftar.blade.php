@@ -81,7 +81,7 @@
                             Pendaftaran Berhasil & Diterima
                         </span>
                         <h2 class="mt-1.5 text-2xl font-black text-slate-900">{{ $existing->eskul_utama }}</h2>
-                        <p class="text-xs text-slate-500">Tahun Ajaran {{ $periode->periode }} • SMK Bagimu Negeriku</p>
+                        <p class="text-xs text-slate-500">Tahun Ajaran {{ $periode->periode }} • {{ \App\Models\AppSetting::get('school.name', 'Sekolah') }}</p>
                     </div>
                 </div>
 
@@ -186,6 +186,9 @@
                             </label>
                             <input id="kelas" name="kelas" type="text" value="{{ old('kelas', $user->student?->kelas ?? '') }}" required placeholder="Contoh: 10 RPL 1 atau 11 DKV 2"
                                    class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 font-medium">
+                            @error('kelas')
+                                <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
+                            @enderror
                             <p class="mt-1 text-[10px] text-slate-400">Format: Tingkat (10/11/12) + Jurusan + Rombel.</p>
                         </div>
 
@@ -202,6 +205,9 @@
                                     </option>
                                 @endforeach
                             </select>
+                            @error('jurusan')
+                                <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         {{-- Usia & No. Absen --}}
@@ -210,8 +216,11 @@
                                 <label for="usia" class="block font-bold text-slate-700 mb-1">
                                     Usia (Tahun) <span class="text-rose-500">*</span>
                                 </label>
-                                <input id="usia" name="usia" type="number" min="13" max="22" value="{{ old('usia', 16) }}" required
+                                <input id="usia" name="usia" type="number" min="13" max="20" value="{{ old('usia', 16) }}" required
                                        class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 font-medium">
+                                @error('usia')
+                                    <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
                                 <label for="no_absen" class="block font-bold text-slate-700 mb-1">
@@ -219,6 +228,9 @@
                                 </label>
                                 <input id="no_absen" name="no_absen" type="number" min="1" max="99" value="{{ old('no_absen', $user->student?->no_absen ?? '') }}" required placeholder="1-50"
                                        class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 font-medium">
+                                @error('no_absen')
+                                    <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
 
@@ -229,6 +241,9 @@
                             </label>
                             <input id="nama_wali_kelas" name="nama_wali_kelas" type="text" value="{{ old('nama_wali_kelas') }}" placeholder="Nama lengkap wali kelas"
                                    class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500">
+                            @error('nama_wali_kelas')
+                                <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         {{-- Jenis Kelamin --}}
@@ -246,6 +261,9 @@
                                     </label>
                                 @endforeach
                             </div>
+                            @error('gender')
+                                <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         {{-- Nomor WhatsApp --}}
@@ -255,6 +273,9 @@
                             </label>
                             <input id="whatsapp" name="whatsapp" type="text" value="{{ old('whatsapp') }}" placeholder="Contoh: 081234567890"
                                    class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500">
+                            @error('whatsapp')
+                                <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
+                            @enderror
                             <p class="mt-1 text-[10px] text-slate-400">Untuk mempermudah pembina mengundang Anda ke grup ekstrakurikuler.</p>
                         </div>
                     </div>
@@ -282,7 +303,7 @@
                                 <option value="">— Silakan Pilih Salah Satu Ekstrakurikuler —</option>
                                 @foreach ($eskuls as $o)
                                     <option value="{{ $o['name'] }}"
-                                        @selected(old('eskul_utama') === $o['name'])
+                                        @selected(old('eskul_utama', $pilihanAwal ?? null) === $o['name'])
                                         @disabled($o['penuh'])
                                         data-pembina="{{ $o['pembina_nama'] }}"
                                         data-jadwal="{{ $o['jadwal'] }}"
@@ -292,10 +313,13 @@
                                         data-terisi="{{ $o['terisi'] }}"
                                         data-kuota-text="{{ $o['kuota_aktif'] ? $o['terisi'].'/'.$o['kuota'].($o['penuh'] ? ' (Penuh)' : '') : 'Bebas' }}"
                                         data-desc="{{ $o['description'] }}">
-                                        {{ $o['name'] }} @if($o['kuota_aktif']) [Kuota: {{ $o['terisi'] }}/{{ $o['kuota'] }} @if($o['penuh']) - PENUH @endif] @endif
+                                        {{ $o['name'] }}{{ $o['kuota_aktif'] ? ' [Kuota: '.$o['terisi'].'/'.$o['kuota'].($o['penuh'] ? ' - PENUH' : '').']' : '' }}
                                     </option>
                                 @endforeach
                             </select>
+                            @error('eskul_utama')
+                                <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         {{-- Card Detail Eskul Terpilih (Interaktif & Modern) --}}
@@ -344,12 +368,15 @@
                             <select id="eskul_cadangan" name="eskul_cadangan" class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 pr-10 py-2.5 font-medium text-slate-700">
                                 <option value="">— Tidak Ada Pilihan Cadangan —</option>
                                 @foreach ($eskuls as $o)
-                                    <option value="{{ $o['name'] }}" @selected(old('eskul_cadangan') === $o['name'])>
-                                        {{ $o['name'] }}
+                                    <option value="{{ $o['name'] }}" @selected(old('eskul_cadangan') === $o['name']) @disabled($o['penuh'])>
+                                        {{ $o['name'] }}{{ $o['kuota_aktif'] ? ' ['.$o['terisi'].'/'.$o['kuota'].($o['penuh'] ? ' - PENUH' : '').']' : ' [Bebas]' }}
                                     </option>
                                 @endforeach
                             </select>
-                            <p class="mt-1 text-[10px] text-slate-400">Pilihan cadangan dipertimbangkan apabila kuota pada eskul utama telah penuh saat pendaftaran diproses.</p>
+                            @error('eskul_cadangan')
+                                <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
+                            @enderror
+                            <p class="mt-1 text-[10px] text-slate-400">Pilihan cadangan dipertimbangkan apabila kuota pada eskul utama telah penuh saat pendaftaran diproses. Eskul penuh tidak bisa dipilih.</p>
                         </div>
 
                         {{-- Alasan / Motivasi --}}
@@ -359,6 +386,9 @@
                             </label>
                             <textarea id="alasan" name="alasan" rows="3" maxlength="1000" placeholder="Ceritakan motivasi, minat, bakat, atau harapan Anda mengikuti kegiatan ekstrakurikuler ini..."
                                       class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 leading-relaxed">{{ old('alasan') }}</textarea>
+                            @error('alasan')
+                                <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
                 </div>

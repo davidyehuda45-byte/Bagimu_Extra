@@ -34,9 +34,9 @@ class PeriodeController extends Controller
             'tahun_ajaran' => ['nullable', 'string', 'max:9'],
             'semester' => ['nullable', 'string', 'max:20'],
             'tgl_mulai' => ['nullable', 'date'],
-            'tgl_selesai' => ['nullable', 'date'],
+            'tgl_selesai' => ['nullable', 'date', 'after_or_equal:tgl_mulai'],
             'status' => ['required', Rule::enum(PeriodeStatus::class)],
-            'max_eskul_per_siswa' => ['required', 'integer', 'min:1'],
+            'max_eskul_per_siswa' => ['required', 'integer', 'min:1', 'max:5'],
         ]);
 
         DB::transaction(function () use ($data) {

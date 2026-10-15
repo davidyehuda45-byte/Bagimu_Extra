@@ -1,1 +1,7 @@
-Demo: siswa NIS 10001 + token 55290023, admin admin@sekolah.sch.id / password.
+Akun demo dibuat via seeder (jangan commit token asli ke repo).
+
+- Admin: admin@sekolah.sch.id / password (dibuat DatabaseSeeder, diblokir di production).
+- Siswa: buat via `php artisan db:seed`, token ditampilkan sekali di output seeder.
+  Ambil token aktif via TU di menu Direktori Siswa → Token, atau cetak Kartu Login.
+
+Contoh lama (NIS 10001) sudah tidak valid karena token dirotasi tiap seed.

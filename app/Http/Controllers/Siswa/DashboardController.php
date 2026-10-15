@@ -29,7 +29,7 @@ class DashboardController extends Controller
                 ->first();
         }
 
-        $pengumuman = collect();
+        $pengumuman = $user->inappNotifications()->latest()->take(5)->get();
 
         $namaEskul = $user->registrations()
             ->get(['eskul_utama', 'eskul_cadangan'])
@@ -58,7 +58,7 @@ class DashboardController extends Controller
 
         $hadirSemua = $ringkasan->sum('hadir');
         $totalSemua = $ringkasan->sum('total');
-        $persenHadir = $totalSemua > 0 ? round($hadirSemua / $totalSemua * 100, 1) : 100;
+        $persenHadir = $totalSemua > 0 ? round($hadirSemua / $totalSemua * 100, 1) : 0;
 
         $izinPending = $regIds->isEmpty()
             ? 0
@@ -74,5 +74,13 @@ class DashboardController extends Controller
             'persenHadir',
             'izinPending'
         ));
+    }
+
+    public function pengumuman(): View
+    {
+        $user = auth()->user();
+        $daftar = $user->inappNotifications()->latest()->paginate(20);
+
+        return view('siswa.pengumuman', compact('daftar'));
     }
 }

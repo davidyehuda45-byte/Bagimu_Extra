@@ -10,10 +10,12 @@ use App\Http\Controllers\Siswa\StatusController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:student', \App\Http\Middleware\MaintenanceMode::class])->prefix('siswa')->name('siswa.')->group(function () {
-    Route::get('/', [PendaftaranController::class, 'create'])->name('dashboard');
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/daftar', [PendaftaranController::class, 'create'])->name('daftar');
     Route::post('/daftar', [PendaftaranController::class, 'store'])->name('daftar.store');
+
+    Route::get('/pengumuman', [DashboardController::class, 'pengumuman'])->name('pengumuman');
 
     Route::get('/status', [StatusController::class, 'index'])->name('status');
 

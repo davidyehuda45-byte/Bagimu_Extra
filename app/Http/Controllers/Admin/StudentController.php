@@ -137,16 +137,19 @@ class StudentController extends Controller
 
     public function store(Request $request)
     {
+        if (is_string($request->input('nisn')) && trim($request->input('nisn')) === '') {
+            $request->merge(['nisn' => null]);
+        }
         $data = $request->validate([
             'nis' => ['required', 'string', 'max:20', 'unique:students,nis'],
             'nisn' => ['nullable', 'string', 'max:20', 'unique:students,nisn'],
             'nama' => ['required', 'string', 'max:100'],
-            'kelas' => ['required', 'string', 'max:50'],
+            'kelas' => ['required', 'string', 'min:3', 'max:50', 'regex:/^(XII|XI|X|10|11|12)\s+(RPL|KULINER|DKV|TP|TKP)\s*\d{0,2}$/i'],
             'jurusan' => ['required', Rule::enum(Jurusan::class)],
             'gender' => ['nullable', Rule::enum(Gender::class)],
-            'no_absen' => ['nullable', 'integer', 'min:1'],
+            'no_absen' => ['nullable', 'integer', 'min:1', 'max:99'],
             'wali_nama' => ['nullable', 'string', 'max:100'],
-            'wali_kontak' => ['nullable', 'string', 'max:20'],
+            'wali_kontak' => ['nullable', 'string', 'max:20', 'regex:/^(\+?62|08)[\d\s\-().]{7,15}$/'],
             'status' => ['nullable', 'string', 'in:AKTIF,LULUS,PINDAH,NONAKTIF,ALUMNI'],
         ]);
 
@@ -181,16 +184,19 @@ class StudentController extends Controller
 
     public function update(Request $request, Student $student)
     {
+        if (is_string($request->input('nisn')) && trim($request->input('nisn')) === '') {
+            $request->merge(['nisn' => null]);
+        }
         $data = $request->validate([
             'nis' => ['required', 'string', 'max:20', 'unique:students,nis,'.$student->id],
             'nisn' => ['nullable', 'string', 'max:20', 'unique:students,nisn,'.$student->id],
             'nama' => ['required', 'string', 'max:100'],
-            'kelas' => ['required', 'string', 'max:50'],
+            'kelas' => ['required', 'string', 'min:3', 'max:50', 'regex:/^(XII|XI|X|10|11|12)\s+(RPL|KULINER|DKV|TP|TKP)\s*\d{0,2}$/i'],
             'jurusan' => ['required', Rule::enum(Jurusan::class)],
             'gender' => ['nullable', Rule::enum(Gender::class)],
-            'no_absen' => ['nullable', 'integer', 'min:1'],
+            'no_absen' => ['nullable', 'integer', 'min:1', 'max:99'],
             'wali_nama' => ['nullable', 'string', 'max:100'],
-            'wali_kontak' => ['nullable', 'string', 'max:20'],
+            'wali_kontak' => ['nullable', 'string', 'max:20', 'regex:/^(\+?62|08)[\d\s\-().]{7,15}$/'],
             'status' => ['nullable', 'string', 'in:AKTIF,LULUS,PINDAH,NONAKTIF,ALUMNI'],
             'alasan' => ['required', 'string', 'max:500'],
         ]);
@@ -695,10 +701,13 @@ class StudentController extends Controller
         }
 
         $plain = LoginToken::issue($user);
+        $user->increment('session_version');
+
+        \App\Support\Notifier::kePengguna($user->id, 'Token login diperbarui', "Admin menerbitkan token baru untuk NIS {$student->nis}. Token lama hangus.");
 
         AdminLog::record('student.token', 'student', $student->id, "Menerbitkan token login NIS {$student->nis}");
 
-        return redirect()->back()->with('status', "Token baru NIS {$student->nis}: {$plain} — catat/cetak SEKARANG, tidak ditampilkan lagi!");
+        return redirect()->back()->with('status', "Token baru NIS {$student->nis}: {$plain} — catat/cetak SEKARANG, tidak ditampilkan lagi! Siswa juga dapat notifikasi in-app.");
     }
 
     public function revokeToken(Student $student)
@@ -710,15 +719,28 @@ class StudentController extends Controller
         }
 
         LoginToken::revoke($user);
+        $user->increment('session_version');
 
         AdminLog::record('student.token.revoke', 'student', $student->id, "Mencabut token login NIS {$student->nis}");
 
         return redirect()->back()->with('status', "Token login NIS {$student->nis} telah dicabut.");
     }
 
-    public function kartu(Student $student)
+    public function kartu(Request $request, Student $student)
     {
         $user = $student->user;
+
+        // GET harus idempoten: jangan buat akun / terbitkan token baru.
+        if ($request->isMethod('get')) {
+            $plainToken = ($user?->login_token && $user?->login_token_revoked_at === null)
+                ? $user->login_token
+                : null;
+
+            return view('admin.students.kartu', [
+                'student' => $student,
+                'plainToken' => $plainToken,
+            ]);
+        }
 
         if (! $user) {
             $user = User::create([

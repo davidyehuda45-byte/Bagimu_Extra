@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Panel') — {{ config('app.name', 'Bagimu Extra') }}</title>
     <meta name="theme-color" content="#1e3a8a">
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" /></noscript>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @include('layouts.partials.session-guard')
 </head>
 <body>
+<a href="#konten-utama" class="skip-link">Lewati ke konten utama</a>
 @php
     $user = auth()->user();
     $isAdminOnly = $user && $user->hasRole(\App\Enums\Role::ADMIN);
@@ -60,17 +64,17 @@
                 <x-school-logo :size="32" />
                 <span class="text-sm font-bold text-slate-900">{{ config('app.name', 'Bagimu Extra') }}</span>
             </div>
-            <details class="relative">
-                <summary class="flex h-9 w-9 list-none items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 [&::-webkit-details-marker]:hidden" aria-label="Menu">
-                    <x-icon name="menu" class="h-5 w-5" />
-                </summary>
-                <nav class="absolute right-0 mt-2 max-h-[75vh] w-64 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-3 shadow-xl">
-                    @include('layouts.partials.staff-nav')
-                </nav>
-            </details>
+            <x-popover label="Menu navigasi" panelClass="w-64 max-h-[75vh] overflow-y-auto">
+                <x-slot:trigger>
+                    <button type="button" class="flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100" aria-label="Menu navigasi" aria-haspopup="menu">
+                        <x-icon name="menu" class="h-5 w-5" />
+                    </button>
+                </x-slot:trigger>
+                @include('layouts.partials.staff-nav')
+            </x-popover>
         </header>
 
-        <main class="w-full p-4 lg:p-8">
+        <main id="konten-utama" class="w-full p-4 lg:p-8">
             @include('layouts.partials.flash-messages')
             @yield('content')
         </main>

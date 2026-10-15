@@ -33,6 +33,12 @@ class JadwalController extends Controller
             'tempat' => ['required', 'string', 'max:100'],
         ]);
 
+        if ($this->bentrok($eskul, $data['hari'], $data['jam_mulai'], $data['jam_selesai'])) {
+            return back()->withInput()->withErrors([
+                'hari' => 'Jadwal bentrok dengan jadwal lain di hari yang sama.',
+            ]);
+        }
+
         $jadwal = $eskul->jadwals()->create($data);
 
         AdminLog::record('pembina.jadwal.store', EskulJadwal::class, $jadwal->id, "Tambah jadwal {$eskul->name} {$data['hari']} {$data['jam_mulai']}-{$data['jam_selesai']}");
@@ -51,6 +57,12 @@ class JadwalController extends Controller
             'jam_selesai' => ['required', 'date_format:H:i', 'after:jam_mulai'],
             'tempat' => ['required', 'string', 'max:100'],
         ]);
+
+        if ($this->bentrok($jadwal->eskul, $data['hari'], $data['jam_mulai'], $data['jam_selesai'], $jadwal->id)) {
+            return back()->withInput()->withErrors([
+                'hari' => 'Jadwal bentrok dengan jadwal lain di hari yang sama.',
+            ]);
+        }
 
         $jadwal->update($data);
 
@@ -72,5 +84,15 @@ class JadwalController extends Controller
         AdminLog::record('pembina.jadwal.destroy', EskulJadwal::class, $jadwal->id, "Hapus jadwal {$info}");
 
         return redirect()->route('pembina.eskul.show', $eskulId)->with('status', 'Jadwal berhasil dihapus.');
+    }
+
+    private function bentrok(Eskul $eskul, string $hari, string $mulai, string $selesai, ?int $kecualiId = null): bool
+    {
+        return $eskul->jadwals()
+            ->where('hari', $hari)
+            ->when($kecualiId, fn ($q) => $q->where('id', '!=', $kecualiId))
+            ->where('jam_mulai', '<', $selesai)
+            ->where('jam_selesai', '>', $mulai)
+            ->exists();
     }
 }

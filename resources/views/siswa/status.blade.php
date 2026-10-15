@@ -37,7 +37,7 @@
                     </span>
                     <div class="min-w-0">
                         <h2 class="truncate text-xl font-bold text-slate-900">{{ $aktif->user?->name }}</h2>
-                        <p class="truncate text-sm text-slate-500">{{ $aktif->user?->email }}</p>
+                        <p class="truncate text-sm text-slate-500">NIS {{ $aktif->nis ?? $aktif->user?->username }} • Akun siswa</p>
                         <p class="mt-1 text-sm font-medium text-slate-700">{{ $aktif->kelas }} • {{ $aktif->jurusan?->short() ?? '—' }}</p>
                         <p class="text-xs text-slate-400">Periode {{ $aktif->periode }}</p>
                     </div>
@@ -60,11 +60,15 @@
                         @endif
                     </div>
                     <div class="rounded-xl bg-slate-50 p-3.5">
-                        <p class="text-xs font-medium text-slate-400">Kontak Pembina</p>
-                        <a href="https://wa.me/{{ \App\Support\Whatsapp::normalize($kontakPembina) }}" target="_blank" rel="noopener noreferrer"
-                           class="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-600 hover:text-emerald-700">
-                            +{{ \App\Support\Whatsapp::normalize($kontakPembina) }}
-                        </a>
+                        <p class="text-xs font-medium text-slate-400">Kontak Sekolah</p>
+                        @if (trim((string) $kontakPembina) !== '')
+                            <a href="https://wa.me/{{ \App\Support\Whatsapp::normalize($kontakPembina) }}" target="_blank" rel="noopener noreferrer"
+                               class="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-600 hover:text-emerald-700">
+                                +{{ \App\Support\Whatsapp::normalize($kontakPembina) }}
+                            </a>
+                        @else
+                            <p class="mt-1 text-sm text-slate-400">Belum diatur — hubungi TU.</p>
+                        @endif
                     </div>
                 </div>
 
@@ -92,7 +96,7 @@
                     <div class="mt-4 flex flex-col items-center rounded-xl bg-slate-50 p-4 text-center">
                         {!! SimpleQr::size(180)->generate(route('verify.show', $aktif->verify_token)) !!}
                         <p class="mt-2 font-mono text-sm font-bold tracking-widest text-slate-800">{{ $aktif->kode() }}</p>
-                        <p class="text-[11px] text-slate-500">Scan dengan kamera. Jika QR buram saat cetak, ketik kode di atas pada halaman verifikasi.</p>
+                        <p class="text-[11px] text-slate-500">QR verifikasi E-Card (bukan QR login). Scan dengan kamera. Jika QR buram saat cetak, ketik kode di atas pada halaman verifikasi.</p>
                     </div>
                 @endif
 
@@ -114,7 +118,7 @@
         </div>
 
         <div class="no-print">
-            <a href="{{ route('siswa.daftar') }}" class="block rounded-xl border border-slate-300 bg-white px-5 py-3 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50">Kembali ke halaman pendaftaran</a>
+            <a href="{{ route('siswa.dashboard') }}" class="block rounded-xl border border-slate-300 bg-white px-5 py-3 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50">Kembali ke Beranda</a>
         </div>
     @endif
 
@@ -126,7 +130,7 @@
                     @if ($aktif && $r->id === $aktif->id) @continue @endif
                     <li class="flex justify-between gap-2">
                         <span>{{ $r->periode }} • {{ $r->eskul_utama }}</span>
-                        <span class="font-semibold text-emerald-700">Terdaftar</span>
+                        <x-badge tone="{{ $r->status->value === 'APPROVED' ? 'emerald' : ($r->status->value === 'PENDING' ? 'amber' : 'rose') }}">{{ $r->status->label() }}</x-badge>
                     </li>
                 @endforeach
             </ul>

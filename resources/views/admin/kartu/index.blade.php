@@ -15,7 +15,7 @@
         </form>
         <button type="button" onclick="window.print()" class="inline-flex items-center gap-2 rounded-xl bg-blue-700 px-4 py-2.5 text-xs font-bold text-white hover:bg-blue-800 shadow transition-colors">
             <x-icon name="printer" class="h-4 w-4" />
-            <span>Cetak Semua ({{ $kartu->total() }})</span>
+            <span>Cetak Halaman Ini ({{ $kartu->count() }} dari {{ $kartu->total() }})</span>
         </button>
     </div>
 </div>
@@ -75,12 +75,12 @@
                     @endif
                 </div>
 
-                {{-- QR Code mini --}}
+                {{-- QR Code mini: hanya untuk buka portal login, bukan verifikasi --}}
                 <div class="flex flex-col items-center pt-1">
                     <div class="rounded-xl border border-slate-200 bg-white p-1.5">
                         {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(80)->margin(1)->generate(route('siswa.login')) !!}
                     </div>
-                    <p class="mt-1 text-[8px] text-slate-400">Pindai QR untuk portal login</p>
+                    <p class="mt-1 text-[8px] text-slate-400">QR Login — pindai untuk buka halaman login (bukan verifikasi E-Card)</p>
                 </div>
             </div>
 

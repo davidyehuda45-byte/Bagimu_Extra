@@ -74,7 +74,7 @@ class KehadiranController extends Controller
     {
         $data = $request->validate([
             'eskul_id' => ['required', 'exists:eskuls,id'],
-            'tanggal' => ['required', 'date'],
+            'tanggal' => ['required', 'date', 'before_or_equal:today', 'after_or_equal:'.now()->subYear()->toDateString()],
             'status' => ['required', 'array'],
             'status.*' => ['required', 'in:HADIR,IZIN,SAKIT,ALPA'],
             'keterangan' => ['nullable', 'array'],
@@ -84,10 +84,21 @@ class KehadiranController extends Controller
         $eskul = Eskul::findOrFail($data['eskul_id']);
         $this->pastikanAksesEskul($eskul->id);
 
+        // Hanya pendaftaran APPROVED milik eskul ini yang boleh ditulis.
+        $bolehIds = \App\Models\Registration::where('eskul_utama', $eskul->name)
+            ->where('status', \App\Enums\Status::APPROVED)
+            ->pluck('id')->map(fn ($v) => (string) $v)->all();
+        $boleh = array_flip($bolehIds);
+
         $diabaikan = 0;
         $disimpan = 0;
+        $ditolak = 0;
 
         foreach ($data['status'] as $registrationId => $status) {
+            if (! isset($boleh[(string) $registrationId])) {
+                $ditolak++;
+                continue;
+            }
             $existing = Kehadiran::where('eskul_id', $eskul->id)
                 ->where('registration_id', $registrationId)
                 ->whereDate('tanggal', $data['tanggal'])
@@ -114,14 +125,19 @@ class KehadiranController extends Controller
 
         AdminLog::record('kehadiran.store', 'Kehadiran', (string) $eskul->id, "Simpan kehadiran {$eskul->name} {$data['tanggal']}: {$disimpan} disimpan, {$diabaikan} diabaikan (terkunci).");
 
-        return back()->with('status', "Kehadiran tersimpan ({$disimpan} baris, {$diabaikan} terkunci diabaikan).");
+        $pesan = "Kehadiran tersimpan ({$disimpan} baris, {$diabaikan} terkunci diabaikan).";
+        if ($ditolak > 0) {
+            $pesan .= " {$ditolak} baris ditolak (bukan anggota eskul ini).";
+        }
+
+        return back()->with('status', $pesan);
     }
 
     public function lock(Request $request)
     {
         $data = $request->validate([
             'eskul_id' => ['required', 'exists:eskuls,id'],
-            'tanggal' => ['required', 'date'],
+            'tanggal' => ['required', 'date', 'before_or_equal:today', 'after_or_equal:'.now()->subYear()->toDateString()],
         ]);
 
         // Pembina boleh mengesahkan eskul ampuannya; membuka kunci khusus admin/operator.
@@ -152,7 +168,7 @@ class KehadiranController extends Controller
 
         $data = $request->validate([
             'eskul_id' => ['required', 'exists:eskuls,id'],
-            'tanggal' => ['required', 'date'],
+            'tanggal' => ['required', 'date', 'before_or_equal:today', 'after_or_equal:'.now()->subYear()->toDateString()],
         ]);
 
         $count = Kehadiran::where('eskul_id', $data['eskul_id'])

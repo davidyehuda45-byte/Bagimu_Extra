@@ -48,6 +48,12 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        // Jangan biarkan admin terakhir menghapus dirinya sendiri.
+        if ($user->role === \App\Enums\Role::ADMIN
+            && \App\Models\User::where('role', \App\Enums\Role::ADMIN)->count() <= 1) {
+            return back()->withErrors(['password' => 'Tidak dapat menghapus akun admin terakhir.'], 'userDeletion');
+        }
+
         Auth::logout();
 
         $user->delete();

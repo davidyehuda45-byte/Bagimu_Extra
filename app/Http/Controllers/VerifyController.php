@@ -22,7 +22,7 @@ class VerifyController extends Controller
             $registration = $this->cari($kode);
 
             if (! $registration) {
-                $error = 'Kode tidak dikenal. Periksa kembali kode pada E-Card siswa.';
+                $error = 'Kode tidak dikenal. Periksa kembali kode E-Card (ESK-…), nomor sertifikat (SRT-…), atau token pada dokumen.';
             }
         }
 
@@ -63,12 +63,24 @@ class VerifyController extends Controller
                 ->first();
         }
 
+        // Nomor sertifikat: SRT-YYYY-XXXXXX → cari via sertifikat.
+        if (preg_match('/^SRT-\d{4}-[A-Z2-9]{6}$/i', $kode)) {
+            $cert = \App\Models\Certificate::where('nomor', strtoupper($kode))->first();
+
+            return $cert ? Registration::with(['user', 'certificate'])->find($cert->registration_id) : null;
+        }
+
         return Registration::dariKode($kode)?->load(['user', 'certificate']);
     }
 
     private function jadwals(Registration $registration)
     {
-        return Eskul::where('name', $registration->eskul_utama)->first()?->jadwals
-            ?? collect();
+        $eskul = Eskul::where('name', $registration->eskul_utama)->first();
+
+        if (! $eskul) {
+            return collect();
+        }
+
+        return $eskul->jadwals;
     }
 }

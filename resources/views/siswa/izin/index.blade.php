@@ -22,6 +22,9 @@
             @if ($izin->bukti)
                 <p class="mt-1"><a href="{{ asset('storage/' . $izin->bukti) }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:underline font-semibold"><x-icon name="file" class="h-3.5 w-3.5" /> Lampiran Bukti</a></p>
             @endif
+            @if ($izin->decided_at)
+                <p class="mt-1 text-[11px] text-slate-400">Diputuskan {{ $izin->decided_at->format('d M Y H:i') }}{{ $izin->decided_by ? ' oleh '.$izin->decided_by : '' }}</p>
+            @endif
         </div>
     @empty
         <div class="rounded-xl bg-white border p-4 text-center">
