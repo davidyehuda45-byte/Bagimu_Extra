@@ -36,8 +36,7 @@
             @endif
         </p>
         <p><span class="text-slate-500">Tgl Daftar/Ubah:</span> {{ $registration->created_at?->format('d/m/Y H:i') }} / {{ $registration->updated_at?->format('d/m/Y H:i') }}</p>
-        <p><span class="text-slate-500">Eskul Utama:</span> {{ $registration->eskul_utama }}</p>
-        <p><span class="text-slate-500">Eskul Cadangan:</span> {{ $registration->eskul_cadangan ?? '-' }}</p>
+        <p><span class="text-slate-500">Eskul Pilihan:</span> {{ $registration->eskul_utama }}</p>
         <p class="sm:col-span-2"><span class="text-slate-500">Alasan:</span> {{ $registration->alasan ?? '-' }}</p>
         @if ($registration->alasan_penolakan)
             <p class="sm:col-span-2 rounded-xl bg-rose-50 border border-rose-200 p-3 text-rose-800"><b>Alasan Penolakan:</b> {{ $registration->alasan_penolakan }}</p>
@@ -80,14 +79,6 @@
             <select name="eskul_utama" class="w-full border-slate-300 rounded-xl">
                 @foreach ($eskulOptions as $o)
                     <option value="{{ $o['name'] }}" @selected(old('eskul_utama', $registration->eskul_utama) === $o['name'])>{{ $o['name'] }} ({{ $o['info'] }})</option>
-                @endforeach
-            </select>
-        </div>
-        <div><label class="block font-medium text-slate-700 mb-1">Eskul Cadangan</label>
-            <select name="eskul_cadangan" class="w-full border-slate-300 rounded-xl">
-                <option value="">— Tidak ada —</option>
-                @foreach ($eskulOptions as $o)
-                    <option value="{{ $o['name'] }}" @selected(old('eskul_cadangan', $registration->eskul_cadangan) === $o['name'])>{{ $o['name'] }} ({{ $o['info'] }})</option>
                 @endforeach
             </select>
         </div>

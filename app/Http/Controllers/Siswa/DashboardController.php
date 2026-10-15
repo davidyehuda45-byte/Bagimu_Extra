@@ -32,8 +32,8 @@ class DashboardController extends Controller
         $pengumuman = $user->inappNotifications()->latest()->take(5)->get();
 
         $namaEskul = $user->registrations()
-            ->get(['eskul_utama', 'eskul_cadangan'])
-            ->flatMap(fn ($r) => [$r->eskul_utama, $r->eskul_cadangan])
+            ->get(['eskul_utama'])
+            ->pluck('eskul_utama')
             ->filter()
             ->unique()
             ->values()

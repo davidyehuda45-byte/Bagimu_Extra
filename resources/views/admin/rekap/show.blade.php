@@ -38,9 +38,6 @@
                         <td class="py-2 px-3">
                             <p class="font-semibold text-slate-900">{{ $r->user?->name ?? '—' }}</p>
                             <p class="text-[11px] text-slate-400 sm:hidden">{{ $r->user?->email }}</p>
-                            @if ($r->eskul_cadangan)
-                                <p class="text-[11px] text-slate-400">Cad: {{ $r->eskul_cadangan }}</p>
-                            @endif
                         </td>
                         <td class="py-2 px-3">{{ $r->kelas }}</td>
                         <td class="py-2 px-3 hidden sm:table-cell">{{ $r->jurusan?->short() ?? '-' }}</td>

@@ -79,7 +79,7 @@
                                 <td class="py-1.5 px-3">{{ $i + 1 }}</td>
                                 <td class="py-1.5 px-3 font-medium">{{ $r->user?->name ?? '—' }}</td>
                                 <td class="py-1.5 px-3 hidden sm:table-cell text-slate-500">{{ $r->user?->email }}</td>
-                                <td class="py-1.5 px-3">{{ $r->eskul_utama }}@if ($r->eskul_cadangan)<span class="block text-[11px] text-slate-400">Cad: {{ $r->eskul_cadangan }}</span>@endif</td>
+                                <td class="py-1.5 px-3">{{ $r->eskul_utama }}</td>
                                 <td class="py-1.5 px-3">
                                     @if ($r->whatsapp && \App\Support\Whatsapp::link($r->whatsapp))
                                         <a href="{{ \App\Support\Whatsapp::link($r->whatsapp) }}" target="_blank" rel="noopener" class="font-medium text-emerald-600 hover:text-emerald-700">WA</a>

@@ -281,8 +281,9 @@
                 </label>
             </div>
 
-            <div class="rounded-xl bg-blue-50 p-2.5 text-[11px] text-blue-800 border border-blue-100 mb-4">
-                💡 <strong>Catatan:</strong> Proses ini akan memproses siswa yang sesuai dengan filter yang aktif saat ini.
+            <div class="rounded-xl bg-blue-50 p-2.5 text-[11px] text-blue-800 border border-blue-100 mb-4 flex items-start gap-2">
+                <x-icon name="bulb" class="h-4 w-4 shrink-0 mt-px" />
+                <span><strong>Catatan:</strong> Proses ini akan memproses siswa yang sesuai dengan filter yang aktif saat ini.</span>
             </div>
 
             <div class="flex items-center justify-end gap-2">
@@ -574,6 +575,15 @@ function exportData(format) {
     window.location.href = url;
 }
 
+// Salin token ke clipboard dengan umpan balik icon
+function salinToken(btn, token) {
+    const ok = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+    const asli = btn.innerHTML;
+    navigator.clipboard.writeText(token);
+    btn.innerHTML = ok;
+    setTimeout(() => { btn.innerHTML = asli; }, 1200);
+}
+
 // Kirim Token via WhatsApp (Ala E-Voting)
 let currentWaPayload = null;
 
@@ -583,7 +593,7 @@ function sendTokenViaWa(nama, nis, token, defaultPhone = '') {
     document.getElementById('wa-phone-input').value = defaultPhone || '';
 
     const loginUrl = "{{ url('/siswa/login') }}";
-    const msg = `Halo *${nama}* (NIS: *${nis}*),\n\nBerikut adalah kredensial token login untuk pemilihan Ekstrakurikuler SMK Bagimu Negeriku:\n\n🔑 *Token Login:* ${token}\n🌐 *Tautan Login:* ${loginUrl}\n\nSilakan simpan token ini dengan baik untuk login ke portal siswa.\nTerima kasih.`;
+    const msg = `Halo *${nama}* (NIS: *${nis}*),\n\nBerikut adalah kredensial token login untuk pemilihan Ekstrakurikuler:\n\n*Token Login:* ${token}\n*Tautan Login:* ${loginUrl}\n\nSilakan simpan token ini dengan baik untuk login ke portal siswa.\nTerima kasih.`;
 
     document.getElementById('wa-message-preview').value = msg;
 

@@ -53,7 +53,7 @@ class NilaiController extends Controller
                 continue;
             }
 
-            if ($reg->eskul_utama !== $eskul->name && $reg->eskul_cadangan !== $eskul->name) {
+            if ($reg->eskul_utama !== $eskul->name) {
                 continue;
             }
 

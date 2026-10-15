@@ -122,11 +122,6 @@
                         @endif
                     </div>
 
-                    @if ($existing->eskul_cadangan)
-                        <div class="text-xs text-slate-500 pt-1 border-t border-slate-100">
-                            Pilihan eskul cadangan: <strong class="text-slate-700">{{ $existing->eskul_cadangan }}</strong>
-                        </div>
-                    @endif
                 </div>
 
                 {{-- Alert Informasi Selesai --}}
@@ -153,8 +148,8 @@
         @elseif ($windowOpen)
             {{-- Pemberitahuan Pendaftaran --}}
             <div class="flex items-start gap-3.5 rounded-2xl border border-amber-200 bg-amber-50/80 p-4 text-xs text-amber-900 shadow-2xs">
-                <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-amber-200 text-amber-900 font-bold text-xs mt-0.5">
-                    !
+                <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-amber-200 text-amber-900 mt-0.5">
+                    <x-icon name="alert" class="h-4 w-4" />
                 </div>
                 <div class="leading-relaxed">
                     <strong class="font-bold text-amber-950">Pemberitahuan Penting:</strong>
@@ -276,7 +271,7 @@
                             @error('whatsapp')
                                 <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
                             @enderror
-                            <p class="mt-1 text-[10px] text-slate-400">Untuk mempermudah pembina mengundang Anda ke grup ekstrakurikuler.</p>
+                            <p class="mt-1 text-[10px] text-slate-400">Nomor ini otomatis tersimpan ke Direktori Siswa untuk koordinasi pembina.</p>
                         </div>
                     </div>
                 </div>
@@ -289,7 +284,7 @@
                         </div>
                         <div>
                             <h2 class="text-sm font-bold text-slate-900">Pilihan Ekstrakurikuler</h2>
-                            <p class="text-[11px] text-slate-400">Tentukan eskul utama yang diminati serta eskul cadangan jika kuota utama penuh.</p>
+                            <p class="text-[11px] text-slate-400">Tentukan satu eskul yang diminati. Bila kuota penuh, silakan pilih eskul lain.</p>
                         </div>
                     </div>
 
@@ -326,7 +321,7 @@
                         <div id="detail-eskul-box" class="hidden rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50/90 via-slate-50/50 to-blue-50/40 p-5 shadow-2xs transition-all animate-fade-in">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-blue-100 pb-3 mb-3">
                                 <div class="flex items-center gap-2">
-                                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600 text-white font-bold text-xs">★</span>
+                                    <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600 text-white"><x-icon name="star" class="h-4 w-4" /></span>
                                     <h4 class="font-extrabold text-blue-950 text-sm" id="detail-eskul-title">Detail Eskul</h4>
                                 </div>
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-bold text-blue-800 border border-blue-200 shadow-2xs self-start sm:self-auto" id="detail-eskul-kuota"></span>
@@ -358,25 +353,6 @@
                                 <span class="font-bold text-slate-400 uppercase tracking-wider text-[10px] block mb-1.5">Jadwal & Lokasi Latihan:</span>
                                 <div id="detail-eskul-jadwal-list" class="space-y-1.5"></div>
                             </div>
-                        </div>
-
-                        {{-- Eskul Cadangan --}}
-                        <div>
-                            <label for="eskul_cadangan" class="block font-bold text-slate-700 mb-1">
-                                Eskul Cadangan <span class="text-slate-400 font-normal">(Opsional)</span>
-                            </label>
-                            <select id="eskul_cadangan" name="eskul_cadangan" class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 pr-10 py-2.5 font-medium text-slate-700">
-                                <option value="">— Tidak Ada Pilihan Cadangan —</option>
-                                @foreach ($eskuls as $o)
-                                    <option value="{{ $o['name'] }}" @selected(old('eskul_cadangan') === $o['name']) @disabled($o['penuh'])>
-                                        {{ $o['name'] }}{{ $o['kuota_aktif'] ? ' ['.$o['terisi'].'/'.$o['kuota'].($o['penuh'] ? ' - PENUH' : '').']' : ' [Bebas]' }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('eskul_cadangan')
-                                <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
-                            @enderror
-                            <p class="mt-1 text-[10px] text-slate-400">Pilihan cadangan dipertimbangkan apabila kuota pada eskul utama telah penuh saat pendaftaran diproses. Eskul penuh tidak bisa dipilih.</p>
                         </div>
 
                         {{-- Alasan / Motivasi --}}
@@ -427,18 +403,15 @@
                             <span class="text-slate-500">Kelas / Rombel:</span>
                             <span class="font-bold text-slate-900" id="modal-review-kelas">-</span>
                         </div>
-                        <div class="flex justify-between items-center pb-2 border-b border-slate-200/60">
-                            <span class="text-slate-500">Eskul Utama:</span>
-                            <span class="font-extrabold text-blue-700 text-sm" id="modal-review-eskul-utama">-</span>
-                        </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-slate-500">Eskul Cadangan:</span>
-                            <span class="font-semibold text-slate-700" id="modal-review-eskul-cadangan">-</span>
+                            <span class="text-slate-500">Eskul Pilihan:</span>
+                            <span class="font-extrabold text-blue-700 text-sm" id="modal-review-eskul-utama">-</span>
                         </div>
                     </div>
 
-                    <div class="rounded-xl bg-amber-50 p-3 text-[11px] text-amber-900 border border-amber-200/80 mb-5 leading-relaxed">
-                        ⚠️ <strong>Penting:</strong> Pendaftaran bersifat permanen dan <strong>tidak dapat diubah</strong> setelah formulir dikirim.
+                    <div class="rounded-xl bg-amber-50 p-3 text-[11px] text-amber-900 border border-amber-200/80 mb-5 leading-relaxed flex items-start gap-2">
+                        <x-icon name="alert" class="h-4 w-4 shrink-0 mt-px" />
+                        <span><strong>Penting:</strong> Pendaftaran bersifat permanen dan <strong>tidak dapat diubah</strong> setelah formulir dikirim.</span>
                     </div>
 
                     <div class="flex gap-2">
@@ -540,14 +513,10 @@
                     return;
                 }
 
-                const selCadangan = document.getElementById('eskul_cadangan');
-                const namaCadangan = selCadangan.options[selCadangan.selectedIndex]?.value || 'Tidak ada';
-
                 const kelasInput = document.getElementById('kelas').value.trim();
 
                 document.getElementById('modal-review-kelas').textContent = kelasInput || '-';
                 document.getElementById('modal-review-eskul-utama').textContent = namaEskulUtama;
-                document.getElementById('modal-review-eskul-cadangan').textContent = namaCadangan;
 
                 const modal = document.getElementById('modal-konfirmasi');
                 modal.classList.remove('hidden');

@@ -96,7 +96,7 @@
             <h2 class="font-bold text-slate-900">Aturan Pendaftaran</h2>
             <ol class="mt-2 list-decimal space-y-1 pl-5 text-sm text-slate-600">
                 <li>Satu akun mendaftar satu kali per tahun ajaran.</li>
-                <li>Pilih eskul utama; cadangan dipakai bila kuota utama penuh.</li>
+                <li>Pilih satu eskul; bila kuota penuh pilih eskul lain.</li>
                 <li>Pendaftaran hanya saat jendela dibuka sekolah.</li>
                 <li>Status dapat dipantau di halaman Status masing-masing.</li>
             </ol>

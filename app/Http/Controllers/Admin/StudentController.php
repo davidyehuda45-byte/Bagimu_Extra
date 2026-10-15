@@ -150,6 +150,7 @@ class StudentController extends Controller
             'no_absen' => ['nullable', 'integer', 'min:1', 'max:99'],
             'wali_nama' => ['nullable', 'string', 'max:100'],
             'wali_kontak' => ['nullable', 'string', 'max:20', 'regex:/^(\+?62|08)[\d\s\-().]{7,15}$/'],
+            'whatsapp' => ['nullable', 'string', 'max:20', 'regex:/^(\+?62|08)[\d\s\-().]{7,15}$/'],
             'status' => ['nullable', 'string', 'in:AKTIF,LULUS,PINDAH,NONAKTIF,ALUMNI'],
         ]);
 
@@ -197,6 +198,7 @@ class StudentController extends Controller
             'no_absen' => ['nullable', 'integer', 'min:1', 'max:99'],
             'wali_nama' => ['nullable', 'string', 'max:100'],
             'wali_kontak' => ['nullable', 'string', 'max:20', 'regex:/^(\+?62|08)[\d\s\-().]{7,15}$/'],
+            'whatsapp' => ['nullable', 'string', 'max:20', 'regex:/^(\+?62|08)[\d\s\-().]{7,15}$/'],
             'status' => ['nullable', 'string', 'in:AKTIF,LULUS,PINDAH,NONAKTIF,ALUMNI'],
             'alasan' => ['required', 'string', 'max:500'],
         ]);
@@ -490,7 +492,7 @@ class StudentController extends Controller
         $no = 1;
         foreach ($students as $s) {
             $reg = $s->user?->registrations->first();
-            $wa = $s->wali_kontak ?: ($reg?->whatsapp ?? '');
+            $wa = $s->whatsapp ?: ($s->wali_kontak ?: ($reg?->whatsapp ?? ''));
             $token = ($s->user?->login_token && $s->user?->login_token_revoked_at === null) ? $s->user->login_token : '';
             $statusEskul = $reg ? 'Terdaftar' : 'Belum Memilih';
             $eskulUtama = $reg ? $reg->eskul_utama : '';

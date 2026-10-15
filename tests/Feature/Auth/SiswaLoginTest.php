@@ -40,7 +40,7 @@ class SiswaLoginTest extends TestCase
         $response = $this->post('/siswa/login', ['nis' => '10001', 'token' => $token]);
 
         $this->assertAuthenticatedAs($user);
-        $response->assertRedirect('/siswa');
+        $response->assertRedirect('/siswa/daftar');
         $this->assertSame($user->id, $master->fresh()->user_id);
     }
 

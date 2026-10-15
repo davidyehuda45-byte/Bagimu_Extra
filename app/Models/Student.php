@@ -20,6 +20,7 @@ class Student extends Model
         'no_absen',
         'wali_nama',
         'wali_kontak',
+        'whatsapp',
         'status',
         'user_id',
     ];

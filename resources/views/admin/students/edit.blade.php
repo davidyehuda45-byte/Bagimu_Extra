@@ -63,6 +63,10 @@
             <input type="text" name="wali_kontak" value="{{ old('wali_kontak', $student->wali_kontak) }}" maxlength="20" class="w-full border-slate-300 rounded-xl px-3 py-2 text-sm">
         </div>
         <div>
+            <label class="block text-sm font-medium mb-1 text-slate-700"><span class="inline-flex items-center gap-1.5"><x-icon name="phone" class="h-3.5 w-3.5 text-slate-400" />Nomor HP / WA Siswa</span></label>
+            <input type="text" name="whatsapp" value="{{ old('whatsapp', $student->whatsapp) }}" maxlength="20" placeholder="cth: 081234567890" class="w-full border-slate-300 rounded-xl px-3 py-2 text-sm">
+        </div>
+        <div>
             <label class="block text-sm font-medium mb-1 text-slate-700">Alasan koreksi (wajib, tercatat audit)</label>
             <input type="text" name="alasan" value="{{ old('alasan') }}" required maxlength="500" class="w-full border-slate-300 rounded-xl px-3 py-2 text-sm">
         </div>

@@ -162,8 +162,7 @@
                             <td class="px-3 py-2 font-medium">{{ $daftar->user->name ?? '-' }}</td>
                             <td class="px-3 py-2">{{ $daftar->kelas ?? '-' }}</td>
                             <td class="px-3 py-2 text-gray-600">
-                                Utama: {{ $daftar->eskul_utama }}<br>
-                                Cadangan: {{ $daftar->eskul_cadangan ?? '-' }}
+                                {{ $daftar->eskul_utama }}
                             </td>
                         </tr>
                     @empty

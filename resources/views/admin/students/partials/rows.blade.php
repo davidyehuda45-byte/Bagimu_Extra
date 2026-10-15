@@ -30,13 +30,13 @@
         </td>
         <td class="py-3 px-3">
             @if ($s->user?->login_token && !$s->user?->login_token_revoked_at)
-                @php $waNum = $s->wali_kontak ?: ($reg?->whatsapp ?? ''); @endphp
+                @php $waNum = $s->whatsapp ?: ($s->wali_kontak ?: ($reg?->whatsapp ?? '')); @endphp
                 <div class="inline-flex items-center gap-1 font-mono font-bold text-xs bg-blue-50 text-blue-900 px-2 py-1 rounded-lg border border-blue-200">
                     <span class="tracking-widest">{{ $s->user->login_token }}</span>
-                    <button type="button" onclick="navigator.clipboard.writeText('{{ $s->user->login_token }}'); this.innerText='✓'; setTimeout(()=>this.innerText='❐', 1200)"
-                            class="text-blue-400 hover:text-blue-700 font-normal text-[11px] px-0.5" title="Salin Token">❐</button>
+                    <button type="button" onclick="salinToken(this, '{{ $s->user->login_token }}')"
+                            class="text-blue-400 hover:text-blue-700 px-0.5" title="Salin Token"><x-icon name="copy" class="h-3.5 w-3.5" /></button>
                     <button type="button" onclick="sendTokenViaWa('{{ addslashes($s->nama) }}', '{{ $s->nis }}', '{{ $s->user->login_token }}', '{{ $waNum }}')"
-                            class="text-emerald-600 hover:text-emerald-800 font-bold text-xs px-1 hover:scale-110 transition-transform" title="Kirim Token via WhatsApp">💬</button>
+                            class="text-emerald-600 hover:text-emerald-800 px-1 hover:scale-110 transition-transform" title="Kirim Token via WhatsApp"><x-icon name="send" class="h-3.5 w-3.5" /></button>
                 </div>
                 @if ($s->user?->password_set_at)
                     <span class="block text-[10px] text-slate-400 font-medium mt-0.5">+ Password aktif</span>

@@ -70,7 +70,6 @@ class FiturTambahanTest extends TestCase
             'gender' => 'LAKI_LAKI',
             'whatsapp' => '081234567890',
             'eskul_utama' => 'Futsal',
-            'eskul_cadangan' => '',
             'alasan' => 'Ingin sehat.',
         ])->assertRedirect('/siswa/status');
 

@@ -134,7 +134,6 @@ class EskulController extends Controller
     {
         // Ditolak bila masih ada pendaftar — disarankan nonaktifkan saja.
         $adaPendaftar = Registration::where('eskul_utama', $eskul->name)
-            ->orWhere('eskul_cadangan', $eskul->name)
             ->exists();
 
         if ($adaPendaftar) {

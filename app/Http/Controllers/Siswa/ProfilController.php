@@ -45,9 +45,10 @@ class ProfilController extends Controller
             $user->student->update([
                 'wali_nama' => $validated['wali_nama'] ?? null,
                 'wali_kontak' => $validated['wali_kontak'] ?? null,
+                'whatsapp' => $validated['whatsapp'] ?? null,
             ]);
         }
-        // Catatan: WA siswa disimpan di registrasi terakhir (tidak ada kolom di master students).
+        // WA siswa tersimpan di direktori (master students) dan salinannya di registrasi terakhir.
 
         $terakhir = $user->registrations()->latest()->first();
         if ($terakhir) {

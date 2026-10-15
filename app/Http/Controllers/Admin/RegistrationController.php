@@ -88,7 +88,7 @@ class RegistrationController extends Controller
 
         $query = $this->terapkanFilter(Registration::with('user')->orderByDesc('created_at'), $request, $request->query('periode', $defaultPeriode));
 
-        $headers = ['No', 'Kode Pendaftaran', 'Nama', 'Email', 'NIS', 'Kelas', 'No Absen', 'Wali Kelas', 'Jurusan', 'Jenis Kelamin', 'Usia', 'No WhatsApp', 'Periode', 'Eskul Utama', 'Eskul Cadangan', 'Alasan', 'Nilai', 'Predikat', 'Tanggal Daftar'];
+        $headers = ['No', 'Kode Pendaftaran', 'Nama', 'Email', 'NIS', 'Kelas', 'No Absen', 'Wali Kelas', 'Jurusan', 'Jenis Kelamin', 'Usia', 'No WhatsApp', 'Periode', 'Eskul Pilihan', 'Alasan', 'Nilai', 'Predikat', 'Tanggal Daftar'];
 
         $tampilkanToken = ! auth()->user()->hasRole(\App\Enums\Role::KEPALA_SEKOLAH);
 
@@ -113,7 +113,6 @@ class RegistrationController extends Controller
                 $r->whatsapp ?? '-',
                 $r->periode,
                 $r->eskul_utama,
-                $r->eskul_cadangan ?? '-',
                 $r->alasan ?? '-',
                 $r->nilai ?? '-',
                 $r->predikat ?? '-',
@@ -167,7 +166,6 @@ class RegistrationController extends Controller
             'nis' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
             'gender' => ['required', 'in:LAKI_LAKI,PEREMPUAN'],
             'eskul_utama' => ['required', 'string', 'exists:eskuls,name'],
-            'eskul_cadangan' => ['nullable', 'string', 'different:eskul_utama', 'exists:eskuls,name'],
             'alasan' => ['nullable', 'string', 'max:1000'],
         ]);
 

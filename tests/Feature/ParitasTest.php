@@ -53,7 +53,6 @@ class ParitasTest extends TestCase
             'gender' => 'LAKI_LAKI',
             'whatsapp' => '081234567890',
             'eskul_utama' => 'Futsal',
-            'eskul_cadangan' => '',
             'alasan' => 'Ingin sehat.',
         ], $over);
     }
@@ -66,14 +65,14 @@ class ParitasTest extends TestCase
             ->assertRedirect('/siswa/status');
 
         $this->assertDatabaseHas('registrations', ['user_id' => $siswa->id, 'status' => 'APPROVED']);
+        // Nomor WA otomatis tersambung ke direktori siswa.
+        $this->assertDatabaseHas('students', ['nis' => '10001', 'whatsapp' => '081234567890']);
     }
 
-    public function test_kuota_penuh_dialihkan_ke_cadangan(): void
+    public function test_kuota_penuh_ditolak_tanpa_cadangan(): void
     {
         [$siswa, $eskul] = $this->siapkan();
         $eskul->update(['kuota_aktif' => true, 'kuota' => 1]);
-
-        Eskul::create(['name' => 'Basket', 'aktif' => true]);
 
         $penuh = User::factory()->create(['username' => '90001', 'role' => Role::STUDENT]);
         Registration::create([
@@ -82,14 +81,9 @@ class ParitasTest extends TestCase
             'eskul_utama' => 'Futsal', 'status' => 'APPROVED',
         ]);
 
-        // Tanpa cadangan → ditolak dengan pesan penuh.
+        // Kuota penuh → ditolak dengan pesan penuh (tanpa pengalihan cadangan).
         $this->actingAs($siswa)->post('/siswa/daftar', $this->daftarPayload())
             ->assertSessionHasErrors('eskul_utama');
-
-        // Dengan cadangan muat → dialihkan.
-        $res = $this->actingAs($siswa)->post('/siswa/daftar', $this->daftarPayload(['eskul_cadangan' => 'Basket']));
-        $res->assertRedirect('/siswa/status');
-        $this->assertDatabaseHas('registrations', ['user_id' => $siswa->id, 'eskul_utama' => 'Basket']);
     }
 
     public function test_predikat_mengikuti_rumus_lama(): void
@@ -210,7 +204,7 @@ class ParitasTest extends TestCase
         // Login pakai NIS + password.
         $this->post('/logout');
         $this->post('/siswa/login', ['nis' => '10001', 'token' => 'sandi-siswa-1'])
-            ->assertRedirect('/siswa');
+            ->assertRedirect('/siswa/daftar');
         $this->assertAuthenticatedAs($siswa);
     }
 

@@ -104,7 +104,7 @@ class SiswaLoginController extends Controller
             'reason' => null,
         ]);
 
-        return redirect()->intended('/siswa');
+        return redirect()->intended('/siswa/daftar');
     }
 
     private function fail(

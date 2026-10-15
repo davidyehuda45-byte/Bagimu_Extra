@@ -61,6 +61,10 @@
             <label class="block text-sm font-medium mb-1">Kontak Wali</label>
             <input type="text" name="wali_kontak" value="{{ old('wali_kontak') }}" maxlength="20" class="w-full border rounded px-3 py-2 text-sm">
         </div>
+        <div>
+            <label class="block text-sm font-medium mb-1"><span class="inline-flex items-center gap-1.5"><x-icon name="phone" class="h-3.5 w-3.5 text-slate-400" />Nomor HP / WA Siswa</span></label>
+            <input type="text" name="whatsapp" value="{{ old('whatsapp') }}" maxlength="20" placeholder="cth: 081234567890" class="w-full border rounded px-3 py-2 text-sm">
+        </div>
     </div>
     <div class="flex gap-2">
         <button class="px-4 py-2 rounded bg-blue-600 text-white text-sm hover:bg-blue-700">Simpan</button>

@@ -127,7 +127,6 @@ class SmokeTest extends TestCase
             'gender' => 'LAKI_LAKI',
             'whatsapp' => '081234567890',
             'eskul_utama' => 'Futsal',
-            'eskul_cadangan' => '',
             'alasan' => 'Ingin sehat.',
         ]);
         $res->assertRedirect('/siswa/status');
@@ -291,7 +290,7 @@ class SmokeTest extends TestCase
         $token = LoginToken::issue($user);
 
         $this->post('/siswa/login', ['nis' => '10001', 'token' => $token])
-            ->assertRedirect('/siswa');
+            ->assertRedirect('/siswa/daftar');
         $this->assertAuthenticatedAs($user);
     }
 }

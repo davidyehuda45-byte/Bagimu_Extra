@@ -81,7 +81,7 @@ class KegiatanController extends Controller
 
         $anggota = Registration::where('status', Status::APPROVED)
             ->whereIn('periode', $periodeAktif)
-            ->where(fn ($q) => $q->whereIn('eskul_utama', $scopeNames)->orWhereIn('eskul_cadangan', $scopeNames))
+            ->whereIn('eskul_utama', $scopeNames)
             ->count();
 
         $pertemuan = Kehadiran::whereIn('eskul_id', $scopeIds)

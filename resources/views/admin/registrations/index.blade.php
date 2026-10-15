@@ -97,7 +97,7 @@
                                 —
                             @endif
                         </td>
-                        <td class="py-2 px-3">{{ $r->eskul_utama }}@if ($r->eskul_cadangan)<span class="block text-[11px] text-slate-400">Cad: {{ $r->eskul_cadangan }}</span>@endif</td>
+                        <td class="py-2 px-3">{{ $r->eskul_utama }}</td>
                         <td class="py-2 px-3">{{ $r->periode }}</td>
                         <td class="py-2 px-3">
                             <div class="flex items-center gap-1.5">

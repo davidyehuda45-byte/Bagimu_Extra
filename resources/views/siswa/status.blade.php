@@ -53,11 +53,8 @@
                         <p class="mt-1 text-sm font-semibold text-slate-800">{{ $aktif->created_at->format('d M Y') }}</p>
                     </div>
                     <div class="rounded-xl bg-slate-50 p-3.5">
-                        <p class="text-xs font-medium text-slate-400">Eskul Utama</p>
+                        <p class="text-xs font-medium text-slate-400">Eskul Pilihan</p>
                         <p class="mt-1 text-sm font-semibold text-slate-800">{{ $aktif->eskul_utama }}</p>
-                        @if ($aktif->eskul_cadangan)
-                            <p class="mt-0.5 text-xs text-slate-500">Cadangan: {{ $aktif->eskul_cadangan }}</p>
-                        @endif
                     </div>
                     <div class="rounded-xl bg-slate-50 p-3.5">
                         <p class="text-xs font-medium text-slate-400">Kontak Sekolah</p>

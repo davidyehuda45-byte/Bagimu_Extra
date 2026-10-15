@@ -156,15 +156,15 @@ class PendaftaranController extends Controller
         }
 
         try {
-            [$registration, $dipakai, $info] = DB::transaction(function () use ($validated, $user, $periode) {
-                [$dipakai, $info] = $this->resolve(
+            [$registration, $dipakai] = DB::transaction(function () use ($validated, $user, $periode, $master) {
+                $dipakai = $this->resolve(
                     $validated['eskul_utama'],
-                    $validated['eskul_cadangan'] ?? null,
                     $periode->periode
                 );
 
                 $data = array_merge($validated, [
                     'eskul_utama' => $dipakai,
+                    'eskul_cadangan' => null,
                     'status' => Status::APPROVED,
                     'alasan_penolakan' => null,
                 ]);
@@ -176,6 +176,11 @@ class PendaftaranController extends Controller
                     'verify_token' => bin2hex(random_bytes(32)),
                 ]));
 
+                // Nomor WA otomatis tersambung ke direktori siswa.
+                if ($master && ! empty($validated['whatsapp'])) {
+                    $master->update(['whatsapp' => $validated['whatsapp']]);
+                }
+
                 StatusHistory::create([
                     'registration_id' => $registration->id,
                     'old_status' => null,
@@ -185,7 +190,7 @@ class PendaftaranController extends Controller
                     'reason' => 'Pendaftaran baru oleh siswa.',
                 ]);
 
-                return [$registration, $dipakai, $info];
+                return [$registration, $dipakai];
             });
         } catch (\Illuminate\Database\QueryException $e) {
             $sudah = Registration::where('user_id', $user->id)->where('periode', $periode->periode)->first();
@@ -199,10 +204,6 @@ class PendaftaranController extends Controller
         $pesan = "Pendaftaran berhasil. Anda resmi terdaftar {$dipakai}.";
 
         Notifier::statusPendaftaran($registration);
-
-        if ($info) {
-            $pesan .= ' '.$info;
-        }
 
         return redirect()->route('siswa.status')->with('status', $pesan);
     }
@@ -232,7 +233,6 @@ class PendaftaranController extends Controller
                         $fail('Eskul tidak tersedia.');
                     }
                 }],
-            'eskul_cadangan' => ['nullable', 'string', 'different:eskul_utama', Rule::exists('eskuls', 'name')],
             'alasan' => ['nullable', 'string', 'max:1000'],
         ], [
             'kelas.regex' => 'Format kelas contoh: 10 RPL 1 atau XI RPL 1 (kelas + jurusan + nomor).',
@@ -244,11 +244,9 @@ class PendaftaranController extends Controller
     }
 
     /**
-     * Tentukan eskul yang dipakai + info pengalihan.
-     *
-     * @return array{0: string, 1: ?string}
+     * Tentukan eskul yang dipakai (tanpa cadangan).
      */
-    private function resolve(string $utama, ?string $cadangan, string $periode, ?int $kecualiId = null): array
+    private function resolve(string $utama, string $periode, ?int $kecualiId = null): string
     {
         $eU = Eskul::where('name', $utama)->lockForUpdate()->first();
 
@@ -256,24 +254,12 @@ class PendaftaranController extends Controller
             throw ValidationException::withMessages(['eskul_utama' => 'Eskul tidak tersedia.']);
         }
 
-        if (! Kuota::penuh($eU, $periode, $kecualiId)) {
-            return [$eU->name, null];
-        }
-
-        if (! $cadangan) {
+        if (Kuota::penuh($eU, $periode, $kecualiId)) {
             throw ValidationException::withMessages([
                 'eskul_utama' => "Maaf, kuota {$eU->name} sudah penuh ({$eU->kuota} siswa). Silakan pilih eskul lain.",
             ]);
         }
 
-        $eC = Eskul::where('name', $cadangan)->lockForUpdate()->first();
-
-        if ($eC && $eC->aktif && ! Kuota::penuh($eC, $periode, $kecualiId)) {
-            return [$eC->name, "{$utama} sudah penuh — otomatis dialihkan ke {$cadangan}."];
-        }
-
-        throw ValidationException::withMessages([
-            'eskul_utama' => "Maaf, {$utama} dan {$cadangan} sama-sama penuh. Silakan pilih eskul lain.",
-        ]);
+        return $eU->name;
     }
 }

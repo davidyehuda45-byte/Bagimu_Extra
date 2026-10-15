@@ -18,8 +18,8 @@ class KehadiranController extends Controller
         $regIds = $user->registrations()->pluck('id');
 
         $eskulDiikuti = $user->registrations()
-            ->get(['eskul_utama', 'eskul_cadangan'])
-            ->flatMap(fn ($r) => [$r->eskul_utama, $r->eskul_cadangan])
+            ->get(['eskul_utama'])
+            ->pluck('eskul_utama')
             ->filter()
             ->unique()
             ->values();
