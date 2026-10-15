@@ -155,6 +155,14 @@ class KehadiranController extends Controller
                 'locked_by' => auth()->user()->email,
             ]);
 
+        \App\Models\Pertemuan::where('eskul_id', $data['eskul_id'])
+            ->whereDate('tanggal', $data['tanggal'])
+            ->whereNull('locked_at')
+            ->update([
+                'locked_at' => now(),
+                'locked_by' => auth()->user()->email,
+            ]);
+
         AdminLog::record('kehadiran.lock', 'Kehadiran', (string) $data['eskul_id'], "Kunci kehadiran eskul #{$data['eskul_id']} tanggal {$data['tanggal']} ({$count} baris).");
 
         return back()->with('status', "Kehadiran tanggal {$data['tanggal']} dikunci ({$count} baris).");
@@ -174,6 +182,13 @@ class KehadiranController extends Controller
         $count = Kehadiran::where('eskul_id', $data['eskul_id'])
             ->whereDate('tanggal', $data['tanggal'])
             ->whereNotNull('locked_at')
+            ->update([
+                'locked_at' => null,
+                'locked_by' => null,
+            ]);
+
+        \App\Models\Pertemuan::where('eskul_id', $data['eskul_id'])
+            ->whereDate('tanggal', $data['tanggal'])
             ->update([
                 'locked_at' => null,
                 'locked_by' => null,

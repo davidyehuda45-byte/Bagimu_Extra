@@ -372,6 +372,15 @@ class SmokeTest extends TestCase
         // Halaman eskul tampilkan Pertemuan 1.
         $this->actingAs($pembina)->get("/pembina/eskul/{$eskul->id}")
             ->assertOk()->assertSee('Pertemuan 1');
+
+        // Sahkan pertemuan → kartu terkunci + hapus diblokir.
+        $this->actingAs($pembina)
+            ->post("/pembina/eskul/{$eskul->id}/kehadiran/lock", ['tanggal' => today()->toDateString()])
+            ->assertRedirect();
+        $this->assertNotNull(\App\Models\Pertemuan::first()->fresh()->locked_at);
+        $pertemuanId = \App\Models\Pertemuan::first()->id;
+        $this->actingAs($pembina)->delete("/pembina/pertemuan/{$pertemuanId}")
+            ->assertSessionHasErrors('pertemuan');
     }
 
     public function test_nilai_satuan_pembina_dan_export_admin(): void

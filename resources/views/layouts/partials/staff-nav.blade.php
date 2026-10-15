@@ -59,16 +59,6 @@
                     </a>
                 @endif
                 @if ($isAdmin || $isKepsek)
-                    <a href="{{ route('admin.rekap.index') }}" class="{{ $link(Route::is('admin.rekap.*')) }}">
-                        <x-icon name="trophy" class="h-4 w-4 shrink-0" />
-                        <span>Rekap Eskul</span>
-                    </a>
-                    <a href="{{ route('admin.kehadiran.index') }}" class="{{ $link(Route::is('admin.kehadiran.*')) }}">
-                        <x-icon name="calendar-check" class="h-4 w-4 shrink-0" />
-                        <span>Absensi</span>
-                    </a>
-                @endif
-                @if ($isAdmin || $isKepsek)
                     <a href="{{ route('admin.nilai.index') }}" class="{{ $link(Route::is('admin.nilai.*')) }}">
                         <x-icon name="file" class="h-4 w-4 shrink-0" />
                         <span>Nilai</span>
@@ -107,7 +97,7 @@
                 Data Kesiswaan
             </div>
             <div class="space-y-0.5">
-                <a href="{{ route('admin.students.index') }}" class="{{ $link(Route::is('admin.students.*') || Route::is('admin.kartu.*')) }}">
+                <a href="{{ route('admin.students.index') }}" class="{{ $link(Route::is('admin.students.index') || Route::is('admin.students.create') || Route::is('admin.students.edit') || Route::is('admin.students.show')) }}">
                     <x-icon name="users" class="h-4 w-4 shrink-0" />
                     <span>Direktori Siswa</span>
                 </a>
