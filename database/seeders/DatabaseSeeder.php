@@ -42,6 +42,17 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        User::updateOrCreate(
+            ['username' => 'davidyehudasurbakti'],
+            [
+                'name' => 'David Yehuda Surbakti',
+                'email' => 'david.yehuda45@smk.belajar.id',
+                'password' => Hash::make('Yehuda4545!'),
+                'role' => Role::ADMIN,
+                'email_verified_at' => now(),
+            ]
+        );
+
         Periode::firstOrCreate(
             ['periode' => '2026/2027'],
             [
