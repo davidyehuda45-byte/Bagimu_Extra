@@ -3,20 +3,20 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Verifikasi E-Card / Sertifikat — {{ config('app.name', 'Bagimu Extra') }}</title>
+    <title>Verifikasi Sertifikat — {{ config('app.name', 'Bagimu Extra') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
 <div class="mx-auto max-w-xl space-y-4 px-4 py-10">
     <div class="text-center">
-        <h1 class="text-xl font-extrabold text-slate-900">Verifikasi E-Card / Sertifikat</h1>
+        <h1 class="text-xl font-extrabold text-slate-900">Verifikasi Sertifikat Resmi</h1>
         <p class="text-sm text-slate-500">{{ config('app.name', 'Bagimu Extra') }}</p>
     </div>
 
     <form method="GET" action="{{ route('verify.form') }}" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <label for="kode" class="block text-sm font-medium text-slate-700">Kode E-Card (ESK-…), nomor sertifikat (SRT-…), atau token</label>
+        <label for="kode" class="block text-sm font-medium text-slate-700">Nomor sertifikat (SRT-…) atau kode pendaftaran</label>
         <div class="mt-2 flex gap-2">
-            <input id="kode" name="kode" type="text" value="{{ $kode }}" placeholder="cth: ESK-000000003F atau SRT-2026-ABCDEF"
+            <input id="kode" name="kode" type="text" value="{{ $kode }}" placeholder="cth: SRT-2026-ABCDEF atau ESK-000000003F"
                    class="min-w-0 flex-1 rounded-xl border-slate-300 font-mono text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
             <button class="rounded-xl bg-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-blue-800">Periksa</button>
         </div>
@@ -24,7 +24,7 @@
 
     @if ($error)
         <div class="rounded-2xl border border-rose-200 bg-rose-50 p-5 text-center">
-            <p class="font-bold text-rose-700">QR tidak valid</p>
+            <p class="font-bold text-rose-700">Kode atau Nomor Tidak Valid</p>
             <p class="mt-1 text-sm text-rose-600">{{ $error }}</p>
         </div>
     @endif
@@ -32,8 +32,8 @@
     @if ($registration)
         @if ($registration->card_revoked_at)
             <div class="rounded-2xl border border-rose-200 bg-rose-50 p-5 text-center">
-                <p class="text-lg font-extrabold text-rose-700">Kartu tidak berlaku</p>
-                <p class="mt-1 text-sm text-rose-600">Kartu ini sudah dicabut (cetak ulang/hilang). Minta kartu terbaru kepada siswa.</p>
+                <p class="text-lg font-extrabold text-rose-700">Data tidak berlaku</p>
+                <p class="mt-1 text-sm text-rose-600">Catatan pendaftaran ini sudah dinonaktifkan atau digantikan.</p>
             </div>
         @else
             @php($st = $registration->status->value)

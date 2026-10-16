@@ -98,6 +98,9 @@ RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh && chmod +x /usr/local/bin/ent
 # Copy application code
 COPY . /var/www/html
 
+# Backup database code (migrations, seeders) so volume mount does not hide new migrations
+COPY database/ /var/www/html/database_files/
+
 # Copy production vendors and compiled frontend assets
 COPY --from=vendor-builder /app/vendor /var/www/html/vendor
 COPY --from=frontend-builder /app/public/build /var/www/html/public/build

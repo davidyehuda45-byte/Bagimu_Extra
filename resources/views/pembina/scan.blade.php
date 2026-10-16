@@ -6,7 +6,7 @@
 <div class="mx-auto w-full max-w-2xl space-y-4">
     <div>
         <a href="{{ route('pembina.eskul.show', $eskul) }}" class="text-sm font-medium text-blue-600 hover:text-blue-700">← Kembali ke {{ $eskul->name }}</a>
-        <h1 class="mt-1 text-xl font-bold text-slate-900">Scan Presensi E-Card</h1>
+        <h1 class="mt-1 text-xl font-bold text-slate-900">Scan Presensi Siswa</h1>
         <p class="text-sm text-slate-500">{{ $eskul->name }} • hasil scan otomatis tercatat HADIR dan tersambung ke absensi.</p>
         @if (! empty($pertemuan))
             <p class="mt-1 inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800">
@@ -23,7 +23,7 @@
 
     <x-card>
         <h2 class="flex items-center gap-2 font-bold text-slate-900">
-            <x-icon name="qr" class="h-5 w-5 text-blue-700" /> Pindai QR E-Card
+            <x-icon name="qr" class="h-5 w-5 text-blue-700" /> Pindai Kode QR Presensi
         </h2>
         <div id="scan-unsupported" class="hidden">
             <x-empty-state icon="qr" title="Kamera tidak didukung" message="Browser ini tidak mendukung pemindai kamera. Ketik kode ESK manual di bawah." />
@@ -38,7 +38,7 @@
                     Hentikan
                 </button>
             </div>
-            <p class="mt-2 text-[11px] text-slate-400">Arahkan QR E-Card siswa ke kamera. Di HP, izinkan akses kamera bila diminta.</p>
+            <p class="mt-2 text-[11px] text-slate-400">Arahkan QR presensi siswa ke kamera. Di HP, izinkan akses kamera bila diminta.</p>
         </div>
         <div id="scan-hasil" aria-live="polite" class="mt-3 space-y-2"></div>
     </x-card>
@@ -48,8 +48,7 @@
             <x-icon name="pencil" class="h-5 w-5 text-blue-700" /> Ketik Manual
         </h2>
         <p class="mt-1 text-xs text-slate-500">
-            Untuk kartu hilang / kamera bermasalah: ketik kode ESK yang tercetak di bawah QR E-Card.
-            Sakit tetap lewat pengajuan izin (otomatis tersambung ke absensi) atau tandai SAKIT di tabel manual.
+            Ketik kode pendaftaran (ESK-...) siswa atau kelola status kehadiran/izin langsung pada lembar absensi pertemuan.
         </p>
         <form id="scan-manual" method="POST" action="{{ route('pembina.scan.store', $eskul) }}" class="mt-3 flex gap-2">
             @csrf

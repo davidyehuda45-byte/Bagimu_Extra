@@ -19,9 +19,8 @@ export default function SiswaLayout({ children, title, subtitle }) {
     const navItems = [
         { label: 'Beranda', href: '/siswa', icon: LayoutDashboard, exact: true },
         { label: 'Pendaftaran', href: '/siswa/daftar', icon: ClipboardList },
-        { label: 'E-Card Siswa', href: '/siswa/status', icon: IdCard },
+        { label: 'Bukti Daftar', href: '/siswa/status', icon: ClipboardList },
         { label: 'Presensi', href: '/siswa/kehadiran', icon: CalendarCheck },
-        { label: 'Izin', href: '/siswa/izin', icon: FileText },
         { label: 'Profil', href: '/siswa/profil', icon: User },
     ];
 

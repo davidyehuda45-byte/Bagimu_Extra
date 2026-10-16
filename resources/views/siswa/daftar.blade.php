@@ -127,14 +127,14 @@
                 {{-- Alert Informasi Selesai --}}
                 <div class="mt-5 rounded-2xl bg-blue-50/80 border border-blue-200 p-4 text-xs text-blue-900 leading-relaxed">
                     <p class="font-bold">Informasi Penting:</p>
-                    <p class="mt-0.5">Pendaftaran Anda telah disimpan secara permanen. Anda dapat mencetak atau menyimpan bukti pendaftaran kartu digital sekarang.</p>
+                    <p class="mt-0.5">Pendaftaran Anda telah disimpan secara permanen. Anda dapat mencetak atau menyimpan bukti pendaftaran resmi sekarang.</p>
                 </div>
 
                 {{-- Tombol Aksi --}}
                 <div class="mt-6 flex flex-col sm:flex-row gap-3">
                     <a href="{{ route('siswa.status') }}" class="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-700 px-6 py-3.5 text-xs font-bold text-white shadow-md shadow-blue-700/20 hover:bg-blue-800 transition-colors">
-                        <x-icon name="id-card" class="h-4 w-4" />
-                        <span>Lihat Bukti Pendaftaran (E-Card)</span>
+                        <x-icon name="check" class="h-4 w-4" />
+                        <span>Lihat Bukti Pendaftaran</span>
                     </a>
                     <form method="POST" action="{{ route('logout') }}" class="sm:w-auto">
                         @csrf

@@ -258,6 +258,19 @@ class StudentController extends Controller
                 continue;
             }
 
+            // Lewati jika siswa sudah memilih eskul (data pendaftaran terkunci)
+            $sudahPilih = \App\Models\Registration::where('nis', $student->nis)
+                ->orWhere(function ($q) use ($student) {
+                    if ($student->user_id) {
+                        $q->where('user_id', $student->user_id);
+                    }
+                })
+                ->exists();
+
+            if ($sudahPilih) {
+                continue;
+            }
+
             if (! $user) {
                 $user = User::create([
                     'name' => $student->nama,
@@ -646,6 +659,19 @@ class StudentController extends Controller
 
     public function issueToken(Student $student)
     {
+        // Tolak jika siswa sudah memilih eskul (data terkunci)
+        $sudahPilih = \App\Models\Registration::where('nis', $student->nis)
+            ->orWhere(function ($q) use ($student) {
+                if ($student->user_id) {
+                    $q->where('user_id', $student->user_id);
+                }
+            })
+            ->exists();
+
+        if ($sudahPilih) {
+            return redirect()->back()->with('error', "Siswa {$student->nama} (NIS: {$student->nis}) sudah memilih ekstrakurikuler dan datanya terkunci. Token baru tidak dapat diterbitkan.");
+        }
+
         $user = $student->user;
 
         if (! $user) {

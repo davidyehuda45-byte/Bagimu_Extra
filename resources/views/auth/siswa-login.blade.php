@@ -64,8 +64,8 @@
                 Ekstrakurikuler<br>
                 <span class="text-blue-100 font-extrabold">Digital, Praktis & Cepat.</span>
             </h1>
-            <p class="text-sm leading-relaxed text-blue-100/90 max-w-md">
-                Pilih eskul favoritmu, dapatkan E-Card digital dengan QR Code unik, dan pantau rekap kehadiran serta nilai akhir langsung dari perangkat ponselmu.
+            <p class="text-sm leading-relaxed text-blue-100 max-w-md">
+                Pilih eskul favoritmu secara mudah dan cepat, langsung terdaftar resmi ke sistem sekolah.
             </p>
 
             <ul class="space-y-3.5 pt-2 text-sm text-white max-w-md">
@@ -79,13 +79,13 @@
                     <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/20 text-white border border-white/20 shadow-xs">
                         <x-icon name="check" class="h-4 w-4" />
                     </span>
-                    <span class="font-medium text-white/95 leading-snug">E-Card presensi digital ber-QR Code untuk absensi latihan</span>
+                    <span class="font-medium text-white/95 leading-snug">Pendaftaran langsung terhubung dengan data pembina eskul</span>
                 </li>
                 <li class="flex items-center gap-3">
                     <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/20 text-white border border-white/20 shadow-xs">
                         <x-icon name="check" class="h-4 w-4" />
                     </span>
-                    <span class="font-medium text-white/95 leading-snug">Transparansi persentase kehadiran dan sertifikat kegiatan resmi</span>
+                    <span class="font-medium text-white/95 leading-snug">Bukti pendaftaran resmi dan transparansi kehadiran kegiatan</span>
                 </li>
             </ul>
         </div>
@@ -116,16 +116,16 @@
             </div>
 
             <div class="rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-xl shadow-slate-200/50">
-                {{-- Segmented Tab Switch (Siswa / Pembina) --}}
-                <div class="mb-6 flex rounded-2xl bg-slate-100 p-1">
-                    <div class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-xs">
+                {{-- Tab Pilihan Pintu Masuk: Siswa & Pembina --}}
+                <div class="grid grid-cols-2 p-1.5 mb-6 bg-slate-100 rounded-2xl text-xs sm:text-sm font-bold text-center border border-slate-200/80">
+                    <div class="py-2.5 rounded-xl bg-blue-600 text-white shadow-xs flex items-center justify-center gap-2">
                         <x-icon name="user" class="h-4 w-4" />
                         <span>Siswa</span>
                     </div>
-                    <button type="button" @click="alert('Portal Khusus Staf & Pembina diakses melalui tautan dinas resmi sekolah.')" class="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-800 transition">
-                        <x-icon name="shield" class="h-4 w-4" />
+                    <a href="{{ route('pembina.login') }}" class="py-2.5 rounded-xl text-slate-600 hover:text-blue-700 hover:bg-white transition flex items-center justify-center gap-2">
+                        <x-icon name="user-group" class="h-4 w-4" />
                         <span>Pembina</span>
-                    </button>
+                    </a>
                 </div>
 
                 <div class="mb-5">
@@ -149,8 +149,8 @@
 
                     <div>
                         <div class="flex items-center justify-between">
-                            <x-input-label for="token" value="Token / Kata Sandi" />
-                            <span class="text-[11px] text-slate-400">8 digit kartu</span>
+                            <x-input-label for="token" value="Token Pendaftaran" />
+                            <span class="text-[11px] text-slate-400">8 digit unik</span>
                         </div>
                         <div class="relative mt-1">
                             <input id="token"
@@ -167,8 +167,8 @@
                             </button>
                         </div>
                         <x-input-error :messages="$errors->get('token')" class="mt-2" />
-                        <p class="mt-1.5 text-[11px] text-slate-400 leading-normal">
-                            Masukkan token 8 karakter dari kartu pelajar atau kata sandi yang pernah Anda atur di menu Profil.
+                        <p class="mt-1.5 text-[11px] text-amber-700 bg-amber-50 p-2 rounded-lg border border-amber-200/80 leading-normal">
+                            ⚠️ <b>Catatan:</b> Token bersifat sekali pakai dan hangus setelah pendaftaran selesai.
                         </p>
                     </div>
 
@@ -176,7 +176,7 @@
                             :disabled="loading"
                             class="relative flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/25 transition hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed">
                         <span x-show="!loading" class="inline-flex items-center gap-2">
-                            <span>Masuk Sekarang</span>
+                            <span>Masuk & Pilih Eskul</span>
                             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                         </span>
                         <span x-show="loading" x-cloak class="inline-flex items-center gap-2">

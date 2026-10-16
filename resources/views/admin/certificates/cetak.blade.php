@@ -59,7 +59,7 @@
                 {!! SimpleQr::size(120)->generate(route('verify.form', ['kode' => $certificate->nomor])) !!}
             </div>
             <div class="mt-2 text-[10px] text-slate-400 font-mono break-all max-w-sm">{{ route('verify.form', ['kode' => $certificate->nomor]) }}</div>
-            <div class="mt-1 text-[10px] text-slate-500">Nomor: <strong class="font-mono">{{ $certificate->nomor }}</strong> — QR ini stabil walau E-Card dicetak ulang.</div>
+            <div class="mt-1 text-[10px] text-slate-500">Nomor: <strong class="font-mono">{{ $certificate->nomor }}</strong> — QR verifikasi keaslian sertifikat resmi.</div>
         </div>
         <div class="mt-6 text-[11px] text-slate-400 italic">Pindai kode QR untuk memverifikasi keaslian dokumen sertifikat ini secara resmi.</div>
     </div>

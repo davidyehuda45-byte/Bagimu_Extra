@@ -57,7 +57,7 @@
         <div class="relative z-10 my-auto py-8 space-y-6 max-w-lg">
             <span class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-semibold bg-white/15 text-white border border-white/25 backdrop-blur-xs shadow-xs">
                 <x-icon name="shield" class="h-3.5 w-3.5 text-blue-100" />
-                Portal Khusus Staf & Pembina
+                Portal Khusus Pembina
             </span>
             <h1 class="text-3xl xl:text-4xl font-black leading-tight tracking-tight text-white">
                 Pengelolaan<br>
@@ -65,7 +65,7 @@
                 <span class="text-blue-100 font-extrabold">Terpadu & Profesional.</span>
             </h1>
             <p class="text-sm leading-relaxed text-blue-100/90 max-w-md">
-                Akses khusus guru, pembina eskul, dan tim tata usaha untuk verifikasi pendaftaran siswa, rekap presensi QR, penilaian rapor ekstrakurikuler, dan penerbitan sertifikat digital.
+                Akses khusus pembina eskul untuk pengelolaan pendaftaran siswa, absensi kehadiran latihan, dan penilaian rapor ekstrakurikuler resmi.
             </p>
 
             <ul class="space-y-3.5 pt-2 text-sm text-white max-w-md">
@@ -79,13 +79,13 @@
                     <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/20 text-white border border-white/20 shadow-xs">
                         <x-icon name="check" class="h-4 w-4" />
                     </span>
-                    <span class="font-medium text-white/95 leading-snug">Pemindaian QR presensi dan validasi surat izin otomatis</span>
+                    <span class="font-medium text-white/95 leading-snug">Pencatatan presensi kehadiran dan keterangan siswa per pertemuan</span>
                 </li>
                 <li class="flex items-center gap-3">
                     <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/20 text-white border border-white/20 shadow-xs">
                         <x-icon name="check" class="h-4 w-4" />
                     </span>
-                    <span class="font-medium text-white/95 leading-snug">Penilaian predikat siswa & cetak e-Sertifikat resmi</span>
+                    <span class="font-medium text-white/95 leading-snug">Penilaian predikat siswa & cetak laporan resmi sekolah</span>
                 </li>
             </ul>
         </div>
@@ -116,21 +116,21 @@
             </div>
 
             <div class="rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-xl shadow-slate-200/50">
-                {{-- Segmented Tab Switch (Siswa / Pembina) --}}
-                <div class="mb-6 flex rounded-2xl bg-slate-100 p-1">
-                    <a href="{{ route('siswa.login') }}" class="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-800 transition">
+                {{-- Tab Pilihan Pintu Masuk: Siswa & Pembina --}}
+                <div class="grid grid-cols-2 p-1.5 mb-6 bg-slate-100 rounded-2xl text-xs sm:text-sm font-bold text-center border border-slate-200/80">
+                    <a href="{{ route('siswa.login') }}" class="py-2.5 rounded-xl text-slate-600 hover:text-blue-700 hover:bg-white transition flex items-center justify-center gap-2">
                         <x-icon name="user" class="h-4 w-4" />
                         <span>Siswa</span>
                     </a>
-                    <div class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-xs">
-                        <x-icon name="shield" class="h-4 w-4" />
+                    <div class="py-2.5 rounded-xl bg-blue-600 text-white shadow-xs flex items-center justify-center gap-2">
+                        <x-icon name="user-group" class="h-4 w-4" />
                         <span>Pembina</span>
                     </div>
                 </div>
 
                 <div class="mb-5">
                     <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold bg-slate-100 text-slate-800 ring-1 ring-inset ring-slate-700/10 mb-2.5">
-                        <x-icon name="shield" class="h-3.5 w-3.5 text-blue-600" /> Portal Staf & Pembina
+                        <x-icon name="shield" class="h-3.5 w-3.5 text-blue-600" /> Portal Pembina
                     </span>
                     <h2 class="text-xl font-bold text-slate-900 tracking-tight">Login Staf / Pembina</h2>
                     <p class="mt-1 text-xs sm:text-sm text-slate-500">Gunakan username atau alamat email akun dinas Anda.</p>
@@ -138,7 +138,7 @@
 
                 <x-auth-session-status class="mb-4" :status="session('status')" />
 
-                <form method="POST" action="{{ route('admin.login') }}" class="space-y-4" x-data="{ loading: false, showPassword: false }" @submit="loading = true">
+                <form method="POST" action="{{ route('pembina.login') }}" class="space-y-4" x-data="{ loading: false, showPassword: false }" @submit="loading = true">
                     @csrf
 
                     <div>
@@ -187,7 +187,7 @@
                             :disabled="loading"
                             class="relative flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/25 transition hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed">
                         <span x-show="!loading" class="inline-flex items-center gap-2">
-                            <span>Masuk Sekarang</span>
+                            <span>Masuk Pembina</span>
                             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                         </span>
                         <span x-show="loading" x-cloak class="inline-flex items-center gap-2">

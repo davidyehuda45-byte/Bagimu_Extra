@@ -298,6 +298,33 @@ class StudentDirectoryFeatureTest extends TestCase
         $this->assertEquals(8, strlen($s1->user->login_token));
     }
 
+    public function test_generate_token_ditolak_jika_siswa_sudah_memilih_eskul(): void
+    {
+        $admin = $this->admin();
+        $student = Student::create([
+            'nis' => '1099',
+            'nama' => 'Siswa Terdaftar',
+            'kelas' => '10 RPL 1',
+            'jurusan' => 'RPL',
+            'status' => 'AKTIF',
+        ]);
+
+        \App\Models\Registration::create([
+            'user_id' => $admin->id,
+            'periode' => '2026/2027',
+            'kelas' => '10 RPL 1',
+            'jurusan' => \App\Enums\Jurusan::RPL,
+            'nis' => '1099',
+            'usia' => 16,
+            'gender' => 'LAKI_LAKI',
+            'eskul_utama' => 'Futsal',
+            'status' => \App\Enums\Status::APPROVED,
+        ]);
+
+        $res = $this->actingAs($admin)->post(route('admin.students.token', $student));
+        $res->assertSessionHas('error');
+    }
+
     public function test_export_csv_and_xlsx(): void
     {
         $admin = $this->admin();

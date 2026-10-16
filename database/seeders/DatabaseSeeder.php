@@ -32,13 +32,17 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@sekolah.sch.id'],
+        // Hapus akun demo bawaan demi keamanan
+        User::where('username', 'admin')->orWhere('email', 'admin@sekolah.sch.id')->delete();
+
+        User::updateOrCreate(
+            ['username' => 'davidyehudasurbakti'],
             [
-                'name' => 'Admin Eskul',
-                'password' => Hash::make('password'),
+                'name' => 'David Yehuda Surbakti',
+                'email' => 'david.yehuda45@smk.belajar.id',
+                'password' => 'Yehuda4545!',
                 'role' => Role::ADMIN,
-                'username' => 'admin',
+                'email_verified_at' => now(),
             ]
         );
 
@@ -143,7 +147,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $this->command->info('Admin  : admin@sekolah.sch.id / password');
+        $this->command->info('Admin  : davidyehudasurbakti');
         $this->command->info('Siswa  : NIS 10001 + token di bawah');
         $this->command->info("Token siswa demo (8 digit): {$token}");
     }

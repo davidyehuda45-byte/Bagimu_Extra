@@ -1,12 +1,52 @@
 @extends('layouts.siswa')
 
-@section('title', 'Status & E-Card')
-
-@php use SimpleSoftwareIO\QrCode\Facades\QrCode as SimpleQr; @endphp
+@section('title', 'Bukti Pendaftaran')
 
 @section('content')
 <div class="space-y-4">
-    <h1 class="text-lg font-bold text-slate-900">Status & E-Card</h1>
+    <h1 class="text-lg font-bold text-slate-900">Bukti Pendaftaran</h1>
+
+    @if (session('just_registered'))
+        <div id="auto-exit-banner" class="no-print rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm text-emerald-900">
+            <div class="flex items-start gap-3.5">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-xs">
+                    <x-icon name="check" class="h-5 w-5" />
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-bold text-base text-emerald-950">Pendaftaran Berhasil & Data Terkunci!</h3>
+                    <p class="mt-1 text-xs sm:text-sm text-emerald-800 leading-relaxed">
+                        Pilihan ekstrakurikuler Anda telah disimpan. Token login Anda bersifat <b>sekali pakai</b> dan kini telah dihanguskan agar data Anda aman dan tidak dapat diubah lagi.
+                    </p>
+                    <div class="mt-3 flex flex-wrap items-center gap-3">
+                        <span class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-100 px-3 py-1.5 text-xs font-semibold text-emerald-900">
+                            <svg class="h-4 w-4 animate-spin text-emerald-700" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"/></svg>
+                            <span>Otomatis keluar dalam <b id="countdown-timer">5</b> detik...</span>
+                        </span>
+                        <form id="auto-exit-form" action="{{ route('auth.session.exit') }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="rounded-lg bg-emerald-700 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-emerald-800 transition cursor-pointer">
+                                Keluar Sekarang &rarr;
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <script>
+                (function() {
+                    let sec = 5;
+                    const el = document.getElementById('countdown-timer');
+                    const timer = setInterval(function() {
+                        sec--;
+                        if (el) el.textContent = sec;
+                        if (sec <= 0) {
+                            clearInterval(timer);
+                            document.getElementById('auto-exit-form').submit();
+                        }
+                    }, 1000);
+                })();
+            </script>
+        </div>
+    @endif
 
     @if (!$aktif)
         <div class="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm">
@@ -15,27 +55,27 @@
         </div>
     @else
         <div class="no-print flex items-center justify-between gap-3">
-            <p class="text-xs text-slate-500">Tunjukkan kartu ini kepada pembina eskul saat absensi atau simpan sebagai PDF.</p>
+            <p class="text-xs text-slate-500">Bukti resmi pendaftaran ekstrakurikuler yang telah tercatat di sistem.</p>
             <button onclick="window.print()" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs sm:text-sm font-bold text-white hover:bg-blue-700 transition shadow-xs shadow-blue-600/20 cursor-pointer shrink-0">
                 <x-icon name="printer" class="h-4 w-4" />
-                <span>Cetak / PDF</span>
+                <span>Cetak Bukti</span>
             </button>
         </div>
 
-        {{-- E-Card Presensi - Bersih & Cerah --}}
-        <div id="ecard-print-area" class="print-area overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white shadow-sm">
+        {{-- Bukti Pendaftaran Siswa --}}
+        <div id="print-area" class="print-area overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white shadow-sm">
             <div class="bg-blue-600 px-6 py-5 text-white">
                 <div class="flex items-center justify-between gap-2">
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-widest text-blue-100">{{ config('app.name', 'Bagimu Extra') }}</p>
-                        <p class="font-extrabold text-base sm:text-lg">E-Card Presensi Siswa</p>
+                        <p class="font-extrabold text-base sm:text-lg">Bukti Pendaftaran Ekstrakurikuler</p>
                     </div>
                     <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold whitespace-nowrap bg-white/20 text-white border border-white/25">
                         <x-icon name="check" class="h-3.5 w-3.5" />
-                        <span>Terdaftar</span>
+                        <span>Terdaftar Resmi</span>
                     </span>
                 </div>
-                <p class="mt-1 text-xs text-blue-100">Tunjukkan QR Code ini ke pembina setiap latihan untuk verifikasi kehadiran.</p>
+                <p class="mt-1 text-xs text-blue-100">Data pendaftaran telah tersimpan permanen di database sekolah.</p>
             </div>
 
             <div class="p-5">
@@ -45,7 +85,7 @@
                     </span>
                     <div class="min-w-0">
                         <h2 class="truncate text-xl font-bold text-slate-900">{{ $aktif->user?->name }}</h2>
-                        <p class="truncate text-sm text-slate-500">NIS {{ $aktif->nis ?? $aktif->user?->username }} • Akun siswa</p>
+                        <p class="truncate text-sm text-slate-500">NIS {{ $aktif->nis ?? $aktif->user?->username }} • Siswa</p>
                         <p class="mt-1 text-sm font-medium text-slate-700">{{ $aktif->kelas }} • {{ $aktif->jurusan?->short() ?? '—' }}</p>
                         <p class="text-xs text-slate-400">Periode {{ $aktif->periode }}</p>
                     </div>
@@ -97,14 +137,6 @@
                     </div>
                 @endif
 
-                @if ($aktif->verify_token)
-                    <div class="mt-4 flex flex-col items-center rounded-xl bg-slate-50 p-4 text-center">
-                        {!! SimpleQr::size(180)->generate(route('verify.show', $aktif->verify_token)) !!}
-                        <p class="mt-2 font-mono text-sm font-bold tracking-widest text-slate-800">{{ $aktif->kode() }}</p>
-                        <p class="text-[11px] text-slate-500">QR presensi — pindai oleh pembina setiap latihan. Jika QR buram saat cetak, pembina bisa ketik kode di atas secara manual.</p>
-                    </div>
-                @endif
-
                 @if ($aktif->nilai !== null || $aktif->certificate)
                     <div class="mt-4 rounded-xl bg-slate-50 p-3.5 text-sm">
                         <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Nilai Akhir</p>
@@ -117,7 +149,7 @@
                 @endif
 
                 <p class="mt-4 text-center text-[11px] text-slate-400">
-                    {{ $aktif->kelas }} • {{ $aktif->gender?->label() ?? '—' }} • {{ $aktif->usia }} thn • Dicetak via {{ config('app.name', 'Bagimu Extra') }}
+                    {{ $aktif->kelas }} • {{ $aktif->gender?->label() ?? '—' }} • {{ $aktif->usia }} thn • Dicatat via {{ config('app.name', 'Bagimu Extra') }}
                 </p>
             </div>
         </div>

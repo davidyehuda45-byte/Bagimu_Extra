@@ -11,10 +11,6 @@
                 <p class="text-xs sm:text-sm text-slate-500 mt-0.5">{{ $pendaftaran->eskul_utama }} • Tahun Ajaran {{ $pendaftaran->periode }}</p>
             @endif
         </div>
-        <a href="{{ route('siswa.izin.create') }}" class="inline-flex items-center gap-1.5 self-start sm:self-center rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 transition shadow-xs shadow-blue-600/20">
-            <x-icon name="plus" class="h-3.5 w-3.5" />
-            <span>Ajukan Izin / Sakit</span>
-        </a>
     </div>
 
     {{-- Filter Eskul --}}
@@ -78,9 +74,8 @@
                 <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
                     <x-icon name="inbox" class="h-4 w-4" />
                 </span>
-                <h2 class="font-bold text-slate-900 text-sm sm:text-base">Riwayat Surat Izin & Sakit</h2>
+                <h2 class="font-bold text-slate-900 text-sm sm:text-base">Catatan Surat Izin & Sakit</h2>
             </div>
-            <a href="{{ route('siswa.izin.create') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-700">+ Buat Pengajuan</a>
         </div>
 
         @if ($pengajuan->isEmpty())

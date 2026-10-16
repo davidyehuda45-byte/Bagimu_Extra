@@ -73,6 +73,36 @@ class SiswaLoginController extends Controller
             $master->update(['user_id' => $user->getAuthIdentifier()]);
         }
 
+        // Kunci data: Siswa yang sudah memilih eskul tidak dapat login lagi dengan token sekali pakai
+        $sudahPilih = \App\Models\Registration::where('user_id', $user->id)
+            ->orWhere('nis', $master->nis)
+            ->exists();
+
+        if ($sudahPilih) {
+            $this->fail(
+                $request,
+                $throttleKey,
+                $user->getAuthIdentifier(),
+                $user->email,
+                'Pendaftaran terkunci',
+                'Data Anda sudah terkunci karena sudah memilih ekstrakurikuler. Token pendaftaran bersifat sekali pakai dan tidak dapat digunakan lagi.',
+                'token'
+            );
+        }
+
+        // Cek jika token sudah pernah dipakai/dihanguskan
+        if ($user->login_token_hash && $user->login_token_revoked_at !== null && LoginToken::verify($normal, $user->login_token_hash)) {
+            $this->fail(
+                $request,
+                $throttleKey,
+                $user->getAuthIdentifier(),
+                $user->email,
+                'Token sudah hangus',
+                'Token ini sudah pernah digunakan (sekali pakai). Silakan hubungi bagian Tata Usaha (TU) jika butuh bantuan.',
+                'token'
+            );
+        }
+
         $tokenOk = $user->login_token_hash
             && $user->login_token_revoked_at === null
             && LoginToken::verify($normal, $user->login_token_hash);

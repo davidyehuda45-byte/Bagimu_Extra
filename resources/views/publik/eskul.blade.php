@@ -31,7 +31,7 @@
         <p>{{ \App\Models\AppSetting::get('school.address', '') }}{{ \App\Models\AppSetting::get('school.contact') ? ' • '.\App\Models\AppSetting::get('school.contact') : '' }}</p>
         <div class="mt-3 flex flex-wrap gap-4 border-t border-slate-200 pt-3 text-xs">
             <a href="{{ route('siswa.daftar') }}" class="font-medium text-slate-600 hover:text-blue-700 hover:underline">Portal Siswa</a>
-            <a href="{{ route('verify.form') }}" class="font-medium text-slate-600 hover:text-blue-700 hover:underline">Verifikasi E-Card / Sertifikat</a>
+            <a href="{{ route('verify.form') }}" class="font-medium text-slate-600 hover:text-blue-700 hover:underline">Verifikasi Sertifikat Resmi</a>
         </div>
     </footer>
 </div>

@@ -22,11 +22,13 @@ class SmokeTest extends TestCase
 
     private function admin(): User
     {
+        /** @var User */
         return User::factory()->create(['role' => Role::ADMIN]);
     }
 
     private function pembina(): User
     {
+        /** @var User */
         return User::factory()->create(['role' => Role::PEMBINA]);
     }
 
@@ -40,6 +42,7 @@ class SmokeTest extends TestCase
             'status' => 'AKTIF',
         ]);
 
+        /** @var User */
         return User::factory()->create(['username' => $nis, 'role' => Role::STUDENT]);
     }
 
@@ -86,7 +89,8 @@ class SmokeTest extends TestCase
         $siswa = $this->siswa();
         $admin = $this->admin();
 
-        $this->get('/siswa')->assertRedirect('/login');
+        $this->get('/siswa')->assertRedirect('/siswa/login');
+        $this->get('/admin')->assertRedirect('/pembina/login');
         $this->actingAs($siswa)->get('/admin')->assertForbidden();
         $this->actingAs($admin)->get('/siswa')->assertForbidden();
     }
@@ -103,11 +107,11 @@ class SmokeTest extends TestCase
             '/siswa', '/siswa/daftar', '/siswa/status',
             '/siswa/kehadiran', '/siswa/profil',
         ] as $url) {
-            $this->actingAs($siswa)->get($url)->assertOk($url);
+            $this->actingAs($siswa)->get($url)->assertOk();
         }
 
         foreach (['/siswa/izin', '/siswa/izin/buat'] as $url) {
-            $this->actingAs($siswaTerdaftar)->get($url)->assertOk($url);
+            $this->actingAs($siswaTerdaftar)->get($url)->assertOk();
         }
     }
 
@@ -184,7 +188,7 @@ class SmokeTest extends TestCase
             '/admin/notifikasi', '/admin/cetak', '/admin/kenaikan/arsip-keluar',
             '/eskul', '/jadwal', '/verify',
         ] as $url) {
-            $this->actingAs($admin)->get($url)->assertOk($url);
+            $this->actingAs($admin)->get($url)->assertOk();
         }
     }
 
@@ -196,7 +200,7 @@ class SmokeTest extends TestCase
         $bukan = $this->eskul('Basket', $other);
 
         foreach (['/pembina', '/pembina/eskul', '/pembina/kegiatan', '/pembina/kegiatan/create'] as $url) {
-            $this->actingAs($me)->get($url)->assertOk($url);
+            $this->actingAs($me)->get($url)->assertOk();
         }
 
         $this->actingAs($me)->get("/pembina/eskul/{$milik->id}")->assertOk();

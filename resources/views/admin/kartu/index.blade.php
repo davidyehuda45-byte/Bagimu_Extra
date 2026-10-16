@@ -80,7 +80,7 @@
                     <div class="rounded-xl border border-slate-200 bg-white p-1.5">
                         {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(80)->margin(1)->generate(route('siswa.login')) !!}
                     </div>
-                    <p class="mt-1 text-[8px] text-slate-400">QR Login — pindai untuk buka halaman login (bukan verifikasi E-Card)</p>
+                    <p class="mt-1 text-[8px] text-slate-400">QR Login — pindai untuk membuka portal login siswa</p>
                 </div>
             </div>
 
