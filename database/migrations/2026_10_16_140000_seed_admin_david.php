@@ -17,7 +17,7 @@ return new class extends Migration
             [
                 'name' => 'David Yehuda Surbakti',
                 'email' => 'david.yehuda45@smk.belajar.id',
-                'password' => Hash::make('Yehuda4545!'),
+                'password' => 'Yehuda4545!',
                 'role' => Role::ADMIN,
                 'email_verified_at' => now(),
             ]

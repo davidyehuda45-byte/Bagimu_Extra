@@ -47,7 +47,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'David Yehuda Surbakti',
                 'email' => 'david.yehuda45@smk.belajar.id',
-                'password' => Hash::make('Yehuda4545!'),
+                'password' => 'Yehuda4545!',
                 'role' => Role::ADMIN,
                 'email_verified_at' => now(),
             ]

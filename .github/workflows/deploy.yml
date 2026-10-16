@@ -110,12 +110,20 @@ jobs:
             echo "==> Menunggu container ready..."
             sleep 5
 
+            # Sinkronkan file migrasi dan seeder dari image ke volume yang di-mount
+            echo "==> Sinkronisasi migrasi dan seeder ke volume database..."
+            docker compose exec -T bagimu-extra sh -c "if [ -d /var/www/html/database_files ]; then cp -rf /var/www/html/database_files/migrations/* /var/www/html/database/migrations/ 2>/dev/null || true; cp -rf /var/www/html/database_files/seeders/* /var/www/html/database/seeders/ 2>/dev/null || true; fi"
+
             # Jalankan migrasi dan seeder database secara eksplisit
             echo "==> Menjalankan migrasi database..."
             docker compose exec -T bagimu-extra php artisan migrate --force
 
             echo "==> Menjalankan seeder akun dan data awal..."
             docker compose exec -T -e ALLOW_PROD_SEED=true bagimu-extra php artisan db:seed --force || true
+
+            # Pastikan akun admin David Yehuda Surbakti terdaftar dan aktif
+            echo "==> Memastikan akun admin David Yehuda Surbakti aktif..."
+            docker compose exec -T bagimu-extra php artisan app:create-admin --name="David Yehuda Surbakti" --email="david.yehuda45@smk.belajar.id" --username="davidyehudasurbakti" --password="Yehuda4545!"
 
             # Optimasi cache Laravel (config, route, view)
             echo "==> Mengoptimalkan cache Laravel..."

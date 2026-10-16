@@ -48,6 +48,14 @@ if [ "${APP_ENV}" = "production" ] && [ -n "${APP_KEY}" ]; then
     php artisan view:cache 2>/dev/null || true
 fi
 
+# Sync fresh migrations and seeders from image into mounted database volume
+if [ -d /var/www/html/database_files ]; then
+    echo "==> Sinkronisasi file migrasi & seeder dari image ke volume..."
+    mkdir -p /var/www/html/database/migrations /var/www/html/database/seeders
+    cp -rf /var/www/html/database_files/migrations/* /var/www/html/database/migrations/ 2>/dev/null || true
+    cp -rf /var/www/html/database_files/seeders/* /var/www/html/database/seeders/ 2>/dev/null || true
+fi
+
 # 1. Migrasi database secara idempotent
 if [ "${AUTO_MIGRATE:-true}" = "true" ]; then
     echo "==> [1/3] Menjalankan migrasi database (idempotent)..."
