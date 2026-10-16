@@ -14,58 +14,82 @@
 <body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
 @php($sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra')))
 <main class="flex min-h-screen">
-    {{-- Panel Branding Desktop - Bersih & Cerah --}}
-    <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-blue-600 p-12 text-white lg:flex">
-        <div class="flex items-center gap-3.5">
-            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 border border-white/20 p-1">
+    {{-- Panel Branding Desktop - Sesuai Mockup Desain Bersih & Cerah --}}
+    <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-white p-10 xl:p-14 text-slate-800 lg:flex border-r border-slate-200/80">
+        {{-- Ambient Glow & Background Waves --}}
+        <div class="pointer-events-none absolute -top-20 -right-20 h-80 w-80 rounded-full bg-blue-100/40 blur-3xl z-0"></div>
+        <svg class="pointer-events-none absolute -bottom-6 -left-6 w-96 max-w-full z-0 opacity-60" viewBox="0 0 400 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M-20 60 C80 120 180 20 420 110 L420 200 L-20 200 Z" fill="#eff6ff" />
+            <path d="M-20 90 C90 140 210 50 420 130 L420 200 L-20 200 Z" fill="#dbeafe" opacity="0.6" />
+        </svg>
+
+        {{-- Visual Arch Gedung Sekolah (Sesuai Mockup) --}}
+        <div class="pointer-events-none absolute -right-2 top-1/2 -translate-y-1/2 h-[75%] max-h-[640px] w-auto select-none z-0 hidden lg:block opacity-95">
+            <img src="{{ asset('login-illustration.png') }}" alt="SMK Bagimu Negeriku" class="h-full w-auto object-contain object-right" />
+        </div>
+
+        {{-- Header Sekolah --}}
+        <div class="relative z-10 flex items-center gap-4">
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white border border-slate-200/80 p-1 shadow-xs">
                 <x-school-logo :size="40" />
             </div>
+            <div class="h-9 w-px bg-slate-200"></div>
             <div>
-                <p class="text-base font-extrabold tracking-tight">{{ config('app.name', 'Bagimu Extra') }}</p>
-                <p class="text-xs font-medium text-blue-100">{{ $sekolah }}</p>
+                <p class="text-sm sm:text-base font-extrabold tracking-tight text-slate-900 uppercase leading-none">{{ $sekolah }}</p>
+                <p class="text-[11px] sm:text-xs font-medium text-slate-500 mt-1">4B Berbudi • Berkualitas • Berdaya • Berhasil</p>
             </div>
         </div>
 
-        <div class="space-y-6 max-w-lg">
-            <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold bg-white/15 text-white border border-white/20">
-                <x-icon name="shield" class="h-3.5 w-3.5 text-blue-100" />
+        {{-- Konten Utama (Persis Sesuai Mockup) --}}
+        <div class="relative z-10 space-y-6 max-w-lg my-auto py-8">
+            <span class="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-100 shadow-xs">
+                <x-icon name="shield" class="h-3.5 w-3.5 text-blue-600" />
                 Portal Khusus Staf & Pembina
             </span>
-            <h1 class="text-3xl xl:text-4xl font-black leading-tight tracking-tight text-white">
-                Pengelolaan Ekstrakurikuler
-                <span class="block text-blue-100 font-extrabold">
-                    Terpadu & Profesional.
-                </span>
+            <h1 class="text-3xl xl:text-4xl font-black leading-[1.18] tracking-tight text-slate-900">
+                Pengelolaan<br>
+                <span class="text-blue-600">Ekstrakurikuler</span><br>
+                Terpadu & Profesional.
             </h1>
-            <p class="text-sm leading-relaxed text-blue-100">
+            <p class="text-sm leading-relaxed text-slate-500 max-w-md">
                 Akses khusus guru, pembina eskul, dan tim tata usaha untuk verifikasi pendaftaran siswa, rekap presensi QR, penilaian rapor ekstrakurikuler, dan penerbitan sertifikat digital.
             </p>
 
-            <ul class="space-y-3 pt-2 text-sm text-white">
-                <li class="flex items-center gap-3">
-                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/20 text-white">
-                        <x-icon name="check" class="h-4 w-4" />
-                    </span>
-                    <span>Monitoring pendaftar dan kuota eskul secara real-time</span>
-                </li>
-                <li class="flex items-center gap-3">
-                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/20 text-white">
-                        <x-icon name="check" class="h-4 w-4" />
-                    </span>
-                    <span>Pemindai QR presensi dan validasi surat izin otomatis</span>
-                </li>
-                <li class="flex items-center gap-3">
-                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/20 text-white">
-                        <x-icon name="check" class="h-4 w-4" />
-                    </span>
-                    <span>Penilaian predikat siswa & cetak e-Sertifikat resmi</span>
-                </li>
-            </ul>
+            <div class="space-y-4 pt-1 max-w-md">
+                <div class="flex items-center gap-3.5">
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 shadow-xs">
+                        <x-icon name="clock" class="h-5 w-5" />
+                    </div>
+                    <p class="text-xs sm:text-sm font-medium text-slate-600 leading-snug">
+                        Monitoring pendaftar dan kuota eskul secara real-time
+                    </p>
+                </div>
+                <div class="flex items-center gap-3.5">
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 shadow-xs">
+                        <x-icon name="qr" class="h-5 w-5" />
+                    </div>
+                    <p class="text-xs sm:text-sm font-medium text-slate-600 leading-snug">
+                        Pemindaian QR presensi dan validasi surat izin otomatis
+                    </p>
+                </div>
+                <div class="flex items-center gap-3.5">
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 shadow-xs">
+                        <x-icon name="award" class="h-5 w-5" />
+                    </div>
+                    <p class="text-xs sm:text-sm font-medium text-slate-600 leading-snug">
+                        Penilaian predikat siswa & cetak e-Sertifikat resmi
+                    </p>
+                </div>
+            </div>
         </div>
 
-        <div class="flex items-center justify-between text-xs text-blue-100 border-t border-white/15 pt-4">
-            <p>&copy; {{ date('Y') }} {{ config('app.name', 'Bagimu Extra') }} — {{ $sekolah }}</p>
-            <a href="{{ route('home') }}" class="font-medium text-white hover:underline transition">Halaman Publik &rarr;</a>
+        {{-- Footer --}}
+        <div class="relative z-10 flex items-center justify-between text-xs text-slate-400 border-t border-slate-200/80 pt-4">
+            <p>&copy; {{ date('Y') }} {{ $sekolah }}</p>
+            <a href="{{ route('home') }}" class="font-semibold text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1 transition">
+                <span>Halaman Publik</span>
+                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
         </div>
     </div>
 
