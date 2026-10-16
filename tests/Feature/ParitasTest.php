@@ -24,7 +24,20 @@ class ParitasTest extends TestCase
 
     private function admin(): User
     {
+        /** @var User */
         return User::factory()->create(['role' => Role::ADMIN]);
+    }
+
+    private function kepsek(): User
+    {
+        /** @var User */
+        return User::factory()->create(['role' => Role::KEPALA_SEKOLAH]);
+    }
+
+    private function pembina(): User
+    {
+        /** @var User */
+        return User::factory()->create(['role' => Role::PEMBINA]);
     }
 
     private function siapkan(): array
@@ -230,7 +243,7 @@ class ParitasTest extends TestCase
             '/admin/rekap', '/admin/kelas', '/admin/window', '/admin/notifikasi',
             '/admin/cetak', '/admin/kenaikan/arsip-keluar', '/admin/settings',
         ] as $url) {
-            $this->actingAs($admin)->get($url)->assertOk($url);
+            $this->actingAs($admin)->get($url)->assertOk();
         }
 
         $this->actingAs($admin)->get('/verify')->assertOk();
@@ -239,7 +252,7 @@ class ParitasTest extends TestCase
     public function test_kepala_sekolah_baca_saja(): void
     {
         [$siswa, $eskul] = $this->siapkan();
-        $kepsek = User::factory()->create(['role' => Role::KEPALA_SEKOLAH]);
+        $kepsek = $this->kepsek();
 
         $this->actingAs($kepsek)->get('/admin/registrations')->assertOk();
         $this->actingAs($kepsek)->get('/admin/laporan')->assertOk();
@@ -362,7 +375,7 @@ class ParitasTest extends TestCase
         $this->assertStringContainsString('ms-excel', $res->headers->get('Content-Type'));
         $this->assertStringContainsString('Token Login', $res->streamedContent());
 
-        $kepsek = User::factory()->create(['role' => Role::KEPALA_SEKOLAH]);
+        $kepsek = $this->kepsek();
         $res = $this->actingAs($kepsek)
             ->get('/admin/registrations/export?periode=2026/2027');
         $res->assertOk();
@@ -442,7 +455,7 @@ class ParitasTest extends TestCase
     public function test_pembina_tanpa_akses_data_admin(): void
     {
         [$siswa, $eskul] = $this->siapkan();
-        $pembina = User::factory()->create(['role' => Role::PEMBINA]);
+        $pembina = $this->pembina();
         $eskul->update(['pembina_id' => $pembina->id]);
 
         $this->actingAs($pembina)->get('/admin/kehadiran')->assertForbidden();
