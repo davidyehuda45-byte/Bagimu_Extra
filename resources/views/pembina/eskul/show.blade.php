@@ -314,14 +314,15 @@
                                         <td class="px-3 py-2 text-slate-600 font-mono">{{ $r->nis ?? '-' }}</td>
                                         <td class="px-3 py-2 text-slate-700">{{ $r->kelas }}</td>
                                         <td class="px-3 py-2">
-                                            <select name="status[{{ $r->id }}]" class="rounded-lg border-slate-300 px-2 py-1 text-xs font-semibold" @disabled($locked)>
-                                                @foreach (['HADIR', 'IZIN', 'SAKIT', 'ALPA'] as $s)
-                                                    <option value="{{ $s }}" @selected(($ada?->status->value ?? 'HADIR') === $s)>{{ $s }}</option>
-                                                @endforeach
+                                            <select name="status[{{ $r->id }}]" class="rounded-xl border-slate-300 py-1.5 px-2.5 text-xs font-bold text-slate-800 bg-white shadow-2xs focus:border-blue-500 focus:ring-blue-500 cursor-pointer" @disabled($locked)>
+                                                <option value="HADIR" class="font-bold text-emerald-700" @selected(($ada?->status->value ?? 'HADIR') === 'HADIR')>Hadir</option>
+                                                <option value="IZIN" class="font-bold text-blue-700" @selected(($ada?->status->value ?? 'HADIR') === 'IZIN')>Izin</option>
+                                                <option value="SAKIT" class="font-bold text-amber-700" @selected(($ada?->status->value ?? 'HADIR') === 'SAKIT')>Sakit</option>
+                                                <option value="ALPA" class="font-bold text-rose-700" @selected(($ada?->status->value ?? 'HADIR') === 'ALPA')>Alpa</option>
                                             </select>
                                         </td>
                                         <td class="px-3 py-2">
-                                            <input type="text" name="keterangan[{{ $r->id }}]" value="{{ $ada?->keterangan }}" maxlength="200" placeholder="Opsional..." class="rounded-lg border-slate-300 px-2 py-1 text-xs w-full max-w-xs" @disabled($locked)>
+                                            <input type="text" name="keterangan[{{ $r->id }}]" value="{{ $ada?->keterangan }}" maxlength="200" placeholder="Keterangan izin/sakit..." class="rounded-xl border-slate-300 px-3 py-1.5 text-xs w-full max-w-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500" @disabled($locked)>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -331,7 +332,7 @@
                 </div>
                 @unless ($locked)
                     <div class="mt-4 flex justify-end">
-                        <button class="rounded-xl bg-blue-700 px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-blue-800 transition-colors cursor-pointer">
+                        <button class="rounded-xl bg-blue-600 px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-600/20 hover:bg-blue-700 transition-colors cursor-pointer">
                             Simpan Presensi ({{ $disetujui->count() }} Anggota)
                         </button>
                     </div>

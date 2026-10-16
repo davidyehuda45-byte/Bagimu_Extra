@@ -13,14 +13,14 @@
                     <x-icon name="check" class="h-5 w-5" />
                 </div>
                 <div class="flex-1">
-                    <h3 class="font-bold text-base text-emerald-950">Pendaftaran Berhasil & Data Terkunci!</h3>
+                    <h3 class="font-bold text-base text-emerald-950">Pendaftaran berhasil disimpan!</h3>
                     <p class="mt-1 text-xs sm:text-sm text-emerald-800 leading-relaxed">
-                        Pilihan ekstrakurikuler Anda telah disimpan. Token login Anda bersifat <b>sekali pakai</b> dan kini telah dihanguskan agar data Anda aman dan tidak dapat diubah lagi.
+                        Pilihan ekstrakurikuler Anda telah dicatat. Sesi Anda akan keluar otomatis dalam <b id="countdown-timer">5</b> detik.
                     </p>
                     <div class="mt-3 flex flex-wrap items-center gap-3">
                         <span class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-100 px-3 py-1.5 text-xs font-semibold text-emerald-900">
                             <svg class="h-4 w-4 animate-spin text-emerald-700" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"/></svg>
-                            <span>Otomatis keluar dalam <b id="countdown-timer">5</b> detik...</span>
+                            <span>Otomatis keluar dalam <b id="countdown-timer-sub">5</b> detik...</span>
                         </span>
                         <form id="auto-exit-form" action="{{ route('auth.session.exit') }}" method="POST" class="inline">
                             @csrf
@@ -35,9 +35,11 @@
                 (function() {
                     let sec = 5;
                     const el = document.getElementById('countdown-timer');
+                    const elSub = document.getElementById('countdown-timer-sub');
                     const timer = setInterval(function() {
                         sec--;
                         if (el) el.textContent = sec;
+                        if (elSub) elSub.textContent = sec;
                         if (sec <= 0) {
                             clearInterval(timer);
                             document.getElementById('auto-exit-form').submit();
@@ -58,7 +60,7 @@
             <p class="text-xs text-slate-500">Bukti resmi pendaftaran ekstrakurikuler yang telah tercatat di sistem.</p>
             <button onclick="window.print()" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs sm:text-sm font-bold text-white hover:bg-blue-700 transition shadow-xs shadow-blue-600/20 cursor-pointer shrink-0">
                 <x-icon name="printer" class="h-4 w-4" />
-                <span>Cetak Bukti</span>
+                <span>Cetak / Simpan PDF</span>
             </button>
         </div>
 
@@ -67,11 +69,11 @@
             <div class="bg-blue-600 px-6 py-5 text-white">
                 <div class="flex items-center justify-between gap-2">
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-widest text-blue-100">{{ config('app.name', 'Bagimu Extra') }}</p>
+                        <p class="text-xs font-semibold uppercase tracking-widest text-blue-100">{{ \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra')) }}</p>
                         <p class="font-extrabold text-base sm:text-lg">Bukti Pendaftaran Ekstrakurikuler</p>
                     </div>
-                    <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold whitespace-nowrap bg-white/20 text-white border border-white/25">
-                        <x-icon name="check" class="h-3.5 w-3.5" />
+                    <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold whitespace-nowrap bg-emerald-500/20 text-emerald-100 border border-emerald-400/30">
+                        <x-icon name="check" class="h-3.5 w-3.5 text-emerald-300" />
                         <span>Terdaftar Resmi</span>
                     </span>
                 </div>

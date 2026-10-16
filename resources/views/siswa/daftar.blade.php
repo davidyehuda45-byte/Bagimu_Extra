@@ -282,9 +282,9 @@
 
                 {{-- Tombol Buka Konfirmasi Modal --}}
                 <div class="pt-4 border-t border-slate-100">
-                    <button type="button" onclick="bukaModalKonfirmasi()" class="w-full flex items-center justify-center gap-2 rounded-2xl bg-blue-700 px-6 py-4 text-sm font-bold text-white shadow-lg shadow-blue-700/25 hover:bg-blue-800 hover:shadow-blue-800/30 transition-all cursor-pointer">
+                    <button type="button" onclick="bukaModalKonfirmasi()" class="w-full flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 py-4 text-sm font-bold text-white shadow-lg shadow-blue-600/25 hover:bg-blue-700 hover:shadow-blue-700/30 transition-all cursor-pointer">
                         <x-icon name="clipboard" class="h-4 w-4" />
-                        <span>Daftar Ekstrakurikuler Sekarang</span>
+                        <span>Kirim Pendaftaran</span>
                     </button>
                     <p class="text-center text-[11px] text-slate-400 mt-2">Dengan mendaftar, Anda berkomitmen untuk aktif mengikuti jadwal kegiatan ekstrakurikuler terpilih.</p>
                 </div>
@@ -321,16 +321,16 @@
                     </div>
 
                     <div class="rounded-xl bg-amber-50 p-3 text-[11px] text-amber-900 border border-amber-200/80 mb-5 leading-relaxed flex items-start gap-2">
-                        <x-icon name="alert" class="h-4 w-4 shrink-0 mt-px" />
-                        <span><strong>Penting:</strong> Pendaftaran bersifat permanen dan <strong>tidak dapat diubah</strong> setelah formulir dikirim.</span>
+                        <x-icon name="alert" class="h-4 w-4 shrink-0 mt-px text-amber-700" />
+                        <span><strong>Konfirmasi:</strong> Pastikan pilihanmu sudah benar. Setelah dikirim, data akan terkunci permanen dan akun akan otomatis keluar.</span>
                     </div>
 
                     <div class="flex gap-2">
                         <button type="button" onclick="tutupModalKonfirmasi()" class="flex-1 rounded-xl border border-slate-300 bg-white py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer">
                             Periksa Lagi
                         </button>
-                        <button type="button" id="btn-submit-pendaftaran" onclick="submitPendaftaran()" class="flex-1 rounded-xl bg-blue-700 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-700/20 hover:bg-blue-800 transition-colors cursor-pointer">
-                            Ya, Kirim Sekarang
+                        <button type="button" id="btn-submit-pendaftaran" onclick="submitPendaftaran()" class="flex-1 rounded-xl bg-blue-600 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-600/20 hover:bg-blue-700 transition-colors cursor-pointer">
+                            Kirim Pendaftaran
                         </button>
                     </div>
                 </div>
