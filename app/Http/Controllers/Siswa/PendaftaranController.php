@@ -137,17 +137,12 @@ class PendaftaranController extends Controller
                 ->with('status', 'Akun Anda tidak aktif atau data siswa belum terdaftar. Hubungi TU.');
         }
 
-        $kelasOverride = $request->filled('kelas')
-            ? \App\Support\Kelas::normalisasi($request->input('kelas'))
-            : $master->kelas;
-
-        $tingkat = \App\Support\Kelas::tingkat($kelasOverride ?? '');
+        $tingkat = \App\Support\Kelas::tingkat($master->kelas ?? '');
         $boleh = array_map('trim', explode(',', \App\Models\AppSetting::get('eskul.kelas_allowed', '10,11')));
         $semester = \App\Models\AppSetting::get('eskul.semester_aktif', '1');
 
         if (! $tingkat || ! in_array((string) $tingkat, $boleh, true)) {
-            return back()->withInput()->withErrors([
-                'kelas' => 'Eskul hanya untuk kelas '.implode(', ', $boleh).'.',
+            return back()->withErrors([
                 'eskul_utama' => 'Eskul hanya untuk kelas '.implode(', ', $boleh).'.',
             ]);
         }
@@ -157,8 +152,7 @@ class PendaftaranController extends Controller
             && \App\Models\AppSetting::get('eskul.kelas11_smt1_only', '1') === '1'
             && $semester !== '1'
         ) {
-            return back()->withInput()->withErrors([
-                'kelas' => 'Kelas 11 hanya bisa ikut eskul di semester 1 (semester 2 magang).',
+            return back()->withErrors([
                 'eskul_utama' => 'Kelas 11 hanya bisa ikut eskul di semester 1 (semester 2 magang).',
             ]);
         }
@@ -169,37 +163,27 @@ class PendaftaranController extends Controller
         }
 
         try {
-            [$registration, $dipakai] = DB::transaction(function () use ($request, $user, $periode, $master, $kelasOverride) {
+            [$registration, $dipakai] = DB::transaction(function () use ($request, $user, $periode, $master) {
                 $dipakai = $this->resolve(
                     $request->input('eskul_utama'),
                     $periode->periode
                 );
 
-                $kelasFinal = $kelasOverride ?: $master->kelas;
-                $waFinal = $request->input('whatsapp') ?? $master->whatsapp;
-
-                if ($master && $request->filled('whatsapp')) {
-                    $master->update(['whatsapp' => $request->input('whatsapp')]);
-                }
-                if ($master && $request->filled('kelas')) {
-                    $master->update(['kelas' => $kelasFinal]);
-                }
-
-                $waliKelasNama = \App\Models\SchoolClass::where('nama', $kelasFinal)->first()?->wali_kelas_nama
+                $waliKelasNama = \App\Models\SchoolClass::where('nama', $master->kelas)->first()?->wali_kelas_nama
                     ?? $master->wali_nama
                     ?? 'Belum ditentukan';
 
                 $registration = Registration::create([
                     'user_id' => $user->id,
                     'periode' => $periode->periode,
-                    'kelas' => $kelasFinal,
+                    'kelas' => $master->kelas,
                     'jurusan' => $master->jurusan,
                     'nis' => $master->nis,
                     'no_absen' => $master->no_absen ?? 1,
                     'nama_wali_kelas' => $waliKelasNama,
                     'usia' => 16,
                     'gender' => $master->gender ?? \App\Enums\Gender::LAKI_LAKI,
-                    'whatsapp' => $waFinal,
+                    'whatsapp' => $master->whatsapp,
                     'eskul_utama' => $dipakai,
                     'eskul_cadangan' => null,
                     'alasan' => null,
