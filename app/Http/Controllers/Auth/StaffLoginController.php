@@ -108,6 +108,16 @@ class StaffLoginController extends Controller
             return redirect()->to($tujuan);
         }
 
+        if ($user->role === Role::WALI_KELAS) {
+            $tujuan = session()->pull('url.intended', route('wali-kelas.dashboard'));
+            $path = parse_url((string) $tujuan, PHP_URL_PATH) ?? '';
+            if (str_starts_with($path, '/admin')) {
+                $tujuan = route('wali-kelas.dashboard');
+            }
+
+            return redirect()->to($tujuan);
+        }
+
         return redirect()->intended('/dashboard');
     }
 

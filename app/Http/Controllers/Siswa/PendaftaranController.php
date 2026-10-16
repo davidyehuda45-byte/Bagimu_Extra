@@ -137,13 +137,15 @@ class PendaftaranController extends Controller
                 ->with('status', 'Akun Anda tidak aktif atau data siswa belum terdaftar. Hubungi TU.');
         }
 
-        $tingkat = \App\Support\Kelas::tingkat($master->kelas ?? '');
+        $kelasInput = $request->input('kelas');
+        $kelas = $kelasInput ? \App\Support\Kelas::normalisasi($kelasInput) : ($master->kelas ?? '');
+        $tingkat = \App\Support\Kelas::tingkat($kelas);
         $boleh = array_map('trim', explode(',', \App\Models\AppSetting::get('eskul.kelas_allowed', '10,11')));
         $semester = \App\Models\AppSetting::get('eskul.semester_aktif', '1');
 
         if (! $tingkat || ! in_array((string) $tingkat, $boleh, true)) {
             return back()->withErrors([
-                'eskul_utama' => 'Eskul hanya untuk kelas '.implode(', ', $boleh).'.',
+                'kelas' => 'Eskul hanya untuk kelas '.implode(', ', $boleh).'.',
             ]);
         }
 
@@ -153,7 +155,7 @@ class PendaftaranController extends Controller
             && $semester !== '1'
         ) {
             return back()->withErrors([
-                'eskul_utama' => 'Kelas 11 hanya bisa ikut eskul di semester 1 (semester 2 magang).',
+                'kelas' => 'Kelas 11 hanya bisa ikut eskul di semester 1 (semester 2 magang).',
             ]);
         }
 
@@ -163,30 +165,37 @@ class PendaftaranController extends Controller
         }
 
         try {
-            [$registration, $dipakai] = DB::transaction(function () use ($request, $user, $periode, $master) {
+            [$registration, $dipakai] = DB::transaction(function () use ($request, $user, $periode, $master, $kelas) {
                 $dipakai = $this->resolve(
                     $request->input('eskul_utama'),
                     $periode->periode
                 );
 
-                $waliKelasNama = \App\Models\SchoolClass::where('nama', $master->kelas)->first()?->wali_kelas_nama
+                if ($request->filled('whatsapp') && $master) {
+                    $master->update(['whatsapp' => $request->input('whatsapp')]);
+                }
+
+                $wa = $request->input('whatsapp') ?? $master->whatsapp;
+
+                $waliKelasNama = $request->input('nama_wali_kelas')
+                    ?? \App\Models\SchoolClass::where('nama', $kelas)->first()?->wali_kelas_nama
                     ?? $master->wali_nama
                     ?? 'Belum ditentukan';
 
                 $registration = Registration::create([
                     'user_id' => $user->id,
                     'periode' => $periode->periode,
-                    'kelas' => $master->kelas,
-                    'jurusan' => $master->jurusan,
+                    'kelas' => $kelas,
+                    'jurusan' => $request->input('jurusan') ? (\App\Enums\Jurusan::tryFrom($request->input('jurusan')) ?? $master->jurusan) : $master->jurusan,
                     'nis' => $master->nis,
-                    'no_absen' => $master->no_absen ?? 1,
+                    'no_absen' => $request->input('no_absen') ?? $master->no_absen ?? 1,
                     'nama_wali_kelas' => $waliKelasNama,
-                    'usia' => 16,
-                    'gender' => $master->gender ?? \App\Enums\Gender::LAKI_LAKI,
-                    'whatsapp' => $master->whatsapp,
+                    'usia' => $request->input('usia') ?? 16,
+                    'gender' => $request->input('gender') ? (\App\Enums\Gender::tryFrom($request->input('gender')) ?? $master->gender ?? \App\Enums\Gender::LAKI_LAKI) : ($master->gender ?? \App\Enums\Gender::LAKI_LAKI),
+                    'whatsapp' => $wa,
                     'eskul_utama' => $dipakai,
-                    'eskul_cadangan' => null,
-                    'alasan' => null,
+                    'eskul_cadangan' => $request->input('eskul_cadangan'),
+                    'alasan' => $request->input('alasan'),
                     'alasan_penolakan' => null,
                     'status' => Status::APPROVED,
                     'verify_token' => bin2hex(random_bytes(32)),

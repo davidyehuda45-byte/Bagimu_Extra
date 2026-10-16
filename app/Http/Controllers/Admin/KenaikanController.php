@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AdminLog;
 use App\Models\ClassHistory;
 use App\Models\Periode;
-use App\Models\PeriodeStatus;
+use App\Enums\PeriodeStatus;
 use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\StudentKeluar;
@@ -60,10 +60,69 @@ class KenaikanController extends Controller
     }
 
     /**
-     * Proses Kenaikan Kelas per Rombel Kelas dengan Checklist
+     * Proses Kenaikan Kelas (Mendukung Massal Otomatis & Per Rombel dengan Checklist)
      */
     public function store(Request $request): RedirectResponse
     {
+        if ($request->has('konfirmasi')) {
+            $periodeAktif = Periode::where('status', PeriodeStatus::DIBUKA)->orderByDesc('periode')->first();
+            $periodeStr = $periodeAktif?->periode ?? date('Y');
+
+            $diproses = 0;
+            $dilewati = 0;
+
+            DB::transaction(function () use ($periodeStr, &$diproses, &$dilewati) {
+                $students = Student::where('status', 'AKTIF')->get();
+
+                foreach ($students as $s) {
+                    $tingkat = Kelas::tingkat($s->kelas);
+
+                    if ($tingkat === null) {
+                        $dilewati++;
+                        continue;
+                    }
+
+                    $kelasLama = $s->kelas;
+
+                    if ($tingkat < 11) {
+                        $baru = Kelas::naikkan($s->kelas);
+                        $s->update(['kelas' => $baru, 'status' => 'AKTIF']);
+                        $s->user?->update(['student_status' => 'AKTIF']);
+                    } elseif ($tingkat === 11) {
+                        $baru = Kelas::naikkan($s->kelas);
+                        $s->update(['kelas' => $baru, 'status' => 'NONAKTIF']);
+                        $s->user?->update(['student_status' => 'NONAKTIF']);
+                    } else {
+                        $baru = 'LULUS';
+                        $s->update(['status' => 'LULUS']);
+                        $s->user?->update(['student_status' => 'LULUS']);
+                        if ($s->user) {
+                            LoginToken::revoke($s->user);
+                            $s->user->increment('session_version');
+                        }
+                    }
+
+                    if ($s->user_id) {
+                        ClassHistory::create([
+                            'user_id' => $s->user_id,
+                            'periode' => $periodeStr,
+                            'kelas_lama' => $kelasLama,
+                            'kelas_baru' => $baru,
+                            'actor_id' => (string) auth()->id(),
+                            'reason' => 'Kenaikan kelas massal',
+                        ]);
+                    }
+
+                    $diproses++;
+                }
+            });
+
+            AdminLog::record('kenaikan.proses', 'Student', null, "Kenaikan kelas: {$diproses} diproses, {$dilewati} dilewati.");
+
+            return redirect()->route('admin.kenaikan.index')
+                ->with('status', "Kenaikan kelas selesai: {$diproses} diproses, {$dilewati} dilewati.");
+        }
+
         $data = $request->validate([
             'kelas_asal' => ['required', 'string'],
             'kelas_tujuan' => ['required', 'string', 'max:50'],
