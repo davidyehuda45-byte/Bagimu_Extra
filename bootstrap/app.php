@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\CheckSessionVersion::class,
             \App\Http\Middleware\SecurityHeaders::class,
+            \App\Http\Middleware\HandleInertiaRequests::class,
         ]);
 
         // Percayai reverse proxy / load balancer bila dikonfigurasi

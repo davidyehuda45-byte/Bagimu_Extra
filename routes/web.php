@@ -11,6 +11,12 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/eskul', [PublikController::class, 'eskul'])->name('publik.eskul');
 Route::get('/jadwal', [PublikController::class, 'jadwal'])->name('publik.jadwal');
 
+Route::get('/inertia-test', function () {
+    return inertia('Test', [
+        'message' => 'Setup Inertia + React di Bagimu Extra sudah aktif dan siap digunakan.',
+    ]);
+});
+
 Route::get('/dashboard', DashboardRedirectController::class)->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
