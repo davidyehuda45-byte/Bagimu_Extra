@@ -93,21 +93,25 @@
         </div>
     </div>
 
-    {{-- Panel Form Kanan --}}
-    <div class="flex w-full items-center justify-center bg-slate-50/70 px-4 py-12 lg:w-1/2">
-        <div class="w-full max-w-md">
+    {{-- Panel Form Kanan - Warna Biru Khas Bagimu Extra --}}
+    <div class="relative flex w-full items-center justify-center bg-blue-600 px-4 py-12 lg:w-1/2 overflow-hidden">
+        {{-- Ambient Glow Dekoratif --}}
+        <div class="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-white/10 blur-3xl"></div>
+        <div class="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-blue-900/30 blur-3xl"></div>
+
+        <div class="relative z-10 w-full max-w-md">
             {{-- Mobile Logo --}}
             <div class="mb-6 flex items-center gap-3 lg:hidden">
-                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-sm p-1">
+                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 border border-white/20 p-1">
                     <x-school-logo :size="36" />
                 </div>
                 <div>
-                    <p class="font-bold text-slate-900 leading-tight">{{ config('app.name', 'Bagimu Extra') }}</p>
-                    <p class="text-xs text-slate-500">{{ $sekolah }}</p>
+                    <p class="font-bold text-white leading-tight">{{ config('app.name', 'Bagimu Extra') }}</p>
+                    <p class="text-xs text-blue-100">{{ $sekolah }}</p>
                 </div>
             </div>
 
-            <div class="rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-sm">
+            <div class="rounded-3xl border border-white/20 bg-white p-6 sm:p-8 shadow-2xl">
                 <div class="mb-5">
                     <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10 mb-2.5">
                         <x-icon name="user" class="h-3.5 w-3.5" /> Portal Siswa
