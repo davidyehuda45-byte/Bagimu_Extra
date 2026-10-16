@@ -125,6 +125,10 @@ jobs:
             echo "==> Memastikan akun admin David Yehuda Surbakti aktif..."
             docker compose exec -T bagimu-extra php artisan app:create-admin --name="David Yehuda Surbakti" --email="david.yehuda45@smk.belajar.id" --username="davidyehudasurbakti" --password="Yehuda4545!"
 
+            # Hapus akun admin demo cadangan demi keamanan
+            echo "==> Menghapus akun admin demo bawaan..."
+            docker compose exec -T bagimu-extra php artisan tinker --execute="App\Models\User::where('username', 'admin')->orWhere('email', 'admin@sekolah.sch.id')->delete();"
+
             # Optimasi cache Laravel (config, route, view)
             echo "==> Mengoptimalkan cache Laravel..."
             docker compose exec -T bagimu-extra php artisan optimize

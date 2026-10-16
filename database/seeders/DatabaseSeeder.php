@@ -32,15 +32,8 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@sekolah.sch.id'],
-            [
-                'name' => 'Admin Eskul',
-                'password' => Hash::make('password'),
-                'role' => Role::ADMIN,
-                'username' => 'admin',
-            ]
-        );
+        // Hapus akun demo bawaan demi keamanan
+        User::where('username', 'admin')->orWhere('email', 'admin@sekolah.sch.id')->delete();
 
         User::updateOrCreate(
             ['username' => 'davidyehudasurbakti'],
@@ -154,7 +147,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $this->command->info('Admin  : admin@sekolah.sch.id / password');
+        $this->command->info('Admin  : davidyehudasurbakti');
         $this->command->info('Siswa  : NIS 10001 + token di bawah');
         $this->command->info("Token siswa demo (8 digit): {$token}");
     }
