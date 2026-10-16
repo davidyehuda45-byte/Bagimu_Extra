@@ -13,115 +13,121 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
 @php($sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra')))
-<main class="relative flex min-h-screen overflow-hidden bg-white">
-    {{-- Panel Branding Desktop - Sesuai Mockup Desain Bersih & Cerah --}}
-    <div class="relative hidden w-1/2 flex-col justify-between bg-white p-10 xl:p-14 text-slate-800 lg:flex z-0">
-        {{-- Ambient Glow & Background Waves --}}
-        <div class="pointer-events-none absolute -top-20 -right-20 h-80 w-80 rounded-full bg-blue-100/40 blur-3xl z-0"></div>
-        <svg class="pointer-events-none absolute -bottom-6 -left-6 w-96 max-w-full z-0 opacity-60" viewBox="0 0 400 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M-20 60 C80 120 180 20 420 110 L420 200 L-20 200 Z" fill="#eff6ff" />
-            <path d="M-20 90 C90 140 210 50 420 130 L420 200 L-20 200 Z" fill="#dbeafe" opacity="0.6" />
+<main class="flex min-h-screen">
+    {{-- Panel Branding Desktop - Sesuai Mockup (Biru Penuh dengan Titik-Titik Putih Elegan) --}}
+    <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-blue-600 p-10 xl:p-14 text-white lg:flex">
+        {{-- Ambient Glow Lembut di Belakang --}}
+        <div class="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-blue-400/25 blur-3xl z-0"></div>
+        <div class="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-blue-700/50 blur-3xl z-0"></div>
+
+        {{-- Titik-Titik Putih Pola Grid Halus & Rapi (Sleek Dot Matrix Pattern, Elegan & Tidak Norak) --}}
+        <svg class="pointer-events-none absolute inset-0 h-full w-full opacity-25 z-0" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="dot-grid-siswa" width="24" height="24" patternUnits="userSpaceOnUse">
+                    <circle cx="2" cy="2" r="1.25" fill="#ffffff" />
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#dot-grid-siswa)" />
         </svg>
 
+        {{-- Titik-Titik Aksentuasi Berkilau Halus (Constellation Dots) --}}
+        <div class="pointer-events-none absolute inset-0 overflow-hidden z-0">
+            <span class="absolute top-[14%] left-[18%] h-1.5 w-1.5 rounded-full bg-white/80 shadow-[0_0_8px_rgba(255,255,255,0.9)]"></span>
+            <span class="absolute top-[26%] left-[74%] h-2 w-2 rounded-full bg-white/70 shadow-[0_0_10px_rgba(255,255,255,0.8)]"></span>
+            <span class="absolute top-[42%] left-[12%] h-1 w-1 rounded-full bg-white/60 shadow-[0_0_6px_rgba(255,255,255,0.7)]"></span>
+            <span class="absolute top-[58%] left-[84%] h-1.5 w-1.5 rounded-full bg-white/80 shadow-[0_0_8px_rgba(255,255,255,0.9)]"></span>
+            <span class="absolute top-[72%] left-[24%] h-2 w-2 rounded-full bg-white/70 shadow-[0_0_10px_rgba(255,255,255,0.8)]"></span>
+            <span class="absolute top-[86%] left-[68%] h-1.5 w-1.5 rounded-full bg-white/60 shadow-[0_0_6px_rgba(255,255,255,0.7)]"></span>
+            <span class="absolute top-[34%] left-[48%] h-1 w-1 rounded-full bg-white/50 shadow-[0_0_6px_rgba(255,255,255,0.6)]"></span>
+        </div>
+
         {{-- Header Sekolah --}}
-        <div class="relative z-10 flex items-center gap-4">
-            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white border border-slate-200/80 p-1 shadow-xs">
-                <x-school-logo :size="40" />
+        <div class="relative z-10 flex items-center gap-3.5">
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 border border-white/20 p-1.5 backdrop-blur-xs shadow-xs">
+                <x-school-logo :size="38" />
             </div>
-            <div class="h-9 w-px bg-slate-200"></div>
             <div>
-                <p class="text-sm sm:text-base font-extrabold tracking-tight text-slate-900 uppercase leading-none">{{ $sekolah }}</p>
-                <p class="text-[11px] sm:text-xs font-medium text-slate-500 mt-1">4B Berbudi • Berkualitas • Berdaya • Berhasil</p>
+                <p class="text-base font-extrabold tracking-tight text-white leading-tight">{{ config('app.name', 'Bagimu Extra') }}</p>
+                <p class="text-xs font-semibold text-blue-100">{{ $sekolah }}</p>
+                <p class="text-[11px] font-medium text-blue-200/90 mt-0.5">4B Berbudi • Berkualitas • Berdaya • Berhasil</p>
             </div>
         </div>
 
         {{-- Konten Utama --}}
-        <div class="relative z-10 space-y-6 max-w-[310px] xl:max-w-[360px] my-auto py-6">
-            <span class="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-100 shadow-xs">
-                <x-icon name="user" class="h-3.5 w-3.5 text-blue-600" />
+        <div class="relative z-10 my-auto py-8 space-y-6 max-w-lg">
+            <span class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-semibold bg-white/15 text-white border border-white/25 backdrop-blur-xs shadow-xs">
+                <x-icon name="user" class="h-3.5 w-3.5 text-blue-100" />
                 Portal Ekstrakurikuler Siswa
             </span>
-            <h1 class="text-2xl sm:text-3xl xl:text-4xl font-black leading-[1.18] tracking-tight text-slate-900">
+            <h1 class="text-3xl xl:text-4xl font-black leading-tight tracking-tight text-white">
                 Pendaftaran & Presensi<br>
-                <span class="text-blue-600">Ekstrakurikuler</span><br>
-                Digital & Praktis.
+                Ekstrakurikuler<br>
+                <span class="text-blue-100 font-extrabold">Digital, Praktis & Cepat.</span>
             </h1>
-            <p class="text-xs sm:text-sm leading-relaxed text-slate-500 max-w-[300px] xl:max-w-[340px]">
-                Pilih eskul favoritmu, dapatkan E-Card digital dengan QR Code unik, dan pantau rekap kehadiran serta nilai akhir langsung dari ponselmu.
+            <p class="text-sm leading-relaxed text-blue-100/90 max-w-md">
+                Pilih eskul favoritmu, dapatkan E-Card digital dengan QR Code unik, dan pantau rekap kehadiran serta nilai akhir langsung dari perangkat ponselmu.
             </p>
 
-            <div class="space-y-3.5 pt-1 max-w-[300px] xl:max-w-[340px]">
-                <div class="flex items-center gap-3.5">
-                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 shadow-xs">
-                        <x-icon name="clock" class="h-5 w-5" />
-                    </div>
-                    <p class="text-xs sm:text-sm font-medium text-slate-600 leading-snug">
-                        Masuk instan menggunakan NIS dan Token Kartu Pelajar
-                    </p>
-                </div>
-                <div class="flex items-center gap-3.5">
-                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 shadow-xs">
-                        <x-icon name="qr" class="h-5 w-5" />
-                    </div>
-                    <p class="text-xs sm:text-sm font-medium text-slate-600 leading-snug">
-                        E-Card presensi digital ber-QR Code untuk absensi latihan
-                    </p>
-                </div>
-                <div class="flex items-center gap-3.5">
-                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 shadow-xs">
-                        <x-icon name="award" class="h-5 w-5" />
-                    </div>
-                    <p class="text-xs sm:text-sm font-medium text-slate-600 leading-snug">
-                        Transparansi persentase kehadiran dan sertifikat kegiatan resmi
-                    </p>
-                </div>
-            </div>
+            <ul class="space-y-3.5 pt-2 text-sm text-white max-w-md">
+                <li class="flex items-center gap-3">
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/20 text-white border border-white/20 shadow-xs">
+                        <x-icon name="check" class="h-4 w-4" />
+                    </span>
+                    <span class="font-medium text-white/95 leading-snug">Masuk instan menggunakan NIS dan Token Kartu Pelajar</span>
+                </li>
+                <li class="flex items-center gap-3">
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/20 text-white border border-white/20 shadow-xs">
+                        <x-icon name="check" class="h-4 w-4" />
+                    </span>
+                    <span class="font-medium text-white/95 leading-snug">E-Card presensi digital ber-QR Code untuk absensi latihan</span>
+                </li>
+                <li class="flex items-center gap-3">
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/20 text-white border border-white/20 shadow-xs">
+                        <x-icon name="check" class="h-4 w-4" />
+                    </span>
+                    <span class="font-medium text-white/95 leading-snug">Transparansi persentase kehadiran dan sertifikat kegiatan resmi</span>
+                </li>
+            </ul>
         </div>
 
         {{-- Footer --}}
-        <div class="relative z-10 flex items-center justify-between text-xs text-slate-400 border-t border-slate-200/80 pt-4">
-            <p>&copy; {{ date('Y') }} {{ $sekolah }}</p>
-            <a href="{{ route('home') }}" class="font-semibold text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1 transition">
+        <div class="relative z-10 flex items-center justify-between text-xs text-blue-100/80 border-t border-white/15 pt-4">
+            <p>&copy; {{ date('Y') }} {{ config('app.name', 'Bagimu Extra') }} — {{ $sekolah }}</p>
+            <a href="{{ route('home') }}" class="font-semibold text-white hover:text-blue-100 hover:underline flex items-center gap-1 transition">
                 <span>Halaman Publik</span>
                 <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
         </div>
     </div>
 
-    {{-- Panel Form Kanan - Warna Biru Khas Bagimu Extra dengan Transisi Wave Mulus --}}
-    <div class="relative flex w-full items-center justify-center bg-blue-600 px-4 py-12 lg:w-1/2 z-10">
-        {{-- Layer 1: Kurva Biru Muda Lembut di Belakang --}}
-        <svg class="pointer-events-none absolute top-0 -left-36 lg:-left-48 xl:-left-60 h-full w-36 lg:w-48 xl:w-60 text-blue-300/40 fill-current z-0 hidden lg:block translate-x-1" viewBox="0 0 100 800" preserveAspectRatio="none">
-            <path d="M100,0 C15,140 0,310 0,470 C0,630 15,750 100,800 L100,0 Z" />
-        </svg>
-
-        {{-- Layer 2: Kurva Utama Biru Khas (Menyatu Sempurna dengan bg-blue-600) --}}
-        <svg class="pointer-events-none absolute top-0 -left-24 lg:-left-36 xl:-left-44 h-full w-24 lg:w-36 xl:w-44 text-blue-600 fill-current z-10 hidden lg:block translate-x-1" viewBox="0 0 100 800" preserveAspectRatio="none">
-            <path d="M100,0 C25,160 0,330 0,470 C0,610 25,740 100,800 L100,0 Z" />
-        </svg>
-
-        {{-- Arch Foto Gedung SMK Bagimu Negeriku (Menyambung Mulus di Atas Lengkungan) --}}
-        <div class="pointer-events-none absolute -left-20 lg:-left-28 xl:-left-36 top-1/2 -translate-y-1/2 w-44 lg:w-52 xl:w-60 h-[340px] lg:h-[400px] xl:h-[440px] rounded-full overflow-hidden border-4 border-white shadow-2xl shadow-blue-950/40 z-20 hidden lg:block">
-            <img src="{{ asset('gedung-clean.png') }}" alt="Gedung SMK Bagimu Negeriku" class="h-full w-full object-cover object-center" />
-        </div>
-
-        {{-- Ambient Glow Dekoratif --}}
-        <div class="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-white/10 blur-3xl"></div>
-        <div class="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-blue-900/30 blur-3xl"></div>
-
-        <div class="relative z-30 w-full max-w-md">
+    {{-- Panel Form Kanan - Latar Bersih Cerah Sesuai Mockup --}}
+    <div class="relative flex w-full items-center justify-center bg-slate-50/70 px-4 py-12 lg:w-1/2">
+        <div class="relative z-10 w-full max-w-md">
             {{-- Mobile Logo --}}
             <div class="mb-6 flex items-center gap-3 lg:hidden">
-                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 border border-white/20 p-1">
+                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 border border-blue-100 p-1 shadow-xs">
                     <x-school-logo :size="36" />
                 </div>
                 <div>
-                    <p class="font-bold text-white leading-tight">{{ config('app.name', 'Bagimu Extra') }}</p>
-                    <p class="text-xs text-blue-100">{{ $sekolah }}</p>
+                    <p class="font-bold text-slate-900 leading-tight">{{ config('app.name', 'Bagimu Extra') }}</p>
+                    <p class="text-xs text-slate-500">{{ $sekolah }}</p>
+                    <p class="text-[10px] text-blue-600 font-medium">4B Berbudi • Berkualitas • Berdaya • Berhasil</p>
                 </div>
             </div>
 
-            <div class="rounded-3xl border border-white/20 bg-white p-6 sm:p-8 shadow-2xl">
+            <div class="rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-xl shadow-slate-200/50">
+                {{-- Segmented Tab Switch (Siswa / Pembina) --}}
+                <div class="mb-6 flex rounded-2xl bg-slate-100 p-1">
+                    <div class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-xs">
+                        <x-icon name="user" class="h-4 w-4" />
+                        <span>Siswa</span>
+                    </div>
+                    <button type="button" @click="alert('Portal Khusus Staf & Pembina diakses melalui tautan dinas resmi sekolah.')" class="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-800 transition">
+                        <x-icon name="shield" class="h-4 w-4" />
+                        <span>Pembina</span>
+                    </button>
+                </div>
+
                 <div class="mb-5">
                     <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10 mb-2.5">
                         <x-icon name="user" class="h-3.5 w-3.5" /> Portal Siswa
@@ -130,7 +136,7 @@
                     <p class="mt-1 text-xs sm:text-sm text-slate-500">Gunakan NIS dan Token 8 digit yang tertera di kartu pelajar Anda.</p>
                 </div>
 
-                <form method="POST" action="{{ route('siswa.login') }}" class="space-y-4" x-data="{ loading: false }" @submit="loading = true">
+                <form method="POST" action="{{ route('siswa.login') }}" class="space-y-4" x-data="{ loading: false, showToken: false }" @submit="loading = true">
                     @csrf
 
                     <div>
@@ -146,28 +152,41 @@
                             <x-input-label for="token" value="Token / Kata Sandi" />
                             <span class="text-[11px] text-slate-400">8 digit kartu</span>
                         </div>
-                        <x-text-input id="token" class="mt-1 block w-full text-center text-xl tracking-[0.4em] font-mono font-bold placeholder:font-sans placeholder:tracking-normal placeholder:font-normal"
-                                        type="text" inputmode="text" autocapitalize="off" spellcheck="false" autocomplete="current-password"
-                                        name="token" required maxlength="100" placeholder="••••••••" />
+                        <div class="relative mt-1">
+                            <input id="token"
+                                   :type="showToken ? 'text' : 'password'"
+                                   name="token"
+                                   required
+                                   maxlength="100"
+                                   autocomplete="current-password"
+                                   placeholder="••••••••"
+                                   class="block w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 pr-10 text-base font-semibold tracking-wider text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal placeholder:font-normal focus:border-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-600/20" />
+                            <button type="button" @click="showToken = !showToken" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-hidden" tabindex="-1">
+                                <svg x-show="!showToken" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <svg x-show="showToken" x-cloak class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.88 9.88 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                            </button>
+                        </div>
                         <x-input-error :messages="$errors->get('token')" class="mt-2" />
                         <p class="mt-1.5 text-[11px] text-slate-400 leading-normal">
                             Masukkan token 8 karakter dari kartu pelajar atau kata sandi yang pernah Anda atur di menu Profil.
                         </p>
                     </div>
 
-                    <x-primary-button class="w-full justify-center py-3 text-sm font-bold shadow-sm shadow-blue-600/25" ::disabled="loading">
-                        <span x-show="! loading" class="inline-flex items-center gap-2">
+                    <button type="submit"
+                            :disabled="loading"
+                            class="relative flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/25 transition hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed">
+                        <span x-show="!loading" class="inline-flex items-center gap-2">
                             <span>Masuk Sekarang</span>
-                            <x-icon name="arrow-right" class="h-4 w-4" />
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                         </span>
                         <span x-show="loading" x-cloak class="inline-flex items-center gap-2">
-                            <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"/></svg>
+                            <svg class="h-4 w-4 animate-spin text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"/></svg>
                             <span>Memproses Masuk…</span>
                         </span>
-                    </x-primary-button>
+                    </button>
 
                     <div class="mt-5 space-y-2 border-t border-slate-100 pt-4 text-center text-xs text-slate-500">
-                        <p class="text-slate-400">Lupa token? Hubungi bagian Tata Usaha (TU) sekolah untuk cetak ulang token.</p>
+                        <p class="text-slate-400">Lupa token? Hubungi bagian <span class="font-medium text-slate-600">Tata Usaha (TU)</span> sekolah untuk cetak ulang token.</p>
                         <div class="pt-1">
                             <a href="{{ route('home') }}" class="font-medium text-slate-600 hover:text-blue-700 hover:underline">
                                 &larr; Kembali ke Beranda
