@@ -13,3 +13,4 @@ class InertiaTestController extends Controller
         ]);
     }
 }
+
