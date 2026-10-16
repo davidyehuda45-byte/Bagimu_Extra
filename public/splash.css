@@ -1,0 +1,45 @@
+/* ===== Splash Screen – SMK Bagimu Negeriku ===== */
+:root{
+  --splash-grad:linear-gradient(120deg,#0B4F9E,#1976D2,#0A3D82,#1E88E5,#0B4F9E); /* ganti warna di sini */
+}
+#splash{
+  position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:var(--splash-grad);background-size:300% 300%;animation:splash-warna 8s ease-in-out infinite;
+  color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);
+  transition:opacity .45s ease,visibility .45s;
+}
+#splash.out{opacity:0;visibility:hidden}
+#splash *{box-sizing:border-box}
+
+/* logo */
+.sp-badge{width:min(52vw,200px);aspect-ratio:1;animation:splash-float 3.2s 1.2s ease-in-out infinite}
+.sp-badge img{display:block;width:100%;height:100%;border-radius:50%;background:#fff;
+  opacity:0;transform:scale(0);animation:splash-pop .8s .15s cubic-bezier(.2,.9,.3,1) forwards}
+
+/* teks */
+.sp-ekskul{margin:30px 0 0;min-height:1.4em;font-size:15px;font-weight:600;letter-spacing:.04em}
+.sp-ekskul::after{content:"";display:inline-block;width:2px;height:1em;margin-left:3px;background:#fff;vertical-align:-2px;animation:splash-caret .8s steps(1) infinite}
+.sp-name{margin:6px 0 0;font-size:clamp(18px,4.8vw,22px);font-weight:700;letter-spacing:.02em;text-align:center;opacity:0;animation:splash-fade .6s .5s ease forwards}
+.sp-motto{margin:6px 16px 0;font-size:13px;color:rgba(255,255,255,.75);text-align:center;opacity:0;animation:splash-fade .6s .7s ease forwards}
+.sp-pct{margin-top:34px;font-size:15px;font-variant-numeric:tabular-nums;color:rgba(255,255,255,.9);opacity:0;animation:splash-fade .4s .8s ease forwards}
+.sp-pct b{font-size:30px;font-weight:700;color:#fff}
+
+/* saat 100%: logo mengecil, teks menghilang */
+#splash.shrink .sp-badge img{animation:splash-kecil .6s cubic-bezier(.6,0,.9,.5) forwards}
+#splash.shrink .sp-ekskul,#splash.shrink .sp-name,#splash.shrink .sp-motto,#splash.shrink .sp-pct{animation:splash-hilang .3s forwards}
+
+@keyframes splash-warna{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes splash-pop{0%{opacity:0;transform:scale(0)}15%{opacity:1}65%{transform:scale(1.14)}100%{opacity:1;transform:scale(1)}}
+@keyframes splash-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes splash-fade{to{opacity:1}}
+@keyframes splash-caret{50%{opacity:0}}
+@keyframes splash-kecil{from{transform:scale(1);opacity:1}to{transform:scale(0);opacity:0}}
+@keyframes splash-hilang{from{opacity:1}to{opacity:0}}
+
+@media (prefers-reduced-motion:reduce){
+  #splash,.sp-badge{animation:none}
+  .sp-badge img{animation:splash-pop .01s forwards}
+  .sp-name,.sp-motto,.sp-pct{animation-duration:.01s;animation-delay:0s}
+  .sp-ekskul::after{animation:none}
+}
