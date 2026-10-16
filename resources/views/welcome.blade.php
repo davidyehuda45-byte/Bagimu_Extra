@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'Bagimu Extra') }} — Pendaftaran Eskul</title>
+    <x-favicon />
     <meta name="theme-color" content="#1e3a8a">
     <meta name="description" content="Pendaftaran ekstrakurikuler digital — jelajahi eskul, lihat jadwal, daftar dengan NIS dan token.">
     <link rel="preconnect" href="https://fonts.bunny.net">

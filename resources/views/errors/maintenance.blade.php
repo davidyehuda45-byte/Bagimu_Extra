@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Sistem Dalam Pemeliharaan — {{ config('app.name', 'Bagimu Extra') }}</title>
+    <x-favicon />
     <meta name="theme-color" content="#1e3a8a">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>

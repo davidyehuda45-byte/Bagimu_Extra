@@ -6,6 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Laravel') }}</title>
+        <x-favicon />
         <meta name="theme-color" content="#1e3a8a">
 
         <!-- Fonts: non-blocking agar offline/timing-out tidak menghambat render, fallback ke system-ui -->

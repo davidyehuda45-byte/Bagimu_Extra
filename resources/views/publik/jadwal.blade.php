@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Jadwal Latihan — {{ config('app.name', 'Bagimu Extra') }}</title>
+    <x-favicon />
     <meta name="theme-color" content="#1e3a8a">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
