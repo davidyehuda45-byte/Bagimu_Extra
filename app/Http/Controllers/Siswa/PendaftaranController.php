@@ -221,11 +221,16 @@ class PendaftaranController extends Controller
             throw $e;
         }
 
-        $pesan = "Pendaftaran berhasil. Anda resmi terdaftar {$dipakai}.";
+        // Token bersifat sekali pakai: langsung hanguskan token setelah pendaftaran berhasil
+        \App\Support\LoginToken::revoke($user);
+
+        $pesan = "Pendaftaran berhasil. Anda resmi terdaftar {$dipakai}. Data telah terkunci.";
 
         Notifier::statusPendaftaran($registration);
 
-        return redirect()->route('siswa.status')->with('status', $pesan);
+        return redirect()->route('siswa.status')
+            ->with('status', $pesan)
+            ->with('just_registered', true);
     }
 
     /**

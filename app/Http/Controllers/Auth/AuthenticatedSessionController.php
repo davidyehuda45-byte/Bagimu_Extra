@@ -75,6 +75,11 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('admin.login')->with('status', 'Sesi Anda telah berakhir demi keamanan. Silakan login kembali.');
         }
 
+        $sudahDaftar = $user && \App\Models\Registration::where('user_id', $user->id)->exists();
+        if ($sudahDaftar) {
+            return redirect()->route('siswa.login')->with('status', 'Pendaftaran Anda telah berhasil disimpan dan data telah terkunci. Token Anda bersifat sekali pakai.');
+        }
+
         return redirect()->route('siswa.login')->with('status', 'Sesi Anda telah berakhir demi keamanan. Silakan login kembali.');
     }
 }

@@ -111,4 +111,41 @@ class SiswaLoginTest extends TestCase
         $this->assertGuest();
         $response->assertSessionHasErrors('token');
     }
+
+    public function test_siswa_yang_sudah_daftar_eskul_ditolak_karena_data_terkunci(): void
+    {
+        $master = $this->master();
+        $user = User::factory()->create(['username' => '10001', 'role' => Role::STUDENT]);
+        $token = LoginToken::issue($user);
+
+        \App\Models\Registration::create([
+            'user_id' => $user->id,
+            'periode' => '2026/2027',
+            'kelas' => 'X RPL 1',
+            'jurusan' => \App\Enums\Jurusan::RPL,
+            'nis' => '10001',
+            'usia' => 16,
+            'gender' => 'LAKI_LAKI',
+            'eskul_utama' => 'Futsal',
+            'status' => \App\Enums\Status::APPROVED,
+        ]);
+
+        $response = $this->post('/siswa/login', ['nis' => '10001', 'token' => $token]);
+
+        $this->assertGuest();
+        $response->assertSessionHasErrors('token');
+    }
+
+    public function test_token_hangus_sekali_pakai_ditolak(): void
+    {
+        $this->master();
+        $user = User::factory()->create(['username' => '10001', 'role' => Role::STUDENT]);
+        $token = LoginToken::issue($user);
+        LoginToken::revoke($user);
+
+        $response = $this->post('/siswa/login', ['nis' => '10001', 'token' => $token]);
+
+        $this->assertGuest();
+        $response->assertSessionHasErrors('token');
+    }
 }

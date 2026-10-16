@@ -8,6 +8,48 @@
 <div class="space-y-4">
     <h1 class="text-lg font-bold text-slate-900">Status & E-Card</h1>
 
+    @if (session('just_registered'))
+        <div id="auto-exit-banner" class="no-print rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm text-emerald-900">
+            <div class="flex items-start gap-3.5">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-xs">
+                    <x-icon name="check" class="h-5 w-5" />
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-bold text-base text-emerald-950">Pendaftaran Berhasil & Data Terkunci!</h3>
+                    <p class="mt-1 text-xs sm:text-sm text-emerald-800 leading-relaxed">
+                        Pilihan ekstrakurikuler Anda telah disimpan. Token login Anda bersifat <b>sekali pakai</b> dan kini telah dihanguskan agar data Anda aman dan tidak dapat diubah lagi.
+                    </p>
+                    <div class="mt-3 flex flex-wrap items-center gap-3">
+                        <span class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-100 px-3 py-1.5 text-xs font-semibold text-emerald-900">
+                            <svg class="h-4 w-4 animate-spin text-emerald-700" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"/></svg>
+                            <span>Otomatis keluar dalam <b id="countdown-timer">5</b> detik...</span>
+                        </span>
+                        <form id="auto-exit-form" action="{{ route('auth.session.exit') }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="rounded-lg bg-emerald-700 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-emerald-800 transition cursor-pointer">
+                                Keluar Sekarang &rarr;
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <script>
+                (function() {
+                    let sec = 5;
+                    const el = document.getElementById('countdown-timer');
+                    const timer = setInterval(function() {
+                        sec--;
+                        if (el) el.textContent = sec;
+                        if (sec <= 0) {
+                            clearInterval(timer);
+                            document.getElementById('auto-exit-form').submit();
+                        }
+                    }, 1000);
+                })();
+            </script>
+        </div>
+    @endif
+
     @if (!$aktif)
         <div class="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm">
             <p class="font-bold text-slate-900">Belum ada pendaftaran.</p>

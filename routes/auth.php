@@ -20,11 +20,17 @@ Route::middleware('guest')->group(function () {
 
     Route::redirect('register', '/siswa/login');
 
-    // Pintu login guru (URL khusus /admin/login): username/email + password.
+    // Pintu login staf & pembina (URL khusus /admin/login atau /pembina/login): username/email + password.
     Route::get('admin/login', [StaffLoginController::class, 'create'])
         ->name('admin.login');
 
     Route::post('admin/login', [StaffLoginController::class, 'store'])
+        ->middleware('throttle:10,1');
+
+    Route::get('pembina/login', [StaffLoginController::class, 'create'])
+        ->name('pembina.login');
+
+    Route::post('pembina/login', [StaffLoginController::class, 'store'])
         ->middleware('throttle:10,1');
 
     Route::get('admin/mfa', [MfaController::class, 'create'])
