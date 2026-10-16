@@ -110,6 +110,13 @@ jobs:
             echo "==> Menunggu container ready..."
             sleep 5
 
+            # Jalankan migrasi dan seeder database secara eksplisit
+            echo "==> Menjalankan migrasi database..."
+            docker compose exec -T bagimu-extra php artisan migrate --force
+
+            echo "==> Menjalankan seeder akun dan data awal..."
+            docker compose exec -T -e ALLOW_PROD_SEED=true bagimu-extra php artisan db:seed --force || true
+
             # Optimasi cache Laravel (config, route, view)
             echo "==> Mengoptimalkan cache Laravel..."
             docker compose exec -T bagimu-extra php artisan optimize
