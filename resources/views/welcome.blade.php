@@ -237,7 +237,7 @@
         </div>
 
         <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 pt-4 text-xs text-slate-400">
-            <span>&copy; {{ date('Y') }} {{ config('app.name', 'Bagimu Extra') }} — Seluruh hak cipta dilindungi.</span>
+            <span>&copy; {{ date('Y') }} {{ config('app.name', 'Bagimu Extra') }} — David Yehuda Surbakti &amp; Vines Fernando Siritoitet. Seluruh hak cipta dilindungi.</span>
             <div class="flex items-center gap-3">
                 <a href="{{ route('verify.form') }}" class="hover:text-blue-600 transition">Verifikasi Dokumen</a>
                 <span>•</span>

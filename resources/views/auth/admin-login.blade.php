@@ -203,6 +203,10 @@
                     </div>
                 </form>
             </div>
+
+            <p class="mt-4 text-center text-[11px] text-slate-400">
+                &copy; {{ date('Y') }} David Yehuda Surbakti &amp; Vines Fernando Siritoitet • {{ config('app.name', 'Bagimu Extra') }}
+            </p>
         </div>
     </div>
 </main>
