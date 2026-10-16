@@ -24,7 +24,7 @@
         </svg>
 
         {{-- Visual Arch Gedung Sekolah (Sesuai Mockup) --}}
-        <div class="pointer-events-none absolute -right-2 top-1/2 -translate-y-1/2 h-[75%] max-h-[640px] w-auto select-none z-0 hidden lg:block opacity-95">
+        <div class="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 h-[70%] xl:h-[78%] max-h-[620px] w-auto select-none z-0 hidden lg:block">
             <img src="{{ asset('login-illustration.png') }}" alt="SMK Bagimu Negeriku" class="h-full w-auto object-contain object-right" />
         </div>
 
@@ -41,21 +41,21 @@
         </div>
 
         {{-- Konten Utama (Persis Sesuai Mockup) --}}
-        <div class="relative z-10 space-y-6 max-w-lg my-auto py-8">
+        <div class="relative z-10 space-y-6 max-w-[310px] xl:max-w-[360px] my-auto py-6">
             <span class="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-100 shadow-xs">
                 <x-icon name="shield" class="h-3.5 w-3.5 text-blue-600" />
                 Portal Khusus Staf & Pembina
             </span>
-            <h1 class="text-3xl xl:text-4xl font-black leading-[1.18] tracking-tight text-slate-900">
+            <h1 class="text-2xl sm:text-3xl xl:text-4xl font-black leading-[1.18] tracking-tight text-slate-900">
                 Pengelolaan<br>
                 <span class="text-blue-600">Ekstrakurikuler</span><br>
                 Terpadu & Profesional.
             </h1>
-            <p class="text-sm leading-relaxed text-slate-500 max-w-md">
+            <p class="text-xs sm:text-sm leading-relaxed text-slate-500 max-w-[300px] xl:max-w-[340px]">
                 Akses khusus guru, pembina eskul, dan tim tata usaha untuk verifikasi pendaftaran siswa, rekap presensi QR, penilaian rapor ekstrakurikuler, dan penerbitan sertifikat digital.
             </p>
 
-            <div class="space-y-4 pt-1 max-w-md">
+            <div class="space-y-3.5 pt-1 max-w-[300px] xl:max-w-[340px]">
                 <div class="flex items-center gap-3.5">
                     <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 shadow-xs">
                         <x-icon name="clock" class="h-5 w-5" />
