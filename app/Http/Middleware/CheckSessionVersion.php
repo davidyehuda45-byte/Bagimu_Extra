@@ -37,6 +37,7 @@ class CheckSessionVersion
                 \App\Enums\Role::OPERATOR,
                 \App\Enums\Role::PEMBINA,
                 \App\Enums\Role::KEPALA_SEKOLAH,
+                \App\Enums\Role::WALI_KELAS,
             ], true) ? 'admin.login' : 'login';
 
             return redirect()->route($loginRoute)->withErrors([

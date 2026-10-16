@@ -24,3 +24,4 @@ require __DIR__.'/siswa.php';
 require __DIR__.'/admin.php';
 require __DIR__.'/admin-lanjutan.php';
 require __DIR__.'/pembina.php';
+require __DIR__.'/wali-kelas.php';

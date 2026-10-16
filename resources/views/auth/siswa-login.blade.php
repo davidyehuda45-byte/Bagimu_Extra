@@ -33,13 +33,13 @@
             </h1>
             <div class="max-w-md space-y-3">
                 <p class="text-sm leading-relaxed text-blue-100">
-                    Daftar eskul langsung dari HP pakai NIS dan token di kartu login kamu. Tanpa install aplikasi.
+                    Daftar eskul langsung dari HP pakai NIS dan token di kartu pelajar kamu. Tanpa install aplikasi.
                 </p>
             </div>
             <ul class="space-y-3 text-sm">
                 <li class="flex items-center gap-3">
                     <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15"><x-icon name="check" class="h-4 w-4" /></span>
-                    Login cepat dengan NIS + token kartu
+                    Login cepat dengan NIS + token kartu pelajar
                 </li>
                 <li class="flex items-center gap-3">
                     <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15"><x-icon name="check" class="h-4 w-4" /></span>
@@ -70,7 +70,7 @@
 
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <h2 class="text-lg font-bold text-slate-900">Login Siswa</h2>
-                <p class="mt-1 text-sm text-slate-500">Pakai NIS + token 8 digit dari kartu login.</p>
+                <p class="mt-1 text-sm text-slate-500">Pakai NIS + token dari kartu pelajar.</p>
 
                 <form method="POST" action="{{ route('siswa.login') }}" class="mt-4 space-y-4" x-data="{ loading: false }" @submit="loading = true">
                     @csrf
@@ -89,7 +89,7 @@
                                         type="text" inputmode="text" autocapitalize="off" spellcheck="false" autocomplete="current-password"
                                         name="token" required maxlength="100" placeholder="••••••••" />
                         <x-input-error :messages="$errors->get('token')" class="mt-2" />
-                        <p class="mt-1 text-[11px] text-slate-400">Token 8 digit angka dari kartu, atau password (huruf/angka/simbol, min. 8) yang diatur di Profil.</p>
+                        <p class="mt-1 text-[11px] text-slate-400">Token 8 digit angka dari kartu pelajar, atau password yang diatur di Profil.</p>
                     </div>
 
                     <x-primary-button class="w-full justify-center py-3" ::disabled="loading">

@@ -228,7 +228,7 @@ class ParitasTest extends TestCase
 
         foreach ([
             '/admin/rekap', '/admin/kelas', '/admin/window', '/admin/notifikasi',
-            '/admin/cetak', '/admin/kartu', '/admin/settings',
+            '/admin/cetak', '/admin/kenaikan/arsip-keluar', '/admin/settings',
         ] as $url) {
             $this->actingAs($admin)->get($url)->assertOk($url);
         }

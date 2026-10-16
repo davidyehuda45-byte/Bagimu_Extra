@@ -53,7 +53,7 @@ class SiswaLoginController extends Controller
 
         if (! $master || $master->status !== 'AKTIF') {
             // Pesan generik sama seperti kredensial salah agar NIS valid tidak bisa dienumerasi.
-            $this->fail($request, $throttleKey, null, null, 'NIS tidak dikenal', 'Token atau password salah. Periksa kembali kartu login Anda, atau hubungi TU bila belum punya token.', 'token');
+            $this->fail($request, $throttleKey, null, null, 'NIS tidak dikenal', 'Token atau password salah. Periksa kembali kartu pelajar Anda, atau hubungi TU bila belum punya token.', 'token');
         }
 
         $user = $master->user ?? User::where('username', $master->nis)->first();

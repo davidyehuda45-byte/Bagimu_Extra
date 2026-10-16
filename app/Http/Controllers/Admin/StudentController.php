@@ -331,8 +331,11 @@ class StudentController extends Controller
 
     public function statusRombel(Request $request)
     {
-        $periode = Periode::where('status', PeriodeStatus::DIBUKA)->orderByDesc('periode')->first()
-            ?? Periode::orderByDesc('periode')->first();
+        $periodes = Periode::orderByDesc('periode')->get();
+        $periodeParam = $request->query('periode');
+        $periode = $periodeParam
+            ? Periode::where('periode', $periodeParam)->first()
+            : (Periode::where('status', PeriodeStatus::DIBUKA)->orderByDesc('periode')->first() ?? $periodes->first());
 
         $tingkatFilter = trim((string) $request->input('tingkat'));
         $jurusanFilter = trim((string) $request->input('jurusan'));
@@ -401,6 +404,7 @@ class StudentController extends Controller
         return view('admin.students.status-rombel', compact(
             'rombelStats',
             'periode',
+            'periodes',
             'totalSemuaSiswa',
             'totalSemuaTerdaftar',
             'tingkatList',
@@ -408,52 +412,6 @@ class StudentController extends Controller
             'tingkatFilter',
             'jurusanFilter'
         ));
-    }
-
-    public function cetakKartuRombel(Request $request)
-    {
-        $kelas = $request->query('kelas');
-        if (! $kelas) {
-            return redirect()->route('admin.students.index')->with('error', 'Pilih kelas terlebih dahulu.');
-        }
-
-        $students = Student::with('user')
-            ->where('kelas', $kelas)
-            ->orderBy('nama')
-            ->get();
-
-        if ($students->isEmpty()) {
-            return redirect()->route('admin.students.index')->with('warning', "Tidak ada siswa di kelas {$kelas}.");
-        }
-
-        $cardsData = [];
-        foreach ($students as $student) {
-            $user = $student->user;
-            if (! $user) {
-                $user = User::create([
-                    'name' => $student->nama,
-                    'email' => $student->nis.'@siswa.local',
-                    'username' => $student->nis,
-                    'password' => Hash::make(Str::random(16)),
-                    'role' => Role::STUDENT,
-                    'student_status' => $student->status ?? 'AKTIF',
-                ]);
-                $student->update(['user_id' => $user->id]);
-            }
-
-            $plainToken = ($user->login_token && $user->login_token_revoked_at === null)
-                ? $user->login_token
-                : LoginToken::issue($user);
-
-            $cardsData[] = [
-                'student' => $student,
-                'token' => $plainToken,
-            ];
-        }
-
-        AdminLog::record('student.kartu_rombel', 'student', null, "Mencetak kartu login massal kelas {$kelas} ({$students->count()} siswa)");
-
-        return view('admin.students.kartu-rombel', compact('kelas', 'cardsData'));
     }
 
     public function export(Request $request)
@@ -726,45 +684,5 @@ class StudentController extends Controller
         AdminLog::record('student.token.revoke', 'student', $student->id, "Mencabut token login NIS {$student->nis}");
 
         return redirect()->back()->with('status', "Token login NIS {$student->nis} telah dicabut.");
-    }
-
-    public function kartu(Request $request, Student $student)
-    {
-        $user = $student->user;
-
-        // GET harus idempoten: jangan buat akun / terbitkan token baru.
-        if ($request->isMethod('get')) {
-            $plainToken = ($user?->login_token && $user?->login_token_revoked_at === null)
-                ? $user->login_token
-                : null;
-
-            return view('admin.students.kartu', [
-                'student' => $student,
-                'plainToken' => $plainToken,
-            ]);
-        }
-
-        if (! $user) {
-            $user = User::create([
-                'name' => $student->nama,
-                'email' => $student->nis.'@siswa.local',
-                'username' => $student->nis,
-                'password' => Hash::make(Str::random(16)),
-                'role' => Role::STUDENT,
-            ]);
-
-            $student->update(['user_id' => $user->id]);
-        }
-
-        $plainToken = ($user->login_token && $user->login_token_revoked_at === null)
-            ? $user->login_token
-            : LoginToken::issue($user);
-
-        AdminLog::record('student.kartu', 'student', $student->id, "Mencetak kartu login NIS {$student->nis}");
-
-        return view('admin.students.kartu', [
-            'student' => $student,
-            'plainToken' => $plainToken,
-        ]);
     }
 }

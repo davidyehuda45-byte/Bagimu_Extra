@@ -79,10 +79,6 @@
                             </button>
                         </form>
                     @endif
-                    <a href="{{ route('admin.students.kartu', $s) }}" target="_blank" class="flex items-center gap-2 rounded-xl px-2.5 py-2 hover:bg-emerald-50 text-emerald-700 font-medium">
-                        <x-icon name="id-card" class="h-3.5 w-3.5 text-emerald-600" />
-                        <span>Cetak Kartu</span>
-                    </a>
                     <div class="my-1 border-t border-slate-100"></div>
                     <button type="button" onclick="confirmDeleteSingle('{{ $s->id }}', '{{ addslashes($s->nama) }}', '{{ $s->nis }}')" class="flex w-full items-center gap-2 rounded-xl px-2.5 py-2 hover:bg-rose-50 text-rose-600 font-medium text-left">
                         <x-icon name="trash" class="h-3.5 w-3.5 text-rose-500" />

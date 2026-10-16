@@ -95,4 +95,14 @@ class User extends Authenticatable
     {
         return $this->hasRole(Role::STUDENT);
     }
+
+    public function isWaliKelas(): bool
+    {
+        return $this->hasRole(Role::WALI_KELAS);
+    }
+
+    public function managedClass(): HasOne
+    {
+        return $this->hasOne(SchoolClass::class, 'wali_kelas_id');
+    }
 }

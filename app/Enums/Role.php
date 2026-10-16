@@ -9,6 +9,7 @@ enum Role: string
     case PEMBINA = 'PEMBINA';
     case OPERATOR = 'OPERATOR';
     case KEPALA_SEKOLAH = 'KEPALA_SEKOLAH';
+    case WALI_KELAS = 'WALI_KELAS';
 
     public function label(): string
     {
@@ -18,6 +19,7 @@ enum Role: string
             self::PEMBINA => 'Pembina',
             self::OPERATOR => 'Operator',
             self::KEPALA_SEKOLAH => 'Kepala Sekolah',
+            self::WALI_KELAS => 'Wali Kelas',
         };
     }
 }

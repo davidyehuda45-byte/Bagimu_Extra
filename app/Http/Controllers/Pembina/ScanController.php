@@ -136,6 +136,17 @@ class ScanController extends Controller
                 ->first();
         }
 
+        // Cari via NIS Kartu Pelajar
+        if (preg_match('/^\d{3,25}$/', $kode)) {
+            $byNis = Registration::with('user')
+                ->where('nis', $kode)
+                ->latest('id')
+                ->first();
+            if ($byNis) {
+                return $byNis;
+            }
+        }
+
         return Registration::dariKode($kode)?->load('user');
     }
 }

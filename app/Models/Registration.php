@@ -50,6 +50,11 @@ class Registration extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function student(): BelongsTo
+    {
+        return $this->belongsTo(Student::class, 'nis', 'nis');
+    }
+
     public function kehadiran(): HasMany
     {
         return $this->hasMany(Kehadiran::class);

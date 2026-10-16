@@ -63,20 +63,67 @@ class EskulSayaController extends Controller
 
         $tanggal = $request->query('tanggal', today()->toDateString());
 
+        $sortFn = function ($a, $b) {
+            $tingkatA = \App\Support\Kelas::tingkat($a->kelas) ?? 99;
+            $tingkatB = \App\Support\Kelas::tingkat($b->kelas) ?? 99;
+            if ($tingkatA !== $tingkatB) {
+                return $tingkatA <=> $tingkatB;
+            }
+            $cmp = strnatcasecmp($a->kelas ?? '', $b->kelas ?? '');
+            if ($cmp !== 0) {
+                return $cmp;
+            }
+            return strcasecmp($a->user?->name ?? '', $b->user?->name ?? '');
+        };
+
         $disetujui = Registration::with('user')
             ->join('users', 'users.id', '=', 'registrations.user_id')
             ->select('registrations.*')
             ->whereIn('periode', $periodeAktif)
             ->where('eskul_utama', $eskul->name)
             ->where('status', Status::APPROVED)
-            ->orderBy('registrations.kelas')->orderBy('users.name')
-            ->get();
+            ->get()
+            ->sort($sortFn)
+            ->values();
+
+        $pendaftar = Registration::with('user')
+            ->join('users', 'users.id', '=', 'registrations.user_id')
+            ->select('registrations.*')
+            ->whereIn('periode', $periodeAktif)
+            ->where('eskul_utama', $eskul->name)
+            ->get()
+            ->sort($sortFn)
+            ->values();
 
         $peta = Kehadiran::where('eskul_id', $eskul->id)
             ->whereDate('tanggal', $tanggal)
             ->get()->keyBy('registration_id');
 
         $locked = $peta->isNotEmpty() && $peta->every(fn ($k) => $k->isLocked());
+
+        $rombelStats = $disetujui->groupBy('kelas')->map(function ($members, $kelasName) use ($peta) {
+            $total = $members->count();
+            $terisi = 0;
+            $hadir = 0;
+            foreach ($members as $m) {
+                $st = $peta[$m->id]?->status?->value ?? null;
+                if ($st !== null) {
+                    $terisi++;
+                    if ($st === 'HADIR') {
+                        $hadir++;
+                    }
+                }
+            }
+            $belum = $total - $terisi;
+            return [
+                'kelas' => $kelasName,
+                'total' => $total,
+                'hadir' => $hadir,
+                'terisi' => $terisi,
+                'belum' => $belum,
+                'lengkap' => $belum === 0 && $total > 0,
+            ];
+        });
 
         $pertemuans = $eskul->pertemuans()->orderByDesc('nomor')->get()->map(function ($p) use ($eskul) {
             $p->hadir_count = Kehadiran::where('eskul_id', $eskul->id)
@@ -87,7 +134,7 @@ class EskulSayaController extends Controller
             return $p;
         });
 
-        return view('pembina.eskul.show', compact('eskul', 'pendaftar', 'jadwals', 'izinPending', 'tanggal', 'disetujui', 'peta', 'locked', 'pertemuans'));
+        return view('pembina.eskul.show', compact('eskul', 'pendaftar', 'jadwals', 'izinPending', 'tanggal', 'disetujui', 'peta', 'locked', 'pertemuans', 'rombelStats'));
     }
 
     public function export(Request $request, Eskul $eskul)

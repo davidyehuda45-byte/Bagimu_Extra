@@ -276,10 +276,9 @@ class StudentDirectoryFeatureTest extends TestCase
         $res->assertSee('10 RPL 1');
         $res->assertSee('50%');
         $res->assertSee('1 siswa belum memilih');
-        $res->assertSee('Cetak Kartu');
     }
 
-    public function test_cetak_kartu_rombel_generates_tokens_and_renders(): void
+    public function test_generate_token_siswa(): void
     {
         $admin = $this->admin();
         $s1 = Student::create([
@@ -290,11 +289,8 @@ class StudentDirectoryFeatureTest extends TestCase
             'status' => 'AKTIF',
         ]);
 
-        $res = $this->actingAs($admin)->get(route('admin.students.cetak-kartu-rombel', ['kelas' => '10 RPL 1']));
-        $res->assertOk();
-        $res->assertSee('Lembar Cetak Kartu Login Siswa');
-        $res->assertSee('Budi Santoso');
-        $res->assertSee('1001');
+        $res = $this->actingAs($admin)->post(route('admin.students.token', $s1));
+        $res->assertRedirect();
 
         $s1->refresh();
         $this->assertNotNull($s1->user);

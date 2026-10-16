@@ -18,8 +18,8 @@ use Illuminate\View\View;
 
 class StaffLoginController extends Controller
 {
-    /** Role yang boleh masuk via pintu staf (admin panel + pembina). */
-    private const ADMIN_PANEL_ROLES = [Role::ADMIN, Role::OPERATOR, Role::KEPALA_SEKOLAH, Role::PEMBINA];
+    /** Role yang boleh masuk via pintu staf (admin panel + pembina + wali kelas). */
+    private const ADMIN_PANEL_ROLES = [Role::ADMIN, Role::OPERATOR, Role::KEPALA_SEKOLAH, Role::PEMBINA, Role::WALI_KELAS];
 
     public function create(): View
     {
@@ -103,6 +103,16 @@ class StaffLoginController extends Controller
             $path = parse_url((string) $tujuan, PHP_URL_PATH) ?? '';
             if (str_starts_with($path, '/admin')) {
                 $tujuan = route('pembina.dashboard');
+            }
+
+            return redirect()->to($tujuan);
+        }
+
+        if ($user->role === Role::WALI_KELAS) {
+            $tujuan = session()->pull('url.intended', route('wali-kelas.dashboard'));
+            $path = parse_url((string) $tujuan, PHP_URL_PATH) ?? '';
+            if (str_starts_with($path, '/admin')) {
+                $tujuan = route('wali-kelas.dashboard');
             }
 
             return redirect()->to($tujuan);

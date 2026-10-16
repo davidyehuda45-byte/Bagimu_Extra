@@ -101,7 +101,14 @@ class PendaftaranController extends Controller
             return redirect()->route('siswa.status')->with('status', 'Belum ada periode pendaftaran yang dibuka.');
         }
 
-        $validated = $this->validated($request);
+        $request->validate([
+            'eskul_utama' => ['required', 'string', Rule::exists('eskuls', 'name'),
+                function ($attr, $val, $fail) {
+                    if (! Eskul::where('name', $val)->where('aktif', true)->exists()) {
+                        $fail('Eskul tidak tersedia.');
+                    }
+                }],
+        ]);
 
         $existing = Registration::where('user_id', $user->id)
             ->where('periode', $periode->periode)
@@ -127,16 +134,21 @@ class PendaftaranController extends Controller
 
         if (! $masterAktif) {
             return redirect()->route('siswa.status')
-                ->with('status', 'Akun Anda tidak aktif. Hubungi TU.');
+                ->with('status', 'Akun Anda tidak aktif atau data siswa belum terdaftar. Hubungi TU.');
         }
 
-        $tingkat = \App\Support\Kelas::tingkat($validated['kelas']);
+        $kelasOverride = $request->filled('kelas')
+            ? \App\Support\Kelas::normalisasi($request->input('kelas'))
+            : $master->kelas;
+
+        $tingkat = \App\Support\Kelas::tingkat($kelasOverride ?? '');
         $boleh = array_map('trim', explode(',', \App\Models\AppSetting::get('eskul.kelas_allowed', '10,11')));
         $semester = \App\Models\AppSetting::get('eskul.semester_aktif', '1');
 
         if (! $tingkat || ! in_array((string) $tingkat, $boleh, true)) {
             return back()->withInput()->withErrors([
                 'kelas' => 'Eskul hanya untuk kelas '.implode(', ', $boleh).'.',
+                'eskul_utama' => 'Eskul hanya untuk kelas '.implode(', ', $boleh).'.',
             ]);
         }
 
@@ -147,6 +159,7 @@ class PendaftaranController extends Controller
         ) {
             return back()->withInput()->withErrors([
                 'kelas' => 'Kelas 11 hanya bisa ikut eskul di semester 1 (semester 2 magang).',
+                'eskul_utama' => 'Kelas 11 hanya bisa ikut eskul di semester 1 (semester 2 magang).',
             ]);
         }
 
@@ -156,30 +169,44 @@ class PendaftaranController extends Controller
         }
 
         try {
-            [$registration, $dipakai] = DB::transaction(function () use ($validated, $user, $periode, $master) {
+            [$registration, $dipakai] = DB::transaction(function () use ($request, $user, $periode, $master, $kelasOverride) {
                 $dipakai = $this->resolve(
-                    $validated['eskul_utama'],
+                    $request->input('eskul_utama'),
                     $periode->periode
                 );
 
-                $data = array_merge($validated, [
-                    'eskul_utama' => $dipakai,
-                    'eskul_cadangan' => null,
-                    'status' => Status::APPROVED,
-                    'alasan_penolakan' => null,
-                ]);
+                $kelasFinal = $kelasOverride ?: $master->kelas;
+                $waFinal = $request->input('whatsapp') ?? $master->whatsapp;
 
-                $registration = Registration::create(array_merge($data, [
+                if ($master && $request->filled('whatsapp')) {
+                    $master->update(['whatsapp' => $request->input('whatsapp')]);
+                }
+                if ($master && $request->filled('kelas')) {
+                    $master->update(['kelas' => $kelasFinal]);
+                }
+
+                $waliKelasNama = \App\Models\SchoolClass::where('nama', $kelasFinal)->first()?->wali_kelas_nama
+                    ?? $master->wali_nama
+                    ?? 'Belum ditentukan';
+
+                $registration = Registration::create([
                     'user_id' => $user->id,
                     'periode' => $periode->periode,
-                    'nis' => $user->student?->nis ?? $user->username,
+                    'kelas' => $kelasFinal,
+                    'jurusan' => $master->jurusan,
+                    'nis' => $master->nis,
+                    'no_absen' => $master->no_absen ?? 1,
+                    'nama_wali_kelas' => $waliKelasNama,
+                    'usia' => 16,
+                    'gender' => $master->gender ?? \App\Enums\Gender::LAKI_LAKI,
+                    'whatsapp' => $waFinal,
+                    'eskul_utama' => $dipakai,
+                    'eskul_cadangan' => null,
+                    'alasan' => null,
+                    'alasan_penolakan' => null,
+                    'status' => Status::APPROVED,
                     'verify_token' => bin2hex(random_bytes(32)),
-                ]));
-
-                // Nomor WA otomatis tersambung ke direktori siswa.
-                if ($master && ! empty($validated['whatsapp'])) {
-                    $master->update(['whatsapp' => $validated['whatsapp']]);
-                }
+                ]);
 
                 StatusHistory::create([
                     'registration_id' => $registration->id,
@@ -206,41 +233,6 @@ class PendaftaranController extends Controller
         Notifier::statusPendaftaran($registration);
 
         return redirect()->route('siswa.status')->with('status', $pesan);
-    }
-
-    private function validated(Request $request): array
-    {
-        $validated = $request->validate([
-            'kelas' => ['required', 'string', 'min:3', 'max:50',
-                'regex:/^(XII|XI|X|10|11|12)\s+(RPL|KULINER|DKV|TP|TKP)\s*\d{0,2}$/i',
-                function ($attr, $val, $fail) use ($request) {
-                    if (
-                        preg_match('/^(XII|XI|X|10|11|12)\s+(RPL|KULINER|DKV|TP|TKP)/i', $val, $m)
-                        && strtoupper($m[2]) !== strtoupper($request->input('jurusan', ''))
-                    ) {
-                        $fail('Jurusan di kelas harus sama dengan jurusan yang dipilih.');
-                    }
-                }],
-            'jurusan' => ['required', Rule::enum(Jurusan::class)],
-            'usia' => ['required', 'integer', 'min:13', 'max:20'],
-            'whatsapp' => ['nullable', 'string', 'max:20', 'regex:/^(\+?62|08)[\d\s\-().]{7,15}$/'],
-            'no_absen' => ['required', 'integer', 'min:1', 'max:99'],
-            'nama_wali_kelas' => ['nullable', 'string', 'max:100'],
-            'gender' => ['required', Rule::enum(Gender::class)],
-            'eskul_utama' => ['required', 'string', Rule::exists('eskuls', 'name'),
-                function ($attr, $val, $fail) {
-                    if (! Eskul::where('name', $val)->where('aktif', true)->exists()) {
-                        $fail('Eskul tidak tersedia.');
-                    }
-                }],
-            'alasan' => ['nullable', 'string', 'max:1000'],
-        ], [
-            'kelas.regex' => 'Format kelas contoh: 10 RPL 1 atau XI RPL 1 (kelas + jurusan + nomor).',
-        ]);
-
-        $validated['kelas'] = Kelas::normalisasi($validated['kelas']);
-
-        return $validated;
     }
 
     /**

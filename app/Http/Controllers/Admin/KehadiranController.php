@@ -36,26 +36,61 @@ class KehadiranController extends Controller
         $pendaftar = collect();
         $peta = collect();
         $locked = false;
+        $rombelStats = collect();
 
         if ($eskul) {
             $q = Registration::with('user')
                 ->join('users', 'users.id', '=', 'registrations.user_id')
                 ->select('registrations.*')
                 ->where('status', Status::APPROVED)
-                ->where('eskul_utama', $eskul->name)
-                ->orderBy('registrations.kelas')->orderBy('users.name');
+                ->where('eskul_utama', $eskul->name);
 
             if ($periodeAktif) {
                 $q->where('periode', $periodeAktif->periode);
             }
 
-            $pendaftar = $q->get();
+            $pendaftar = $q->get()->sort(function ($a, $b) {
+                $tingkatA = \App\Support\Kelas::tingkat($a->kelas) ?? 99;
+                $tingkatB = \App\Support\Kelas::tingkat($b->kelas) ?? 99;
+                if ($tingkatA !== $tingkatB) {
+                    return $tingkatA <=> $tingkatB;
+                }
+                $cmp = strnatcasecmp($a->kelas ?? '', $b->kelas ?? '');
+                if ($cmp !== 0) {
+                    return $cmp;
+                }
+                return strcasecmp($a->user?->name ?? '', $b->user?->name ?? '');
+            })->values();
 
             $peta = Kehadiran::where('eskul_id', $eskul->id)
                 ->whereDate('tanggal', $tanggal)
                 ->get()->keyBy('registration_id');
 
             $locked = $peta->isNotEmpty() && $peta->every(fn ($k) => $k->isLocked());
+
+            $rombelStats = $pendaftar->groupBy('kelas')->map(function ($members, $kelasName) use ($peta) {
+                $total = $members->count();
+                $terisi = 0;
+                $hadir = 0;
+                foreach ($members as $m) {
+                    $st = $peta[$m->id]?->status?->value ?? null;
+                    if ($st !== null) {
+                        $terisi++;
+                        if ($st === 'HADIR') {
+                            $hadir++;
+                        }
+                    }
+                }
+                $belum = $total - $terisi;
+                return [
+                    'kelas' => $kelasName,
+                    'total' => $total,
+                    'hadir' => $hadir,
+                    'terisi' => $terisi,
+                    'belum' => $belum,
+                    'lengkap' => $belum === 0 && $total > 0,
+                ];
+            });
         }
 
         return view('admin.kehadiran.index', [
@@ -65,6 +100,7 @@ class KehadiranController extends Controller
             'pendaftar' => $pendaftar,
             'peta' => $peta,
             'locked' => $locked,
+            'rombelStats' => $rombelStats,
             'statusList' => KehadiranStatus::cases(),
             'periodeAktif' => $periodeAktif,
         ]);

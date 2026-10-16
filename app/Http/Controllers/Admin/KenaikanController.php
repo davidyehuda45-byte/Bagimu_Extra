@@ -4,124 +4,295 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AdminLog;
+use App\Models\ClassHistory;
+use App\Models\Periode;
+use App\Enums\PeriodeStatus;
+use App\Models\SchoolClass;
 use App\Models\Student;
+use App\Models\StudentKeluar;
 use App\Support\Kelas;
+use App\Support\LoginToken;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class KenaikanController extends Controller
 {
     /**
-     * Pratinjau pemetaan: 10→11 (tetap aktif), 11→12 (nonaktif),
-     * 12→LULUS (nonaktif). Di luar itu dilewati.
+     * Tampilan Kenaikan Kelas Berbasis Per Rombel Kelas
      */
-    public function index()
+    public function index(Request $request): View
     {
-        $peta = Student::orderBy('kelas')->orderBy('nis')->get()->map(function ($s) {
-            if ($s->status !== 'AKTIF') {
-                return [
-                    'student' => $s,
-                    'tingkat' => Kelas::tingkat($s->kelas),
-                    'kelasBaru' => $s->kelas,
-                    'aksi' => "Dilewati (status {$s->status})",
-                    'statusBaru' => $s->status,
-                ];
+        // Ambil daftar kelas dari SchoolClass dan Student
+        $fromMaster = SchoolClass::orderBy('nama')->pluck('nama');
+        $fromStudents = Student::select('kelas')->distinct()->whereNotNull('kelas')->pluck('kelas');
+
+        $availableClasses = $fromMaster->merge($fromStudents)->unique()->sort(function ($a, $b) {
+            $ta = Kelas::tingkat($a) ?? 99;
+            $tb = Kelas::tingkat($b) ?? 99;
+            if ($ta !== $tb) {
+                return $ta <=> $tb;
             }
+            return strnatcasecmp($a, $b);
+        })->values();
 
-            $tingkat = Kelas::tingkat($s->kelas);
-            $baru = $tingkat !== null && $tingkat < 12 ? Kelas::naikkan($s->kelas) : null;
+        $selectedClass = $request->query('kelas', $availableClasses->first() ?? '');
+        $targetKelas = $request->query('target_kelas', $selectedClass ? Kelas::naikkan($selectedClass) : '');
 
-            if ($tingkat === null) {
-                $aksi = 'Dilewati (format kelas tak dikenal)';
-                $statusBaru = $s->status;
-            } elseif ($tingkat < 11) {
-                $aksi = "Naik ke {$baru} (tetap aktif)";
-                $statusBaru = 'AKTIF';
-            } elseif ($tingkat === 11) {
-                $aksi = "Naik ke {$baru} (otomatis nonaktif — kelas 12 tidak ikut eskul)";
-                $statusBaru = 'NONAKTIF';
-            } else {
-                $aksi = 'Lulus (otomatis nonaktif)';
-                $statusBaru = 'LULUS';
-            }
+        $students = collect();
+        if ($selectedClass) {
+            $students = Student::where('kelas', $selectedClass)
+                ->where('status', 'AKTIF')
+                ->orderBy('nis')
+                ->get();
+        }
 
-            return [
-                'student' => $s,
-                'tingkat' => $tingkat,
-                'kelasBaru' => $baru,
-                'aksi' => $aksi,
-                'statusBaru' => $statusBaru,
-            ];
-        });
+        $totalArsipKeluar = StudentKeluar::count();
 
-        return view('admin.kenaikan.index', compact('peta'));
+        return view('admin.kenaikan.index', compact(
+            'availableClasses',
+            'selectedClass',
+            'targetKelas',
+            'students',
+            'totalArsipKeluar'
+        ));
     }
 
-    public function store(Request $request)
+    /**
+     * Proses Kenaikan Kelas per Rombel Kelas dengan Checklist
+     */
+    public function store(Request $request): RedirectResponse
     {
+        if ($request->filled('konfirmasi') && ! $request->filled('kelas_asal')) {
+            $diproses = 0;
+            $dilewati = 0;
+            $periodeAktif = Periode::where('status', PeriodeStatus::DIBUKA)->orderByDesc('periode')->first();
+            $periodeStr = $periodeAktif?->periode ?? date('Y');
+
+            DB::transaction(function () use (&$diproses, &$dilewati, $periodeStr) {
+                foreach (Student::orderBy('id')->get() as $s) {
+                    if ($s->status !== 'AKTIF') {
+                        $dilewati++;
+                        continue;
+                    }
+                    $tingkat = Kelas::tingkat($s->kelas);
+                    if ($tingkat === null) {
+                        $dilewati++;
+                        continue;
+                    }
+                    $kelasLama = $s->kelas;
+                    if ($tingkat < 11) {
+                        $baru = Kelas::naikkan($s->kelas);
+                        $s->update(['kelas' => $baru, 'status' => 'AKTIF']);
+                        $s->user?->update(['student_status' => 'AKTIF']);
+                    } elseif ($tingkat === 11) {
+                        $baru = Kelas::naikkan($s->kelas);
+                        $s->update(['kelas' => $baru, 'status' => 'NONAKTIF']);
+                        $s->user?->update(['student_status' => 'NONAKTIF']);
+                    } else {
+                        $baru = 'LULUS';
+                        $s->update(['status' => 'LULUS']);
+                        $s->user?->update(['student_status' => 'LULUS']);
+                        if ($s->user) {
+                            LoginToken::revoke($s->user);
+                            $s->user->increment('session_version');
+                        }
+                    }
+
+                    if ($s->user_id) {
+                        ClassHistory::create([
+                            'user_id' => $s->user_id,
+                            'periode' => $periodeStr,
+                            'kelas_lama' => $kelasLama,
+                            'kelas_baru' => $baru,
+                            'actor_id' => (string) auth()->id(),
+                            'reason' => 'Kenaikan kelas massal',
+                        ]);
+                    }
+                    $diproses++;
+                }
+            });
+
+            AdminLog::record('kenaikan.proses', 'Student', null, "Kenaikan kelas massal: {$diproses} diproses, {$dilewati} dilewati.");
+
+            return redirect()->route('admin.kenaikan.index')
+                ->with('status', "Kenaikan kelas massal selesai: {$diproses} diproses, {$dilewati} dilewati.");
+        }
+
         $data = $request->validate([
-            'konfirmasi' => ['required', 'accepted'],
+            'kelas_asal' => ['required', 'string'],
+            'kelas_tujuan' => ['required', 'string', 'max:50'],
+            'siswa_ids' => ['required', 'array'],
+            'siswa_ids.*' => ['required', 'exists:students,id'],
+            'naik_siswa_ids' => ['nullable', 'array'],
+            'keluar_siswa_ids' => ['nullable', 'array'],
+            'alasan_keluar' => ['nullable', 'array'],
         ]);
 
-        $diproses = 0;
-        $dilewati = 0;
+        $kelasAsal = $data['kelas_asal'];
+        $kelasTujuan = Kelas::normalisasi($data['kelas_tujuan']);
+        $tingkatTujuan = Kelas::tingkat($kelasTujuan);
 
-        $periodeAktif = \App\Models\Periode::where('status', \App\Enums\PeriodeStatus::DIBUKA)->orderByDesc('periode')->first();
+        $naikIds = array_flip($data['naik_siswa_ids'] ?? []);
+        $keluarIds = array_flip($data['keluar_siswa_ids'] ?? []);
+
+        $periodeAktif = Periode::where('status', PeriodeStatus::DIBUKA)->orderByDesc('periode')->first();
         $periodeStr = $periodeAktif?->periode ?? date('Y');
 
-        DB::transaction(function () use (&$diproses, &$dilewati, $periodeStr) {
-            foreach (Student::orderBy('id')->get() as $s) {
-                if ($s->status !== 'AKTIF') {
-                    $dilewati++;
-                    continue;
-                }
+        $naikCount = 0;
+        $tinggalCount = 0;
+        $keluarCount = 0;
 
-                $tingkat = Kelas::tingkat($s->kelas);
+        DB::transaction(function () use (
+            $data,
+            $kelasAsal,
+            $kelasTujuan,
+            $tingkatTujuan,
+            $naikIds,
+            $keluarIds,
+            $periodeStr,
+            &$naikCount,
+            &$tinggalCount,
+            &$keluarCount
+        ) {
+            $students = Student::whereIn('id', $data['siswa_ids'])->get();
 
-                if ($tingkat === null) {
-                    $dilewati++;
-                    continue;
-                }
+            foreach ($students as $s) {
+                $idStr = (string) $s->id;
 
-                $kelasLama = $s->kelas;
+                // 1. Dikeluarkan / Mutasi -> Simpan ke students_keluar
+                if (isset($keluarIds[$idStr])) {
+                    $alasan = $data['alasan_keluar'][$s->id] ?? 'Dikeluarkan / mutasi saat kenaikan kelas';
 
-                if ($tingkat < 11) {
-                    $baru = Kelas::naikkan($s->kelas);
-                    $s->update(['kelas' => $baru, 'status' => 'AKTIF']);
-                    $s->user?->update(['student_status' => 'AKTIF']);
-                } elseif ($tingkat === 11) {
-                    $baru = Kelas::naikkan($s->kelas);
-                    $s->update(['kelas' => $baru, 'status' => 'NONAKTIF']);
-                    $s->user?->update(['student_status' => 'NONAKTIF']);
-                } else {
-                    $baru = 'LULUS';
-                    $s->update(['status' => 'LULUS']);
-                    $s->user?->update(['student_status' => 'LULUS']);
-                    // Paksa keluar: cabut token login + naikkan versi sesi.
+                    StudentKeluar::create([
+                        'student_id' => $s->id,
+                        'nis' => $s->nis,
+                        'nisn' => $s->nisn,
+                        'nama' => $s->nama,
+                        'kelas_terakhir' => $s->kelas,
+                        'jurusan' => $s->jurusan?->value ?? (preg_match('/(RPL|DKV|KULINER|TP|TKP)/i', $s->kelas, $m) ? strtoupper($m[1]) : null),
+                        'whatsapp' => $s->whatsapp,
+                        'status_keluar' => 'KELUAR',
+                        'alasan' => $alasan,
+                        'tanggal_keluar' => today(),
+                        'diproses_oleh' => auth()->user()->name,
+                    ]);
+
+                    $s->update(['status' => 'KELUAR']);
+
                     if ($s->user) {
-                        \App\Support\LoginToken::revoke($s->user);
+                        $s->user->update(['student_status' => 'NONAKTIF']);
+                        LoginToken::revoke($s->user);
                         $s->user->increment('session_version');
                     }
+
+                    $keluarCount++;
+                    continue;
                 }
 
-                if ($s->user_id) {
-                    \App\Models\ClassHistory::create([
-                        'user_id' => $s->user_id,
-                        'periode' => $periodeStr,
-                        'kelas_lama' => $kelasLama,
-                        'kelas_baru' => $baru,
-                        'actor_id' => (string) auth()->id(),
-                        'reason' => 'Kenaikan kelas massal',
+                // 2. Naik Kelas (Dicentang)
+                if (isset($naikIds[$idStr])) {
+                    $statusBaru = 'AKTIF';
+                    if ($tingkatTujuan !== null && $tingkatTujuan >= 12) {
+                        $statusBaru = 'NONAKTIF'; // Kelas 12 tidak ikut eskul
+                    }
+
+                    $s->update([
+                        'kelas' => $kelasTujuan,
+                        'status' => $statusBaru,
                     ]);
-                }
 
-                $diproses++;
+                    if ($s->user) {
+                        $s->user->update(['student_status' => $statusBaru]);
+                    }
+
+                    if ($s->user_id) {
+                        ClassHistory::create([
+                            'user_id' => $s->user_id,
+                            'periode' => $periodeStr,
+                            'kelas_lama' => $kelasAsal,
+                            'kelas_baru' => $kelasTujuan,
+                            'actor_id' => (string) auth()->id(),
+                            'reason' => 'Kenaikan kelas per rombel',
+                        ]);
+                    }
+
+                    $naikCount++;
+                } else {
+                    // 3. Tinggal Kelas (Centang Dicopot)
+                    // Siswa tetap di kelas asal
+                    if ($s->user_id) {
+                        ClassHistory::create([
+                            'user_id' => $s->user_id,
+                            'periode' => $periodeStr,
+                            'kelas_lama' => $kelasAsal,
+                            'kelas_baru' => $kelasAsal,
+                            'actor_id' => (string) auth()->id(),
+                            'reason' => 'Tinggal kelas (tidak dicentang naik)',
+                        ]);
+                    }
+
+                    $tinggalCount++;
+                }
             }
         });
 
-        AdminLog::record('kenaikan.proses', 'Student', null, "Kenaikan kelas: {$diproses} diproses, {$dilewati} dilewati.");
+        AdminLog::record('kenaikan.proses', 'Student', $kelasAsal, "Kenaikan kelas rombel {$kelasAsal} -> {$kelasTujuan}: {$naikCount} naik, {$tinggalCount} tinggal kelas, {$keluarCount} diarsipkan keluar.");
 
-        return redirect()->route('admin.kenaikan.index')
-            ->with('status', "Kenaikan kelas selesai: {$diproses} diproses, {$dilewati} dilewati (format kelas tak dikenal).");
+        return redirect()->route('admin.kenaikan.index', ['kelas' => $kelasAsal])
+            ->with('status', "Proses rombel {$kelasAsal} selesai: {$naikCount} siswa naik ke {$kelasTujuan}, {$tinggalCount} siswa tinggal kelas, {$keluarCount} siswa diarsipkan ke tabel siswa keluar.");
+    }
+
+    /**
+     * Keluarkan siswa individual langsung dari tombol aksi
+     */
+    public function keluarkanSiswa(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'student_id' => ['required', 'exists:students,id'],
+            'status_keluar' => ['required', 'in:KELUAR,MUTASI,DO'],
+            'alasan' => ['required', 'string', 'max:500'],
+        ]);
+
+        $student = Student::findOrFail($data['student_id']);
+
+        StudentKeluar::create([
+            'student_id' => $student->id,
+            'nis' => $student->nis,
+            'nisn' => $student->nisn,
+            'nama' => $student->nama,
+            'kelas_terakhir' => $student->kelas,
+            'jurusan' => $student->jurusan?->value ?? (preg_match('/(RPL|DKV|KULINER|TP|TKP)/i', $student->kelas, $m) ? strtoupper($m[1]) : null),
+            'whatsapp' => $student->whatsapp,
+            'status_keluar' => $data['status_keluar'],
+            'alasan' => $data['alasan'],
+            'tanggal_keluar' => today(),
+            'diproses_oleh' => auth()->user()->name,
+        ]);
+
+        $student->update(['status' => $data['status_keluar']]);
+
+        if ($student->user) {
+            $student->user->update(['student_status' => 'NONAKTIF']);
+            LoginToken::revoke($student->user);
+            $student->user->increment('session_version');
+        }
+
+        AdminLog::record('siswa.keluar', 'Student', (string) $student->id, "Siswa {$student->nama} ({$student->nis}) berstatus {$data['status_keluar']}. Data diarsipkan.");
+
+        return back()->with('status', "Siswa {$student->nama} berhasil diarsipkan ke tabel Siswa Keluar dengan status {$data['status_keluar']}.");
+    }
+
+    /**
+     * Halaman Arsip Siswa Keluar / Mutasi
+     */
+    public function arsipKeluar(): View
+    {
+        $arsip = StudentKeluar::orderByDesc('tanggal_keluar')
+            ->orderByDesc('id')
+            ->paginate(30);
+
+        return view('admin.kenaikan.arsip-keluar', compact('arsip'));
     }
 }

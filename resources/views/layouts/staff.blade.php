@@ -20,6 +20,7 @@
     $isAdmin = $user && $user->hasRole(\App\Enums\Role::ADMIN, \App\Enums\Role::OPERATOR);
     $isPembina = $user && $user->hasRole(\App\Enums\Role::PEMBINA);
     $isKepsek = $user && $user->hasRole(\App\Enums\Role::KEPALA_SEKOLAH);
+    $isWaliKelas = $user && $user->hasRole(\App\Enums\Role::WALI_KELAS);
     $link = fn ($active) => 'flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors '
         .($active ? 'bg-blue-700 text-white shadow-sm font-semibold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900');
 @endphp

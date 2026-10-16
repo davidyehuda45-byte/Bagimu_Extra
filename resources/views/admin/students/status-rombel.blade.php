@@ -58,6 +58,19 @@
 
     {{-- Filter Bar --}}
     <form method="GET" action="{{ route('admin.students.status-rombel') }}" class="rounded-2xl border border-slate-200 bg-white p-4 flex flex-wrap items-center gap-3 shadow-2xs">
+        @if (!empty($periodes) && count($periodes) > 0)
+            <div class="min-w-[170px]">
+                <label for="periode" class="block font-semibold mb-1 text-slate-700 text-xs">Tahun Ajaran / Periode</label>
+                <select id="periode" name="periode" onchange="this.form.submit()" class="w-full rounded-xl border-slate-300 text-xs focus:border-blue-500 focus:ring-blue-500">
+                    @foreach ($periodes as $p)
+                        <option value="{{ $p->periode }}" @selected(($periode?->periode ?? '') === $p->periode)>
+                            {{ $p->tahun_ajaran ? $p->tahun_ajaran.' ('.$p->periode.')' : $p->periode }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        @endif
+
         <div class="min-w-[140px]">
             <label for="tingkat" class="block font-semibold mb-1 text-slate-700 text-xs">Tingkat</label>
             <select id="tingkat" name="tingkat" onchange="this.form.submit()" class="w-full rounded-xl border-slate-300 text-xs focus:border-blue-500 focus:ring-blue-500">
@@ -132,10 +145,6 @@
                 <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
                     <a href="{{ route('admin.students.index', ['kelas' => $stat['kelas']]) }}" class="font-bold text-blue-700 hover:text-blue-900 hover:underline">
                         Lihat Siswa →
-                    </a>
-                    <a href="{{ route('admin.students.cetak-kartu-rombel', ['kelas' => $stat['kelas']]) }}" target="_blank" class="inline-flex items-center gap-1 font-semibold text-slate-600 hover:text-slate-900">
-                        <x-icon name="printer" class="h-3 w-3" />
-                        <span>Cetak Kartu</span>
                     </a>
                 </div>
             </div>

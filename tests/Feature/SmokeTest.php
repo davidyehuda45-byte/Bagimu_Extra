@@ -181,7 +181,7 @@ class SmokeTest extends TestCase
             '/admin/izin', '/admin/certificates', '/admin/inventory',
             '/admin/inventory/create', '/admin/laporan', '/admin/logs',
             '/admin/settings', '/admin/rekap', '/admin/kelas', '/admin/window',
-            '/admin/notifikasi', '/admin/cetak', '/admin/kartu',
+            '/admin/notifikasi', '/admin/cetak', '/admin/kenaikan/arsip-keluar',
             '/eskul', '/jadwal', '/verify',
         ] as $url) {
             $this->actingAs($admin)->get($url)->assertOk($url);
@@ -218,10 +218,7 @@ class SmokeTest extends TestCase
         $user = User::where('username', '20001')->firstOrFail();
         $this->assertNotNull($user->login_token_hash);
 
-        // Login dengan token yang baru diterbitkan tidak bisa ditebak dari
-        // session, jadi uji revoke + cetak kartu (terbitkan lagi + tampil).
-        $this->actingAs($admin)->post("/admin/students/{$student->id}/kartu")
-            ->assertOk();
+        $this->assertDatabaseHas('users', ['username' => '20001']);
     }
 
     public function test_sertifikat_dan_verifikasi_publik(): void

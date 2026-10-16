@@ -161,117 +161,40 @@
             <form id="form-pendaftaran" method="POST" action="{{ route('siswa.daftar.store') }}" class="space-y-6 rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-xs">
                 @csrf
 
-                {{-- Bagian 1: Identitas & Akademik Siswa --}}
-                <div>
-                    <div class="flex items-center gap-2 pb-3 mb-4 border-b border-slate-100">
-                        <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
-                            <x-icon name="user" class="h-4 w-4" />
+                {{-- Bagian 1: Identitas & Akademik Siswa (Terkoneksi Kartu Pelajar) --}}
+                <div class="rounded-2xl border border-slate-200/90 bg-slate-50/70 p-4 sm:p-5">
+                    <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200/80">
+                        <div class="flex items-center gap-2">
+                            <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
+                                <x-icon name="user" class="h-4 w-4" />
+                            </div>
+                            <div>
+                                <h2 class="text-xs font-bold text-slate-900">Data Siswa (Terkoneksi Kartu Pelajar)</h2>
+                                <p class="text-[10px] text-slate-500">Data identitas otomatis sinkron dari direktori siswa</p>
+                            </div>
                         </div>
-                        <div>
-                            <h2 class="text-sm font-bold text-slate-900">Data Identitas & Akademik Siswa</h2>
-                            <p class="text-[11px] text-slate-400">Pastikan data rombel dan kontak Anda sesuai untuk kebutuhan koordinasi ekstrakurikuler.</p>
-                        </div>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                            <x-icon name="check" class="h-3 w-3" />
+                            Terverifikasi
+                        </span>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                        {{-- Kelas / Rombel --}}
-                        <div>
-                            <label for="kelas" class="block font-bold text-slate-700 mb-1">
-                                Kelas / Rombel <span class="text-rose-500">*</span>
-                            </label>
-                            <input id="kelas" name="kelas" type="text" value="{{ old('kelas', $user->student?->kelas ?? '') }}" required placeholder="Contoh: 10 RPL 1 atau 11 DKV 2"
-                                   class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 font-medium">
-                            @error('kelas')
-                                <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
-                            @enderror
-                            <p class="mt-1 text-[10px] text-slate-400">Format: Tingkat (10/11/12) + Jurusan + Rombel.</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200/60 shadow-2xs">
+                            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">NIS</span>
+                            <span class="font-mono font-bold text-slate-800">{{ $user->student?->nis ?? $user->username }}</span>
                         </div>
-
-                        {{-- Jurusan --}}
-                        <div>
-                            <label for="jurusan" class="block font-bold text-slate-700 mb-1">
-                                Jurusan <span class="text-rose-500">*</span>
-                            </label>
-                            <select id="jurusan" name="jurusan" required class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 pr-8 font-medium">
-                                <option value="">— Pilih Jurusan —</option>
-                                @foreach ($jurusans as $j)
-                                    <option value="{{ $j->value }}" @selected(old('jurusan', $user->student?->jurusan?->value) === $j->value)>
-                                        {{ $j->label() }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('jurusan')
-                                <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
-                            @enderror
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200/60 shadow-2xs">
+                            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Kelas</span>
+                            <span class="font-bold text-slate-800">{{ $user->student?->kelas ?? '-' }}</span>
                         </div>
-
-                        {{-- Usia & No. Absen --}}
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label for="usia" class="block font-bold text-slate-700 mb-1">
-                                    Usia (Tahun) <span class="text-rose-500">*</span>
-                                </label>
-                                <input id="usia" name="usia" type="number" min="13" max="20" value="{{ old('usia', 16) }}" required
-                                       class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 font-medium">
-                                @error('usia')
-                                    <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                <label for="no_absen" class="block font-bold text-slate-700 mb-1">
-                                    No. Absen <span class="text-rose-500">*</span>
-                                </label>
-                                <input id="no_absen" name="no_absen" type="number" min="1" max="99" value="{{ old('no_absen', $user->student?->no_absen ?? '') }}" required placeholder="1-50"
-                                       class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 font-medium">
-                                @error('no_absen')
-                                    <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
-                                @enderror
-                            </div>
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200/60 shadow-2xs">
+                            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Jurusan</span>
+                            <span class="font-bold text-slate-800">{{ $user->student?->jurusan?->label() ?? '-' }}</span>
                         </div>
-
-                        {{-- Nama Wali Kelas --}}
-                        <div>
-                            <label for="nama_wali_kelas" class="block font-bold text-slate-700 mb-1">
-                                Nama Wali Kelas <span class="text-slate-400 font-normal">(Opsional)</span>
-                            </label>
-                            <input id="nama_wali_kelas" name="nama_wali_kelas" type="text" value="{{ old('nama_wali_kelas') }}" placeholder="Nama lengkap wali kelas"
-                                   class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500">
-                            @error('nama_wali_kelas')
-                                <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        {{-- Jenis Kelamin --}}
-                        <div>
-                            <span class="block font-bold text-slate-700 mb-1">
-                                Jenis Kelamin <span class="text-rose-500">*</span>
-                            </span>
-                            <div class="grid grid-cols-2 gap-2 mt-1">
-                                @foreach ($genders as $g)
-                                    <label class="gender-pill flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 px-3 text-xs font-semibold text-slate-700 cursor-pointer hover:bg-slate-50 transition-all has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 has-[:checked]:text-blue-900">
-                                        <input type="radio" name="gender" value="{{ $g->value }}" required
-                                               @checked(old('gender', $user->student?->gender?->value) === $g->value)
-                                               class="h-3.5 w-3.5 text-blue-600 focus:ring-blue-500 border-slate-300">
-                                        <span>{{ $g->label() }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                            @error('gender')
-                                <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        {{-- Nomor WhatsApp --}}
-                        <div>
-                            <label for="whatsapp" class="block font-bold text-slate-700 mb-1">
-                                Nomor WhatsApp Siswa <span class="text-slate-400 font-normal">(Opsional)</span>
-                            </label>
-                            <input id="whatsapp" name="whatsapp" type="text" value="{{ old('whatsapp') }}" placeholder="Contoh: 081234567890"
-                                   class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500">
-                            @error('whatsapp')
-                                <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
-                            @enderror
-                            <p class="mt-1 text-[10px] text-slate-400">Nomor ini otomatis tersimpan ke Direktori Siswa untuk koordinasi pembina.</p>
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200/60 shadow-2xs">
+                            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">No. Absen</span>
+                            <span class="font-bold text-slate-800">{{ $user->student?->no_absen ?? '-' }}</span>
                         </div>
                     </div>
                 </div>
@@ -353,18 +276,6 @@
                                 <span class="font-bold text-slate-400 uppercase tracking-wider text-[10px] block mb-1.5">Jadwal & Lokasi Latihan:</span>
                                 <div id="detail-eskul-jadwal-list" class="space-y-1.5"></div>
                             </div>
-                        </div>
-
-                        {{-- Alasan / Motivasi --}}
-                        <div>
-                            <label for="alasan" class="block font-bold text-slate-700 mb-1">
-                                Alasan / Motivasi Memilih <span class="text-slate-400 font-normal">(Opsional)</span>
-                            </label>
-                            <textarea id="alasan" name="alasan" rows="3" maxlength="1000" placeholder="Ceritakan motivasi, minat, bakat, atau harapan Anda mengikuti kegiatan ekstrakurikuler ini..."
-                                      class="w-full rounded-xl border-slate-300 text-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500 leading-relaxed">{{ old('alasan') }}</textarea>
-                            @error('alasan')
-                                <p class="mt-1 text-[11px] font-medium text-rose-600">{{ $message }}</p>
-                            @enderror
                         </div>
                     </div>
                 </div>
@@ -513,9 +424,9 @@
                     return;
                 }
 
-                const kelasInput = document.getElementById('kelas').value.trim();
+                const kelasText = @json($user->student?->kelas ?? '-');
 
-                document.getElementById('modal-review-kelas').textContent = kelasInput || '-';
+                document.getElementById('modal-review-kelas').textContent = kelasText;
                 document.getElementById('modal-review-eskul-utama').textContent = namaEskulUtama;
 
                 const modal = document.getElementById('modal-konfirmasi');

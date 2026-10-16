@@ -4,7 +4,6 @@ use App\Http\Controllers\Admin\CetakController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EskulController;
 use App\Http\Controllers\Admin\EskulJadwalController;
-use App\Http\Controllers\Admin\KartuController;
 use App\Http\Controllers\Admin\InvitationController;
 use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\KenaikanController;
@@ -45,6 +44,8 @@ Route::middleware(['auth', 'role:admin,operator,kepala_sekolah', \App\Http\Middl
 
     Route::get('kenaikan', [KenaikanController::class, 'index'])->name('kenaikan.index');
     Route::post('kenaikan', [KenaikanController::class, 'store'])->name('kenaikan.store');
+    Route::post('kenaikan/keluarkan', [KenaikanController::class, 'keluarkanSiswa'])->name('kenaikan.keluarkan');
+    Route::get('kenaikan/arsip-keluar', [KenaikanController::class, 'arsipKeluar'])->name('kenaikan.arsip-keluar');
 
     Route::get('invitations', [InvitationController::class, 'index'])->name('invitations.index');
     Route::post('invitations', [InvitationController::class, 'store'])->name('invitations.store');
@@ -54,7 +55,10 @@ Route::middleware(['auth', 'role:admin,operator,kepala_sekolah', \App\Http\Middl
 
     Route::get('cetak', [CetakController::class, 'index'])->name('cetak.index');
 
-    Route::get('kartu', [KartuController::class, 'index'])->name('kartu.index');
+    Route::post('kelas', [KelasController::class, 'store'])->name('kelas.store');
+    Route::post('kelas/sync', [KelasController::class, 'syncFromStudents'])->name('kelas.sync');
+    Route::put('kelas/{schoolClass}', [KelasController::class, 'update'])->name('kelas.update');
+    Route::delete('kelas/{schoolClass}', [KelasController::class, 'destroy'])->name('kelas.destroy');
 
     Route::get('registrations', [RegistrationController::class, 'index'])->name('registrations.index');
     Route::get('registrations/export', [RegistrationController::class, 'export'])->name('registrations.export');
@@ -70,7 +74,6 @@ Route::middleware(['auth', 'role:admin,operator,kepala_sekolah', \App\Http\Middl
     Route::post('students/bulk-token', [StudentController::class, 'bulkToken'])->name('students.bulk-token');
     Route::post('students/bulk-delete', [StudentController::class, 'bulkDelete'])->name('students.bulk-delete');
     Route::get('students/status-rombel', [StudentController::class, 'statusRombel'])->name('students.status-rombel');
-    Route::get('students/cetak-kartu-rombel', [StudentController::class, 'cetakKartuRombel'])->name('students.cetak-kartu-rombel');
     Route::get('students/export', [StudentController::class, 'export'])->name('students.export');
     Route::get('students/import', [StudentController::class, 'importForm'])->name('students.import');
     Route::get('students/import/template', [StudentController::class, 'template'])->name('students.import.template');
@@ -78,5 +81,4 @@ Route::middleware(['auth', 'role:admin,operator,kepala_sekolah', \App\Http\Middl
     Route::resource('students', StudentController::class);
     Route::post('students/{student}/token', [StudentController::class, 'issueToken'])->name('students.token');
     Route::post('students/{student}/revoke', [StudentController::class, 'revokeToken'])->name('students.revoke');
-    Route::match(['get', 'post'], 'students/{student}/kartu', [StudentController::class, 'kartu'])->name('students.kartu');
 });

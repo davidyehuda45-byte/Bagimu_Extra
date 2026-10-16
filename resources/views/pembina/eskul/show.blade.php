@@ -236,62 +236,105 @@
         @endif
     </div>
 
-    <div class="rounded-lg border bg-white p-4 shadow-sm">
-        <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h2 class="font-semibold">Absensi (hanya anggota disetujui)</h2>
-            <a href="{{ route('pembina.scan.show', $eskul) }}" class="inline-flex items-center gap-1.5 rounded-xl bg-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-blue-800">
-                <x-icon name="qr" class="h-4 w-4" /> Scan Presensi
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+            <div>
+                <h2 class="text-sm font-bold text-slate-900">Presensi Anggota Eskul (Per Rombel Kelas)</h2>
+                <p class="text-[11px] text-slate-500">Urutan siswa dimulai dari Kelas 10 lalu Kelas 11, dikelompokkan per rombel.</p>
+            </div>
+            <a href="{{ route('pembina.scan.show', $eskul) }}" class="inline-flex items-center gap-1.5 rounded-xl bg-blue-700 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-blue-800">
+                <x-icon name="qr" class="h-4 w-4" /> Scan Kartu Pelajar
             </a>
         </div>
-        <form method="GET" action="{{ route('pembina.eskul.show', $eskul) }}" class="mb-3 flex flex-wrap gap-2 items-end text-sm">
-            <div>
-                <label class="block text-xs font-medium">Tanggal</label>
-                <input type="date" name="tanggal" value="{{ $tanggal }}" class="rounded border px-2 py-1.5">
+
+        {{-- Ringkasan Status per Rombel --}}
+        @if (!empty($rombelStats) && $rombelStats->isNotEmpty())
+            <div class="mb-4 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                <h3 class="text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-2">Status Presensi Rombel:</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    @foreach ($rombelStats as $stat)
+                        <div class="p-2 rounded-lg border bg-white text-xs {{ $stat['lengkap'] ? 'border-emerald-200' : ($stat['terisi'] > 0 ? 'border-amber-200' : 'border-rose-200') }}">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-slate-800">{{ $stat['kelas'] }}</span>
+                                @if ($stat['lengkap'])
+                                    <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">Lengkap</span>
+                                @else
+                                    <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">{{ $stat['belum'] }} Belum</span>
+                                @endif
+                            </div>
+                            <span class="text-[11px] text-slate-500 mt-1 block">Hadir: {{ $stat['hadir'] }}/{{ $stat['total'] }}</span>
+                        </div>
+                    @endforeach
+                </div>
             </div>
-            <button class="rounded border px-3 py-1.5 hover:bg-gray-50">Tampilkan</button>
+        @endif
+
+        <form method="GET" action="{{ route('pembina.eskul.show', $eskul) }}" class="mb-4 flex flex-wrap gap-2 items-end text-xs">
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Kegiatan</label>
+                <input type="date" name="tanggal" value="{{ $tanggal }}" class="rounded-xl border-slate-300 px-3 py-1.5 text-xs focus:border-blue-500 focus:ring-blue-500">
+            </div>
+            <button class="rounded-xl bg-slate-900 px-4 py-1.5 text-white font-bold hover:bg-slate-800 cursor-pointer">Tampilkan</button>
             @if ($locked)
-                <span class="text-xs font-semibold text-amber-700">Terkunci — tidak dapat diubah</span>
+                <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-1 rounded-lg border border-amber-200">Presensi Terkunci (Disahkan)</span>
             @endif
         </form>
+
         @if ($disetujui->isEmpty())
-            <p class="text-sm text-gray-500">Belum ada anggota disetujui.</p>
+            <p class="text-xs text-slate-400 py-4 text-center">Belum ada anggota yang disetujui untuk eskul ini.</p>
         @else
             <form method="POST" action="{{ route('pembina.kehadiran.store', $eskul) }}">
                 @csrf
                 <input type="hidden" name="tanggal" value="{{ $tanggal }}">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm">
-                        <thead>
-                            <tr class="border-b bg-gray-50 text-left">
-                                <th class="px-3 py-2 font-medium">Nama</th>
-                                <th class="px-3 py-2 font-medium">Kelas</th>
-                                <th class="px-3 py-2 font-medium">Status</th>
-                                <th class="px-3 py-2 font-medium">Keterangan</th>
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="min-w-full text-xs">
+                        <thead class="bg-slate-50 border-b border-slate-200 text-left font-bold text-slate-700">
+                            <tr>
+                                <th class="px-3 py-2.5">Nama Siswa</th>
+                                <th class="px-3 py-2.5">NIS</th>
+                                <th class="px-3 py-2.5">Kelas</th>
+                                <th class="px-3 py-2.5">Status Presensi</th>
+                                <th class="px-3 py-2.5">Keterangan</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach ($disetujui as $r)
-                                @php($ada = $peta->get($r->id))
-                                <tr class="border-b last:border-0">
-                                    <td class="px-3 py-2">{{ $r->user?->name }}</td>
-                                    <td class="px-3 py-2">{{ $r->kelas }}</td>
-                                    <td class="px-3 py-2">
-                                        <select name="status[{{ $r->id }}]" class="rounded border px-2 py-1" @disabled($locked)>
-                                            @foreach (['HADIR', 'IZIN', 'SAKIT', 'ALPA'] as $s)
-                                                <option value="{{ $s }}" @selected(($ada?->status->value ?? 'HADIR') === $s)>{{ $s }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td class="px-3 py-2">
-                                        <input type="text" name="keterangan[{{ $r->id }}]" value="{{ $ada?->keterangan }}" maxlength="200" class="rounded border px-2 py-1 text-sm w-full" @disabled($locked)>
+                        <tbody class="divide-y divide-slate-100">
+                            @php
+                                $grouped = $disetujui->groupBy('kelas');
+                            @endphp
+                            @foreach ($grouped as $namaKelas => $list)
+                                <tr class="bg-slate-100/70">
+                                    <td colspan="5" class="px-3 py-1.5 font-bold text-slate-800 text-[11px]">
+                                        Rombel: {{ $namaKelas }} ({{ $list->count() }} Siswa)
                                     </td>
                                 </tr>
+                                @foreach ($list as $r)
+                                    @php($ada = $peta->get($r->id))
+                                    <tr class="hover:bg-slate-50/60">
+                                        <td class="px-3 py-2 font-medium text-slate-900">{{ $r->user?->name }}</td>
+                                        <td class="px-3 py-2 text-slate-600 font-mono">{{ $r->nis ?? '-' }}</td>
+                                        <td class="px-3 py-2 text-slate-700">{{ $r->kelas }}</td>
+                                        <td class="px-3 py-2">
+                                            <select name="status[{{ $r->id }}]" class="rounded-lg border-slate-300 px-2 py-1 text-xs font-semibold" @disabled($locked)>
+                                                @foreach (['HADIR', 'IZIN', 'SAKIT', 'ALPA'] as $s)
+                                                    <option value="{{ $s }}" @selected(($ada?->status->value ?? 'HADIR') === $s)>{{ $s }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td class="px-3 py-2">
+                                            <input type="text" name="keterangan[{{ $r->id }}]" value="{{ $ada?->keterangan }}" maxlength="200" placeholder="Opsional..." class="rounded-lg border-slate-300 px-2 py-1 text-xs w-full max-w-xs" @disabled($locked)>
+                                        </td>
+                                    </tr>
+                                @endforeach
                             @endforeach
                         </tbody>
                     </table>
                 </div>
                 @unless ($locked)
-                    <button class="mt-3 rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">Simpan Absensi ({{ $disetujui->count() }})</button>
+                    <div class="mt-4 flex justify-end">
+                        <button class="rounded-xl bg-blue-700 px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-blue-800 transition-colors cursor-pointer">
+                            Simpan Presensi ({{ $disetujui->count() }} Anggota)
+                        </button>
+                    </div>
                 @endunless
             </form>
         @endif

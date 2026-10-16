@@ -18,6 +18,20 @@
                     <span>Dashboard Saya</span>
                 </a>
             @endif
+            @if ($isWaliKelas)
+                <a href="{{ route('wali-kelas.dashboard') }}" class="{{ $link(Route::is('wali-kelas.dashboard')) }}">
+                    <x-icon name="home" class="h-4 w-4 shrink-0" />
+                    <span>Dashboard Kelas</span>
+                </a>
+                <a href="{{ route('wali-kelas.siswa') }}" class="{{ $link(Route::is('wali-kelas.siswa')) }}">
+                    <x-icon name="users" class="h-4 w-4 shrink-0" />
+                    <span>Siswa Kelas Saya</span>
+                </a>
+                <a href="{{ route('wali-kelas.nilai') }}" class="{{ $link(Route::is('wali-kelas.nilai*')) }}">
+                    <x-icon name="file" class="h-4 w-4 shrink-0" />
+                    <span>Rekap Nilai Rapor</span>
+                </a>
+            @endif
         </div>
     </div>
 
@@ -55,25 +69,11 @@
                     </a>
                     <a href="{{ route('admin.kehadiran.index') }}" class="{{ $link(Route::is('admin.kehadiran.*')) }}">
                         <x-icon name="calendar-check" class="h-4 w-4 shrink-0" />
-                        <span>Absensi</span>
+                        <span>Presensi</span>
                     </a>
-                @endif
-                @if ($isAdmin || $isKepsek)
                     <a href="{{ route('admin.nilai.index') }}" class="{{ $link(Route::is('admin.nilai.*')) }}">
                         <x-icon name="file" class="h-4 w-4 shrink-0" />
                         <span>Nilai</span>
-                    </a>
-                    <a href="{{ route('admin.izin.index') }}" class="{{ $link(Route::is('admin.izin.*')) }}">
-                        <x-icon name="inbox" class="h-4 w-4 shrink-0" />
-                        <span>Perizinan</span>
-                    </a>
-                    <a href="{{ route('admin.certificates.index') }}" class="{{ $link(Route::is('admin.certificates.*')) }}">
-                        <x-icon name="award" class="h-4 w-4 shrink-0" />
-                        <span>Sertifikat</span>
-                    </a>
-                    <a href="{{ route('admin.inventory.index') }}" class="{{ $link(Route::is('admin.inventory.*') || Route::is('admin.loans.*')) }}">
-                        <x-icon name="package" class="h-4 w-4 shrink-0" />
-                        <span>Inventaris</span>
                     </a>
                 @endif
                 @if ($isPembina)
@@ -101,7 +101,7 @@
                     <x-icon name="users" class="h-4 w-4 shrink-0" />
                     <span>Direktori Siswa</span>
                 </a>
-                <a href="{{ route('admin.students.status-rombel') }}" class="{{ $link(Route::is('admin.students.status-rombel') || Route::is('admin.students.cetak-kartu-rombel')) }}">
+                <a href="{{ route('admin.students.status-rombel') }}" class="{{ $link(Route::is('admin.students.status-rombel')) }}">
                     <x-icon name="chart" class="h-4 w-4 shrink-0" />
                     <span>Status Rombel</span>
                 </a>
@@ -113,12 +113,6 @@
                     <a href="{{ route('admin.kenaikan.index') }}" class="{{ $link(Route::is('admin.kenaikan.*')) }}">
                         <x-icon name="trending-up" class="h-4 w-4 shrink-0" />
                         <span>Kenaikan Kelas</span>
-                    </a>
-                @endif
-                @if ($isAdmin)
-                    <a href="{{ route('admin.kartu.index') }}" class="{{ $link(Route::is('admin.kartu.*')) }}">
-                        <x-icon name="key" class="h-4 w-4 shrink-0" />
-                        <span>Kartu Login</span>
                     </a>
                 @endif
             </div>

@@ -176,3 +176,4 @@ flowchart TD
 2. Kuota Terkontrol Otomatis: Menghindari eskul kelebihan muatan kapasitas atau penumpukan siswa di satu bidang.
 3. Presensi Cepat Berbasis QR: Mempercepat waktu absensi di lapangan saat jam latihan eskul berlangsung.
 4. Data Transparan & Bebas Kertas: Seluruh proses mulai dari pendaftaran, perizinan, presensi, hingga sertifikat tersimpan rapi di dalam pangkalan data dan dapat dipertanggungjawabkan sewaktu-waktu.
+
