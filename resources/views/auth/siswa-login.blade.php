@@ -13,20 +13,15 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
 @php($sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra')))
-<main class="flex min-h-screen">
+<main class="relative flex min-h-screen overflow-hidden bg-white">
     {{-- Panel Branding Desktop - Sesuai Mockup Desain Bersih & Cerah --}}
-    <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-white p-10 xl:p-14 text-slate-800 lg:flex border-r border-slate-200/80">
+    <div class="relative hidden w-1/2 flex-col justify-between bg-white p-10 xl:p-14 text-slate-800 lg:flex z-0">
         {{-- Ambient Glow & Background Waves --}}
         <div class="pointer-events-none absolute -top-20 -right-20 h-80 w-80 rounded-full bg-blue-100/40 blur-3xl z-0"></div>
         <svg class="pointer-events-none absolute -bottom-6 -left-6 w-96 max-w-full z-0 opacity-60" viewBox="0 0 400 160" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M-20 60 C80 120 180 20 420 110 L420 200 L-20 200 Z" fill="#eff6ff" />
             <path d="M-20 90 C90 140 210 50 420 130 L420 200 L-20 200 Z" fill="#dbeafe" opacity="0.6" />
         </svg>
-
-        {{-- Visual Arch Gedung Sekolah (Sesuai Mockup) --}}
-        <div class="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 h-[70%] xl:h-[78%] max-h-[620px] w-auto select-none z-0 hidden lg:block">
-            <img src="{{ asset('login-illustration.png') }}" alt="SMK Bagimu Negeriku" class="h-full w-auto object-contain object-right" />
-        </div>
 
         {{-- Header Sekolah --}}
         <div class="relative z-10 flex items-center gap-4">
@@ -93,13 +88,28 @@
         </div>
     </div>
 
-    {{-- Panel Form Kanan - Warna Biru Khas Bagimu Extra --}}
-    <div class="relative flex w-full items-center justify-center bg-blue-600 px-4 py-12 lg:w-1/2 overflow-hidden">
+    {{-- Panel Form Kanan - Warna Biru Khas Bagimu Extra dengan Transisi Wave Mulus --}}
+    <div class="relative flex w-full items-center justify-center bg-blue-600 px-4 py-12 lg:w-1/2 z-10">
+        {{-- Layer 1: Kurva Biru Muda Lembut di Belakang --}}
+        <svg class="pointer-events-none absolute top-0 -left-36 lg:-left-48 xl:-left-60 h-full w-36 lg:w-48 xl:w-60 text-blue-300/40 fill-current z-0 hidden lg:block translate-x-1" viewBox="0 0 100 800" preserveAspectRatio="none">
+            <path d="M100,0 C15,140 0,310 0,470 C0,630 15,750 100,800 L100,0 Z" />
+        </svg>
+
+        {{-- Layer 2: Kurva Utama Biru Khas (Menyatu Sempurna dengan bg-blue-600) --}}
+        <svg class="pointer-events-none absolute top-0 -left-24 lg:-left-36 xl:-left-44 h-full w-24 lg:w-36 xl:w-44 text-blue-600 fill-current z-10 hidden lg:block translate-x-1" viewBox="0 0 100 800" preserveAspectRatio="none">
+            <path d="M100,0 C25,160 0,330 0,470 C0,610 25,740 100,800 L100,0 Z" />
+        </svg>
+
+        {{-- Arch Foto Gedung SMK Bagimu Negeriku (Menyambung Mulus di Atas Lengkungan) --}}
+        <div class="pointer-events-none absolute -left-20 lg:-left-28 xl:-left-36 top-1/2 -translate-y-1/2 w-44 lg:w-52 xl:w-60 h-[340px] lg:h-[400px] xl:h-[440px] rounded-full overflow-hidden border-4 border-white shadow-2xl shadow-blue-950/40 z-20 hidden lg:block">
+            <img src="{{ asset('gedung-clean.png') }}" alt="Gedung SMK Bagimu Negeriku" class="h-full w-full object-cover object-center" />
+        </div>
+
         {{-- Ambient Glow Dekoratif --}}
         <div class="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-white/10 blur-3xl"></div>
         <div class="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-blue-900/30 blur-3xl"></div>
 
-        <div class="relative z-10 w-full max-w-md">
+        <div class="relative z-30 w-full max-w-md">
             {{-- Mobile Logo --}}
             <div class="mb-6 flex items-center gap-3 lg:hidden">
                 <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 border border-white/20 p-1">
