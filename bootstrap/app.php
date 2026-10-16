@@ -11,6 +11,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->redirectGuestsTo(fn (\Illuminate\Http\Request $request) =>
+            $request->is('admin*') || $request->is('pembina*')
+                ? route('pembina.login')
+                : route('siswa.login')
+        );
+
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureRole::class,
         ]);

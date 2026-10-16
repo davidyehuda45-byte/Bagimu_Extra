@@ -218,7 +218,7 @@ class ParitasTest extends TestCase
             'verify_token' => bin2hex(random_bytes(32)),
         ]);
 
-        $this->actingAs($siswa)->get('/siswa/status')->assertOk()->assertSee('E-Card');
+        $this->actingAs($siswa)->get('/siswa/status')->assertOk()->assertSee('Bukti Pendaftaran');
     }
 
     public function test_halaman_admin_baru(): void

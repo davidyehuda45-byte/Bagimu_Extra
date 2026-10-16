@@ -86,7 +86,8 @@ class SmokeTest extends TestCase
         $siswa = $this->siswa();
         $admin = $this->admin();
 
-        $this->get('/siswa')->assertRedirect('/login');
+        $this->get('/siswa')->assertRedirect('/siswa/login');
+        $this->get('/admin')->assertRedirect('/pembina/login');
         $this->actingAs($siswa)->get('/admin')->assertForbidden();
         $this->actingAs($admin)->get('/siswa')->assertForbidden();
     }

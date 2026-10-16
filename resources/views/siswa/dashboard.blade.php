@@ -70,14 +70,14 @@
                             <x-badge tone="emerald" dot="true">Terdaftar Aktif</x-badge>
                         </div>
                         <p class="mt-1 text-xs sm:text-sm text-slate-600">
-                            E-Card & QR verifikasi aktif. Tunjukkan QR Code pada ponsel ke pembina saat latihan.
+                            Pendaftaran Anda telah tercatat resmi. Pembina eskul akan mendata kehadiran saat kegiatan latihan.
                         </p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
                     <a href="{{ route('siswa.status') }}" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs sm:text-sm font-bold text-white hover:bg-blue-700 transition shadow-sm shadow-blue-600/20">
-                        <x-icon name="id-card" class="h-4 w-4" />
-                        <span>Buka E-Card Digital</span>
+                        <x-icon name="check" class="h-4 w-4" />
+                        <span>Lihat Bukti Pendaftaran</span>
                     </a>
                 </div>
             </div>
@@ -183,10 +183,10 @@
 
             <a href="{{ route('siswa.status') }}" class="group rounded-2xl border border-slate-200/90 bg-white p-4 sm:p-5 shadow-xs hover:border-blue-300 hover:shadow-sm hover-lift transition">
                 <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-700 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                    <x-icon name="id-card" class="h-5 w-5" />
+                    <x-icon name="check" class="h-5 w-5" />
                 </div>
-                <p class="mt-3 text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">E-Card Digital</p>
-                <p class="mt-0.5 text-xs text-slate-500">QR Code presensi & cetak kartu</p>
+                <p class="mt-3 text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Bukti Pendaftaran</p>
+                <p class="mt-0.5 text-xs text-slate-500">Informasi eskul yang dipilih</p>
             </a>
 
             <a href="{{ route('siswa.kehadiran') }}" class="group rounded-2xl border border-slate-200/90 bg-white p-4 sm:p-5 shadow-xs hover:border-blue-300 hover:shadow-sm hover-lift transition">
@@ -195,14 +195,6 @@
                 </div>
                 <p class="mt-3 text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Presensi Saya</p>
                 <p class="mt-0.5 text-xs text-slate-500">Riwayat & rekap kehadiran</p>
-            </a>
-
-            <a href="{{ route('siswa.izin.create') }}" class="group rounded-2xl border border-slate-200/90 bg-white p-4 sm:p-5 shadow-xs hover:border-blue-300 hover:shadow-sm hover-lift transition">
-                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-700 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                    <x-icon name="inbox" class="h-5 w-5" />
-                </div>
-                <p class="mt-3 text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Ajukan Izin</p>
-                <p class="mt-0.5 text-xs text-slate-500">Upload surat izin atau sakit</p>
             </a>
 
             <a href="{{ route('siswa.pengumuman') }}" class="group rounded-2xl border border-slate-200/90 bg-white p-4 sm:p-5 shadow-xs hover:border-blue-300 hover:shadow-sm hover-lift transition">

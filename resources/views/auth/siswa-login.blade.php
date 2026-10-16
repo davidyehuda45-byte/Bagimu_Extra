@@ -38,7 +38,7 @@
                 </span>
             </h1>
             <p class="text-sm leading-relaxed text-blue-100">
-                Pilih eskul favoritmu, dapatkan E-Card digital dengan QR Code unik, dan pantau rekap kehadiran serta nilai akhir langsung dari perangkat ponselmu.
+                Pilih eskul favoritmu secara mudah dan cepat, langsung terdaftar resmi ke sistem sekolah.
             </p>
 
             <ul class="space-y-3 pt-2 text-sm text-white">
@@ -52,7 +52,7 @@
                     <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/20 text-white">
                         <x-icon name="check" class="h-4 w-4" />
                     </span>
-                    <span>E-Card presensi digital ber-QR Code untuk absensi latihan</span>
+                    <span>Pendaftaran langsung terhubung dengan data pembina eskul</span>
                 </li>
                 <li class="flex items-center gap-3">
                     <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/20 text-white">

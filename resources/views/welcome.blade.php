@@ -155,7 +155,7 @@
                 <li>Setiap siswa hanya dapat memilih satu ekstrakurikuler utama per periode tahun ajaran.</li>
                 <li>Pendaftaran dilakukan mandiri dengan NIS dan Token 8 digit yang tertera pada kartu pelajar.</li>
                 <li>Apabila kuota eskul utama telah penuh, siswa dipersilakan memilih alternatif eskul lainnya.</li>
-                <li>Setelah pendaftaran diterima, siswa wajib menunjukkan E-Card digital saat sesi absensi latihan.</li>
+                <li>Setelah pendaftaran terkirim, data siswa resmi terdaftar dan terkunci untuk periode berjalan.</li>
             </ol>
             <div class="mt-5 pt-4 border-t border-slate-100">
                 @if (auth()->check())
@@ -209,7 +209,7 @@
                     Portal Siswa
                 </a>
                 <a href="{{ route('verify.form') }}" class="rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition">
-                    Verifikasi Sertifikat / E-Card
+                    Verifikasi Sertifikat Resmi
                 </a>
             </div>
         </div>
