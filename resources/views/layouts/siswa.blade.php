@@ -11,26 +11,26 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @include('layouts.partials.session-guard')
 </head>
-<body>
+<body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
 <a href="#konten-utama" class="skip-link">Lewati ke konten utama</a>
 @php
-    $pill = fn ($active) => 'flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium '
-        .($active ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900');
+    $pill = fn ($active) => 'flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-bold transition-all duration-150 '
+        .($active ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/20' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 active:scale-[0.98]');
 @endphp
-<header class="no-print sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur">
-    <div class="flex h-16 w-full items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-        <a href="{{ route('siswa.dashboard') }}" class="flex shrink-0 items-center gap-2">
+<header class="no-print sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 backdrop-blur-md">
+    <div class="flex h-16 w-full items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <a href="{{ route('siswa.dashboard') }}" class="flex shrink-0 items-center gap-2.5 group">
             <x-school-logo :size="36" />
             <div class="leading-tight">
-                <p class="text-sm font-bold text-slate-900">{{ config('app.name', 'Bagimu Extra') }}</p>
-                <p class="hidden text-[11px] text-slate-400 sm:block">{{ \App\Models\AppSetting::get('school.name', 'Pendaftaran Eskul') }}</p>
+                <p class="text-sm font-extrabold text-slate-900 tracking-tight group-hover:text-blue-700 transition-colors">{{ config('app.name', 'Bagimu Extra') }}</p>
+                <p class="hidden text-[10px] font-medium text-slate-400 sm:block">{{ \App\Models\AppSetting::get('school.name', 'Pendaftaran Eskul') }}</p>
             </div>
         </a>
 
-        <nav class="flex min-w-0 items-center gap-1 overflow-x-auto" aria-label="Navigasi siswa">
+        <nav class="flex min-w-0 items-center gap-1.5 overflow-x-auto py-1" aria-label="Navigasi siswa">
             <a href="{{ route('siswa.dashboard') }}" class="{{ $pill(Route::is('siswa.dashboard') || Route::is('siswa.pengumuman')) }}"><x-icon name="home" class="h-4 w-4 shrink-0" /><span>Beranda</span></a>
             <a href="{{ route('siswa.daftar') }}" class="{{ $pill(Route::is('siswa.daftar*')) }}"><x-icon name="clipboard" class="h-4 w-4 shrink-0" /><span>Pilih Eskul</span></a>
-            <a href="{{ route('siswa.status') }}" class="{{ $pill(Route::is('siswa.status')) }}"><x-icon name="id-card" class="h-4 w-4 shrink-0" /><span>Status</span></a>
+            <a href="{{ route('siswa.status') }}" class="{{ $pill(Route::is('siswa.status')) }}"><x-icon name="id-card" class="h-4 w-4 shrink-0" /><span>E-Card</span></a>
             <a href="{{ route('siswa.profil') }}" class="{{ $pill(Route::is('siswa.profil')) }}"><x-icon name="user" class="h-4 w-4 shrink-0" /><span class="hidden sm:inline">Saya</span></a>
         </nav>
 

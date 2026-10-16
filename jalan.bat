@@ -14,9 +14,12 @@ if errorlevel 1 (
 )
 
 echo [1/4] Cek ekstensi PHP yang dibutuhkan...
-php -r "foreach (['zip','fileinfo','mbstring','pdo_mysql','openssl'] as $e) { echo ' - '.$e.': '.(extension_loaded($e)?'OK':'MATI').PHP_EOL; }"
+php -r "foreach (['zip','fileinfo','mbstring','pdo_mysql','pdo_sqlite','openssl'] as $e) { echo ' - '.$e.': '.(extension_loaded($e)?'OK':'MATI').PHP_EOL; }"
 
-echo [2/4] Bersihkan cache lama...
+echo [2/4] Bersihkan cache & siapkan file sistem...
+if not exist database mkdir database
+if not exist database\database.sqlite type nul > database\database.sqlite
+if not exist public\storage php artisan storage:link >nul 2>nul
 php artisan config:clear >nul 2>nul
 php artisan view:clear >nul 2>nul
 

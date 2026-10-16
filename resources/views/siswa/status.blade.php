@@ -14,21 +14,28 @@
             <a href="{{ route('siswa.daftar') }}" class="mt-3 inline-block rounded-xl bg-blue-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-800">Daftar Sekarang</a>
         </div>
     @else
-        <div class="no-print flex gap-2">
-            <button onclick="window.print()" class="rounded-xl bg-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-blue-800">Cetak / PDF</button>
+        <div class="no-print flex items-center justify-between gap-3">
+            <p class="text-xs text-slate-500">Tunjukkan kartu ini kepada pembina eskul saat absensi atau simpan sebagai PDF.</p>
+            <button onclick="window.print()" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs sm:text-sm font-bold text-white hover:bg-blue-700 transition shadow-xs shadow-blue-600/20 cursor-pointer shrink-0">
+                <x-icon name="printer" class="h-4 w-4" />
+                <span>Cetak / PDF</span>
+            </button>
         </div>
 
-        {{-- E-Card Presensi --}}
-        <div id="ecard-print-area" class="print-area overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div class="bg-blue-900 px-5 py-4 text-white">
+        {{-- E-Card Presensi - Bersih & Cerah --}}
+        <div id="ecard-print-area" class="print-area overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white shadow-sm">
+            <div class="bg-blue-600 px-6 py-5 text-white">
                 <div class="flex items-center justify-between gap-2">
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-widest text-blue-300">{{ config('app.name', 'Bagimu Extra') }}</p>
-                        <p class="font-extrabold">E-Card Presensi</p>
+                        <p class="text-xs font-semibold uppercase tracking-widest text-blue-100">{{ config('app.name', 'Bagimu Extra') }}</p>
+                        <p class="font-extrabold text-base sm:text-lg">E-Card Presensi Siswa</p>
                     </div>
-                    <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap bg-emerald-100 text-emerald-800">Terdaftar</span>
+                    <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold whitespace-nowrap bg-white/20 text-white border border-white/25">
+                        <x-icon name="check" class="h-3.5 w-3.5" />
+                        <span>Terdaftar</span>
+                    </span>
                 </div>
-                <p class="mt-1 text-[11px] text-blue-200">Tunjukkan QR ini ke pembina setiap latihan untuk presensi.</p>
+                <p class="mt-1 text-xs text-blue-100">Tunjukkan QR Code ini ke pembina setiap latihan untuk verifikasi kehadiran.</p>
             </div>
 
             <div class="p-5">
@@ -116,7 +123,9 @@
         </div>
 
         <div class="no-print">
-            <a href="{{ route('siswa.dashboard') }}" class="block rounded-xl border border-slate-300 bg-white px-5 py-3 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50">Kembali ke Beranda</a>
+            <a href="{{ route('siswa.dashboard') }}" class="inline-flex items-center justify-center gap-2 w-full rounded-xl border border-slate-200 bg-white px-5 py-3 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition shadow-xs">
+                &larr; Kembali ke Beranda
+            </a>
         </div>
     @endif
 

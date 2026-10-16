@@ -12,7 +12,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @include('layouts.partials.session-guard')
 </head>
-<body>
+<body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
 <a href="#konten-utama" class="skip-link">Lewati ke konten utama</a>
 @php
     $user = auth()->user();
@@ -21,39 +21,39 @@
     $isPembina = $user && $user->hasRole(\App\Enums\Role::PEMBINA);
     $isKepsek = $user && $user->hasRole(\App\Enums\Role::KEPALA_SEKOLAH);
     $isWaliKelas = $user && $user->hasRole(\App\Enums\Role::WALI_KELAS);
-    $link = fn ($active) => 'flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors '
-        .($active ? 'bg-blue-700 text-white shadow-sm font-semibold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900');
+    $link = fn ($active) => 'flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold transition-all duration-150 '
+        .($active ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/25' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 active:scale-[0.99]');
 @endphp
-<div class="min-h-screen lg:flex">
+<div class="min-h-screen lg:flex bg-slate-50">
     {{-- Sidebar desktop --}}
-    <aside class="no-print fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-slate-200 bg-white lg:flex">
-        <div class="flex items-center gap-3 border-b border-slate-100 px-4 py-5">
-            <x-school-logo :size="40" />
-            <div class="leading-tight">
-                <p class="text-sm font-bold text-slate-900">{{ config('app.name', 'Bagimu Extra') }}</p>
-                <p class="text-[11px] text-slate-500">{{ \App\Models\AppSetting::get('school.name', 'Admin Panel') }}</p>
+    <aside class="no-print fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-slate-200/80 bg-white/95 backdrop-blur-sm lg:flex">
+        <div class="flex items-center gap-3 border-b border-slate-100/90 px-5 py-5">
+            <x-school-logo :size="38" />
+            <div class="leading-tight min-w-0">
+                <p class="text-sm font-extrabold text-slate-900 tracking-tight truncate">{{ config('app.name', 'Bagimu Extra') }}</p>
+                <p class="text-[11px] text-slate-400 font-medium truncate">{{ \App\Models\AppSetting::get('school.name', 'Panel Guru & Staf') }}</p>
             </div>
         </div>
 
-        <nav id="staff-sidebar-nav" class="min-h-0 flex-1 overflow-y-auto px-3 py-3">
+        <nav id="staff-sidebar-nav" class="min-h-0 flex-1 overflow-y-auto px-3.5 py-4">
             @include('layouts.partials.staff-nav')
         </nav>
 
-        <div class="border-t border-slate-200 p-3">
-            <div class="flex items-center gap-3 rounded-xl px-2 py-2">
-                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-800">
+        <div class="border-t border-slate-100 p-3.5">
+            <div class="flex items-center gap-3 rounded-2xl border border-slate-200/70 bg-slate-50/80 p-2.5 shadow-2xs">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-xs font-black text-white shadow-xs">
                     {{ strtoupper(substr($user?->name ?? 'A', 0, 1)) }}
                 </span>
-                <div class="min-w-0 leading-tight">
-                    <p class="truncate text-sm font-medium text-slate-800">{{ $user?->name }}</p>
-                    <p class="truncate text-[11px] text-slate-400">{{ $user?->email }}</p>
+                <div class="min-w-0 flex-1 leading-tight">
+                    <p class="truncate text-xs font-bold text-slate-900">{{ $user?->name }}</p>
+                    <p class="truncate text-[10px] text-slate-400 capitalize font-medium">{{ str_replace('_', ' ', $user?->role?->value ?? ($user?->role ?? 'Staf')) }}</p>
                 </div>
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="mt-2 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-rose-50 hover:text-rose-600">
-                    <x-icon name="logout" class="h-4 w-4" />
-                    Keluar
+                <button type="submit" class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-600 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all cursor-pointer">
+                    <x-icon name="logout" class="h-3.5 w-3.5" />
+                    Keluar Sesi
                 </button>
             </form>
         </div>
@@ -61,14 +61,14 @@
 
     <div class="flex-1 min-w-0 lg:ps-64">
         {{-- Topbar mobile --}}
-        <header class="no-print sticky top-0 z-30 flex h-14 items-center justify-between border-b border-slate-200 bg-white px-4 lg:hidden">
-            <div class="flex items-center gap-2">
+        <header class="no-print sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/90 backdrop-blur-md px-4 sm:px-6 lg:hidden">
+            <div class="flex items-center gap-2.5">
                 <x-school-logo :size="32" />
-                <span class="text-sm font-bold text-slate-900">{{ config('app.name', 'Bagimu Extra') }}</span>
+                <span class="text-sm font-extrabold text-slate-900 tracking-tight">{{ config('app.name', 'Bagimu Extra') }}</span>
             </div>
             <x-popover label="Menu navigasi" panelClass="w-64 max-h-[75vh] overflow-y-auto">
                 <x-slot:trigger>
-                    <button type="button" class="flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100" aria-label="Menu navigasi" aria-haspopup="menu">
+                    <button type="button" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors" aria-label="Menu navigasi" aria-haspopup="menu">
                         <x-icon name="menu" class="h-5 w-5" />
                     </button>
                 </x-slot:trigger>
@@ -76,7 +76,7 @@
             </x-popover>
         </header>
 
-        <main id="konten-utama" class="w-full p-4 lg:p-8">
+        <main id="konten-utama" class="w-full p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
             @include('layouts.partials.flash-messages')
             @yield('content')
         </main>
@@ -94,7 +94,7 @@
     }
 
     // 2. Pastikan menu aktif terlihat
-    const activeLink = nav.querySelector('a.bg-blue-700');
+    const activeLink = nav.querySelector('a.bg-blue-600, a.bg-blue-700');
     if (activeLink) {
         const navRect = nav.getBoundingClientRect();
         const linkRect = activeLink.getBoundingClientRect();
