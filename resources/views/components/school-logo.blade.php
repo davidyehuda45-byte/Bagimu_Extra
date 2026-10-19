@@ -3,7 +3,7 @@
   Logo sekolah: pakai /logo.png bila ada, fallback ikon toga.
   Taruh file logo di public/logo.png untuk mengganti ikon.
 --}}
-<span class="relative block shrink-0 overflow-hidden bg-white rounded-full ring-2 ring-slate-200" style="width: {{ $size }}px; height: {{ $size }}px;">
+<span {{ $attributes->merge(['class' => 'relative block shrink-0 overflow-hidden bg-white rounded-full ring-2 ring-slate-200']) }} style="width: {{ $size }}px; height: {{ $size }}px;">
     <img src="/logo.png" alt="Logo sekolah" class="h-full w-full object-cover" style="display: none;"
         onload="this.style.display='block';this.parentElement.querySelector('[data-fallback]').style.display='none';"
         onerror="this.style.display='none';">

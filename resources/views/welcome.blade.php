@@ -31,7 +31,7 @@
   <div class="sp-badge"><img src="{{ asset('splash-logo.png') }}" alt="Logo {{ $sekolah }}"></div>
   <div class="sp-ekskul" id="sp-ekskul"></div>
   <h2 class="sp-name">{{ $sekolah }}</h2>
-  <p class="sp-motto">Berbudi · Berkualitas · Berdaya · Berhasil</p>
+  <p class="sp-motto">4B Berbudi · Berkualitas · Berdaya · Berhasil</p>
   <div class="sp-pct"><b id="sp-num">1</b>%</div>
 </div>
 <!-- =========================== -->
@@ -40,7 +40,7 @@
     {{-- Top Navbar Mini --}}
     <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-            <x-school-logo :size="38" />
+            <x-school-logo :size="42" />
             <div>
                 <span class="text-sm font-extrabold text-slate-900 tracking-tight block">{{ config('app.name', 'Bagimu Extra') }}</span>
                 <span class="text-[11px] font-medium text-slate-500 block truncate max-w-[200px] sm:max-w-none">{{ $sekolah }}</span>

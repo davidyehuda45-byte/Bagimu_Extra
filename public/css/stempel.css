@@ -1,0 +1,161 @@
+/* ==========================================================
+   STEMPEL NOTIFIKASI
+   Posisi: Pojok Kanan Atas Kartu Login (.card)
+   ========================================================== */
+
+.card {
+  position: relative;
+}
+
+/* --- Getar kolom input saat salah --- */
+input.err {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+  animation: shake .35s !important;
+}
+@keyframes shake {
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* --- Stempel di Pojok Kanan Atas (Digeser ke atas-kanan agar tombol Pembina tidak tertutup) --- */
+.toast-container {
+  position: absolute;
+  top: -105px;
+  right: -28px;
+  z-index: 50;
+  pointer-events: none;
+}
+.toast {
+  position: relative;
+  width: 125px;
+  height: 125px;
+  color: #1d4ed8;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .05em;
+  line-height: 1.1;
+  text-align: center;
+  text-transform: uppercase;
+  filter: drop-shadow(0 8px 12px rgba(0,0,0,.22));
+  transform: rotate(-10deg);
+  opacity: 0;
+  animation: stampIn .85s cubic-bezier(.4,0,.6,1) forwards;
+}
+.toast svg {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.toast .ring {
+  fill: none;
+  stroke: #2563eb;
+  stroke-linecap: round;
+}
+.toast .disc {
+  fill: var(--toast-bg, #ffffff);
+}
+.toast .ink {
+  display: none !important;
+}
+.toast .shock {
+  fill: none;
+  stroke: #2563eb;
+  stroke-width: 3;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: shock .6s ease-out .52s forwards;
+}
+.toast .shock.s2 {
+  stroke-width: 1.5;
+  animation-delay: .64s;
+}
+.toast span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 95px;
+  transform: translate(-50%,-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.toast b {
+  display: block;
+  font-weight: 800;
+  opacity: 0;
+  animation: wd .4s cubic-bezier(.2,1.5,.4,1) forwards;
+  animation-delay: calc(.58s + var(--i) * .16s);
+}
+.toast.hide {
+  animation: stampOut .45s ease forwards;
+}
+@keyframes stampIn {
+  0% { opacity: 0; transform: perspective(500px) rotate(-34deg) rotateX(55deg) scale(3); filter: blur(7px) drop-shadow(0 5px 6px rgba(0,0,0,.35)); }
+  45% { opacity: 1; transform: perspective(500px) rotate(-14deg) rotateX(20deg) scale(1.5); filter: blur(2px) drop-shadow(0 5px 6px rgba(0,0,0,.35)); }
+  62% { opacity: 1; transform: perspective(500px) rotate(-10deg) rotateX(0) scale(.9); filter: blur(0) drop-shadow(0 1px 2px rgba(0,0,0,.45)); }
+  76% { transform: perspective(500px) rotate(-10deg) rotateX(0) scale(1.05); }
+  88% { transform: perspective(500px) rotate(-10deg) rotateX(0) scale(.99); }
+  100% { opacity: 1; transform: perspective(500px) rotate(-10deg) rotateX(0) scale(1); filter: blur(0) drop-shadow(0 8px 12px rgba(0,0,0,.22)); }
+}
+@keyframes wd {
+  from { opacity: 0; transform: scale(2.2); filter: blur(4px); }
+  to { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+@keyframes ink {
+  from { opacity: 1; transform: translate(0,0) scale(.3); }
+  to { opacity: .9; transform: translate(var(--dx),var(--dy)) scale(1); }
+}
+@keyframes shock {
+  from { opacity: .9; transform: scale(.8); }
+  to { opacity: 0; transform: scale(1.7); }
+}
+@keyframes stampOut {
+  from { opacity: 1; transform: rotate(-10deg) scale(1); }
+  to { opacity: 0; transform: translate(26px,-30px) rotate(-26deg) scale(.7); }
+}
+@keyframes hit {
+  20% { transform: translate(-5px,2px); }
+  40% { transform: translate(4px,-2px); }
+  60% { transform: translate(-3px,1px); }
+  80% { transform: translate(2px,0); }
+}
+.card.hit {
+  animation: hit .35s .5s;
+}
+
+/* Stempel Berhasil (Warna Hijau Emerald) */
+.toast.success {
+  color: #166534;
+}
+.toast.success span {
+  font-size: 14px;
+  letter-spacing: .08em;
+}
+.toast.success .ring, .toast.success .shock {
+  stroke: #22c55e;
+}
+.toast.success .ink {
+  display: none !important;
+}
+
+@media (max-width: 640px) {
+  .toast-container {
+    top: -85px;
+    right: -18px;
+  }
+  .toast {
+    width: 110px;
+    height: 110px;
+    font-size: 13px;
+  }
+  .toast span {
+    width: 78px;
+  }
+}
+

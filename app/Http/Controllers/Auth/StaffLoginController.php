@@ -26,7 +26,7 @@ class StaffLoginController extends Controller
         return view('auth.admin-login');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|\Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
             'login' => ['required', 'string'],
@@ -75,6 +75,13 @@ class StaffLoginController extends Controller
             session(['mfa_user_id' => $user->getAuthIdentifier()]);
             $request->session()->regenerate();
 
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'redirect' => route('admin.mfa'),
+                ]);
+            }
+
             return redirect()->route('admin.mfa');
         }
 
@@ -105,6 +112,13 @@ class StaffLoginController extends Controller
                 $tujuan = route('pembina.dashboard');
             }
 
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'redirect' => $tujuan,
+                ]);
+            }
+
             return redirect()->to($tujuan);
         }
 
@@ -115,10 +129,26 @@ class StaffLoginController extends Controller
                 $tujuan = route('wali-kelas.dashboard');
             }
 
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'redirect' => $tujuan,
+                ]);
+            }
+
             return redirect()->to($tujuan);
         }
 
-        return redirect()->intended('/dashboard');
+        $tujuan = session()->pull('url.intended', '/dashboard');
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'redirect' => $tujuan,
+            ]);
+        }
+
+        return redirect()->to($tujuan);
     }
 
     private function hitAndLog(
