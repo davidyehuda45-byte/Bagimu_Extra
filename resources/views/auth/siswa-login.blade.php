@@ -10,6 +10,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" /></noscript>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="{{ asset('css/stempel.css') }}">
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
 @php($sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra')))
@@ -111,7 +112,7 @@
                 </div>
             </div>
 
-            <div class="rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-xl shadow-slate-200/50">
+            <div class="card relative rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-xl shadow-slate-200/50">
                 {{-- Tab Pilihan Pintu Masuk: Siswa & Pembina --}}
                 <div class="grid grid-cols-2 p-1.5 mb-6 bg-slate-100 rounded-2xl text-xs sm:text-sm font-bold text-center border border-slate-200/80">
                     <div class="py-2.5 rounded-xl bg-blue-600 text-white shadow-xs flex items-center justify-center gap-2">
@@ -132,14 +133,14 @@
                     <p class="mt-1 text-xs sm:text-sm text-slate-500">Gunakan NIS dan Token 8 digit yang tertera di kartu pelajar Anda.</p>
                 </div>
 
-                <form method="POST" action="{{ route('siswa.login') }}" class="space-y-4" x-data="{ loading: false, showToken: false }" @submit="loading = true">
+                <form method="POST" action="{{ route('siswa.login') }}" id="loginForm" class="space-y-4" x-data="{ loading: false, showToken: false }" @submit="handleSiswaLoginSubmit($event, $data)">
                     @csrf
 
                     <div>
                         <x-input-label for="nis" value="Nomor Induk Siswa (NIS)" />
                         <x-text-input id="nis" class="mt-1 block w-full text-base tracking-wider font-semibold placeholder:font-normal placeholder:tracking-normal" type="text"
                                         inputmode="numeric" autocomplete="username" name="nis" :value="old('nis')"
-                                        required autofocus placeholder="cth: 10001" />
+                                        required autofocus placeholder="cth: 10001" oninput="this.classList.remove('err')" />
                         <x-input-error :messages="$errors->get('nis')" class="mt-2" />
                     </div>
 
@@ -156,6 +157,7 @@
                                    maxlength="100"
                                    autocomplete="current-password"
                                    placeholder="••••••••"
+                                   oninput="this.classList.remove('err')"
                                    class="block w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 pr-10 text-base font-semibold tracking-wider text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal placeholder:font-normal focus:border-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-600/20" />
                             <button type="button" @click="showToken = !showToken" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-hidden" tabindex="-1">
                                 <svg x-show="!showToken" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -198,5 +200,112 @@
         </div>
     </div>
 </main>
+
+<script src="{{ asset('js/stempel.js') }}"></script>
+<script>
+    function handleSiswaLoginSubmit(e, alpineData) {
+        var form = document.getElementById('loginForm');
+        var nisInput = document.getElementById('nis');
+        var tokenInput = document.getElementById('token');
+        if (!form || !nisInput || !tokenInput) return;
+
+        e.preventDefault();
+
+        nisInput.classList.remove('err');
+        tokenInput.classList.remove('err');
+        void tokenInput.offsetWidth;
+
+        var nisVal = nisInput.value.trim();
+        var tokenVal = tokenInput.value.trim();
+
+        // 1. Validasi Kolom Kosong: getar input & stempel sejenak lalu kembalikan seperti semula
+        if (!nisVal || !tokenVal) {
+            if (!nisVal) nisInput.classList.add('err');
+            if (!tokenVal) tokenInput.classList.add('err');
+            showToast('Wajib diisi', 'error', 2500);
+            return;
+        }
+
+        if (alpineData) alpineData.loading = true;
+
+        var formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            },
+            body: formData
+        })
+        .then(function (res) {
+            if (res.ok) {
+                return res.json().then(function (data) {
+                    // BERHASIL: Stempel hijau permanen di pojok kanan atas, JANGAN DIKEMBALIKAN
+                    showToast('Berhasil', 'success');
+                    var targetUrl = data.redirect || '/siswa/daftar';
+                    setTimeout(function () {
+                        window.location.href = targetUrl;
+                    }, 1200);
+                });
+            } else if (res.status === 422) {
+                return res.json().then(function (data) {
+                    var stampText = 'Sandi salah';
+                    if (data.errors) {
+                        if (data.errors.token && data.errors.token[0]) {
+                            var msg = data.errors.token[0];
+                            tokenInput.classList.add('err');
+                            tokenInput.select();
+                            if (msg.indexOf('hangus') !== -1) stampText = 'Token hangus';
+                            else if (msg.indexOf('terkunci') !== -1) stampText = 'Data terkunci';
+                            else if (msg.indexOf('percobaan') !== -1) stampText = 'Coba nanti';
+                            else stampText = 'Sandi salah';
+                        } else if (data.errors.nis && data.errors.nis[0]) {
+                            nisInput.classList.add('err');
+                            nisInput.select();
+                            stampText = 'NIS salah';
+                        }
+                    }
+                    // ERROR: Stempel muncul, lalu KEMBALIKAN LAGI SEPERTI SEMULA
+                    showToast(stampText, 'error', 2500);
+                    if (alpineData) alpineData.loading = false;
+                });
+            } else {
+                showToast('Gagal masuk', 'error', 2500);
+                if (alpineData) alpineData.loading = false;
+            }
+        })
+        .catch(function () {
+            form.submit();
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        @if ($errors->any())
+            var tokenInput = document.getElementById('token');
+            var nisInput = document.getElementById('nis');
+            @if ($errors->has('token'))
+                if (tokenInput) {
+                    tokenInput.classList.add('err');
+                    tokenInput.select();
+                }
+            @endif
+            @if ($errors->has('nis'))
+                if (nisInput) {
+                    nisInput.classList.add('err');
+                    nisInput.select();
+                }
+            @endif
+            setTimeout(function () {
+                showToast('Sandi salah', 'error', 2500);
+            }, 100);
+        @elseif (session('status'))
+            setTimeout(function () {
+                showToast('Berhasil', 'success');
+            }, 100);
+        @endif
+    });
+</script>
 </body>
 </html>

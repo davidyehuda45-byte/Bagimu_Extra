@@ -29,7 +29,7 @@ class SiswaLoginController extends Controller
      * Login siswa: NIS + token 8 digit, atau NIS + password
      * (bila siswa sudah mengatur password di Profil).
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|\Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
             'nis' => ['required', 'string', 'max:20'],
@@ -139,6 +139,13 @@ class SiswaLoginController extends Controller
         $path = parse_url((string) $tujuan, PHP_URL_PATH) ?? '';
         if (str_starts_with($path, '/admin') || str_starts_with($path, '/pembina')) {
             $tujuan = '/siswa/daftar';
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'redirect' => $tujuan,
+            ]);
         }
 
         return redirect()->to($tujuan);
