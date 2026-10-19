@@ -10,6 +10,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" /></noscript>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="{{ asset('css/stempel.css') }}?v={{ filemtime(public_path('css/stempel.css')) }}">
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
 @php($sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra')))
@@ -111,7 +112,7 @@
                 </div>
             </div>
 
-            <div class="rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-xl shadow-slate-200/50">
+            <div class="card relative rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-xl shadow-slate-200/50">
                 {{-- Tab Pilihan Pintu Masuk: Siswa & Pembina --}}
                 <div class="grid grid-cols-2 p-1.5 mb-6 bg-slate-100 rounded-2xl text-xs sm:text-sm font-bold text-center border border-slate-200/80">
                     <a href="{{ route('siswa.login') }}" class="py-2.5 rounded-xl text-slate-600 hover:text-blue-700 hover:bg-white transition flex items-center justify-center gap-2">
@@ -134,14 +135,15 @@
 
                 <x-auth-session-status class="mb-4" :status="session('status')" />
 
-                <form method="POST" action="{{ route('pembina.login') }}" class="space-y-4" x-data="{ loading: false, showPassword: false }" @submit="loading = true">
+                <form method="POST" action="{{ route('pembina.login') }}" id="loginForm" novalidate class="space-y-4" x-data="{ loading: false, showPassword: false }" @submit="handlePembinaLoginSubmit($event, $data)">
                     @csrf
 
                     <div>
                         <x-input-label for="login" value="Username / Alamat Email" />
                         <x-text-input id="login" class="mt-1 block w-full text-sm font-medium" type="text"
-                                        name="login" :value="old('login')" required autofocus
-                                        autocomplete="username" placeholder="cth: pembina.pramuka atau email@smk.sch.id" />
+                                        name="login" :value="old('login')" autofocus
+                                        autocomplete="username" placeholder="cth: pembina.pramuka atau email@smk.sch.id"
+                                        oninput="this.classList.remove('err')" />
                         <x-input-error :messages="$errors->get('login')" class="mt-2" />
                     </div>
 
@@ -158,9 +160,9 @@
                             <input id="password"
                                    :type="showPassword ? 'text' : 'password'"
                                    name="password"
-                                   required
                                    autocomplete="current-password"
                                    placeholder="••••••••"
+                                   oninput="this.classList.remove('err')"
                                    class="block w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 pr-10 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-600/20" />
                             <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-hidden" tabindex="-1">
                                 <svg x-show="!showPassword" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -206,5 +208,109 @@
         </div>
     </div>
 </main>
+
+<script src="{{ asset('js/stempel.js') }}?v={{ filemtime(public_path('js/stempel.js')) }}"></script>
+<script>
+    function handlePembinaLoginSubmit(e, alpineData) {
+        var form = document.getElementById('loginForm');
+        var loginInput = document.getElementById('login');
+        var passwordInput = document.getElementById('password');
+        if (!form || !loginInput || !passwordInput) return;
+
+        e.preventDefault();
+
+        loginInput.classList.remove('err');
+        passwordInput.classList.remove('err');
+        void loginInput.offsetWidth;
+        void passwordInput.offsetWidth;
+
+        var loginVal = loginInput.value.trim();
+        var passwordVal = passwordInput.value;
+
+        // 1. Validasi Kolom Kosong: getar input & stempel sejenak lalu kembalikan seperti semula
+        if (!loginVal || !passwordVal) {
+            if (!loginVal) {
+                loginInput.classList.add('err');
+                loginInput.focus();
+            }
+            if (!passwordVal) {
+                passwordInput.classList.add('err');
+                if (loginVal) passwordInput.focus();
+            }
+            showToast('Wajib diisi', 'error', 2500);
+            return;
+        }
+
+        if (alpineData) alpineData.loading = true;
+
+        var formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            },
+            body: formData
+        })
+        .then(function (res) {
+            if (res.ok) {
+                return res.json().then(function (data) {
+                    // BERHASIL: Stempel hijau permanen di pojok kanan atas, JANGAN DIKEMBALIKAN
+                    showToast('Berhasil', 'success');
+                    var targetUrl = data.redirect || '{{ route('pembina.dashboard') }}';
+                    setTimeout(function () {
+                        window.location.href = targetUrl;
+                    }, 1200);
+                });
+            } else if (res.status === 422) {
+                return res.json().then(function (data) {
+                    var stampText = 'Sandi salah';
+                    if (data.errors) {
+                        if (data.errors.password && data.errors.password[0]) {
+                            passwordInput.classList.add('err');
+                            passwordInput.select();
+                            stampText = 'Sandi salah';
+                        } else if (data.errors.login && data.errors.login[0]) {
+                            var msg = data.errors.login[0];
+                            loginInput.classList.add('err');
+                            passwordInput.classList.add('err');
+                            loginInput.select();
+                            if (msg.indexOf('percobaan') !== -1) stampText = 'Coba nanti';
+                            else if (msg.indexOf('siswa') !== -1) stampText = 'Bukan staf';
+                            else stampText = 'Sandi salah';
+                        }
+                    }
+                    // ERROR: Stempel muncul, lalu KEMBALIKAN LAGI SEPERTI SEMULA
+                    showToast(stampText, 'error', 2500);
+                    if (alpineData) alpineData.loading = false;
+                });
+            } else {
+                showToast('Gagal masuk', 'error', 2500);
+                if (alpineData) alpineData.loading = false;
+            }
+        })
+        .catch(function () {
+            form.submit();
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        @if ($errors->any())
+            var loginInput = document.getElementById('login');
+            var passwordInput = document.getElementById('password');
+            if (loginInput) loginInput.classList.add('err');
+            if (passwordInput) passwordInput.classList.add('err');
+            setTimeout(function () {
+                showToast('Sandi salah', 'error', 2500);
+            }, 100);
+        @elseif (session('status'))
+            setTimeout(function () {
+                showToast('Berhasil', 'success');
+            }, 100);
+        @endif
+    });
+</script>
 </body>
 </html>
