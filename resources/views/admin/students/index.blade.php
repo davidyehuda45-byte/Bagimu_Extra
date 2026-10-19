@@ -38,6 +38,12 @@
             <span>Generate Semua Token</span>
         </button>
 
+        {{-- Tombol WA Blast Massal Fonnte --}}
+        <button type="button" onclick="openWaBlastModal('all')" class="inline-flex items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 px-3.5 py-2.5 text-xs font-bold text-emerald-800 hover:bg-emerald-100 shadow-2xs transition-all cursor-pointer" title="Kirim pesan WhatsApp massal ke siswa (WA Blast)">
+            <x-icon name="send" class="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+            <span>WA Blast</span>
+        </button>
+
         {{-- Form Input / Upload Langsung Berkas Siswa Multi-Format (Excel, CSV, PDF) --}}
         <form id="direct-student-import-form" method="POST" action="{{ route('admin.students.import.store') }}" enctype="multipart/form-data" class="inline-block m-0">
             @csrf
@@ -176,6 +182,10 @@
         </span>
     </div>
     <div class="flex items-center gap-2">
+        <button type="button" onclick="openWaBlastModal('selected')" class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-1.5 font-bold text-white hover:bg-emerald-700 transition-colors shadow-2xs cursor-pointer">
+            <x-icon name="send" class="h-3.5 w-3.5" />
+            <span>WA Blast Terpilih</span>
+        </button>
         <button type="button" onclick="confirmBulkTokenSelected()" class="inline-flex items-center gap-1.5 rounded-xl border border-blue-300 bg-white px-3 py-1.5 font-bold text-blue-700 hover:bg-blue-100 transition-colors shadow-2xs cursor-pointer">
             <x-icon name="key" class="h-3.5 w-3.5 text-blue-600" />
             <span>Generate Token Terpilih</span>
@@ -337,6 +347,147 @@
                 <x-icon name="arrow-right" class="h-3.5 w-3.5" />
             </button>
         </div>
+    </div>
+</div>
+
+{{-- Modal WA Blast Fonnte --}}
+<div id="modal-wa-blast" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs" onclick="closeWaBlastModal()"></div>
+    <div class="relative w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl text-left max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-2.5">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200">
+                    <x-icon name="send" class="h-5 w-5" />
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-900">WhatsApp Blast Massal</h3>
+                    <p class="text-xs text-slate-500">Kirim pesan WhatsApp otomatis ke siswa via Fonnte Gateway.</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeWaBlastModal()" class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer">
+                <x-icon name="x" class="h-5 w-5" />
+            </button>
+        </div>
+
+        @if (!($fonnte['connected'] ?? false))
+            <div class="mt-4 rounded-xl bg-amber-50 p-3.5 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
+                <x-icon name="alert" class="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                    <p class="font-bold">WhatsApp Gateway Belum Terhubung!</p>
+                    <p class="mt-0.5 text-amber-800 leading-relaxed">
+                        Anda belum menghubungkan Fonnte API Key. Silakan masukkan dan verifikasi token terlebih dahulu di menu Pengaturan.
+                    </p>
+                    <a href="{{ route('admin.settings.index') }}" class="mt-2 inline-flex items-center gap-1 font-bold text-blue-700 hover:underline">
+                        Buka Pengaturan Fonnte &rarr;
+                    </a>
+                </div>
+            </div>
+        @else
+            <div class="mt-3 flex items-center justify-between rounded-xl bg-emerald-50/80 p-2.5 border border-emerald-200 text-xs">
+                <span class="inline-flex items-center gap-1.5 font-semibold text-emerald-800">
+                    <span class="h-2 w-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                    Gateway: <b>{{ $fonnte['name'] ?? 'Device' }}</b> ({{ $fonnte['device'] ?? '' }})
+                </span>
+                <span class="text-[11px] text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md font-medium">Siap Kirim</span>
+            </div>
+        @endif
+
+        <form id="form-wa-blast" method="POST" action="{{ route('admin.students.wa-blast') }}" class="mt-4 space-y-3.5" onsubmit="return handleWaBlastSubmit(this)">
+            @csrf
+            {{-- Parameter filter aktif diteruskan --}}
+            <input type="hidden" name="q" id="wa-blast-q" value="{{ request('q') }}">
+            <input type="hidden" name="tingkat" id="wa-blast-tingkat" value="{{ request('tingkat') }}">
+            <input type="hidden" name="kelas" id="wa-blast-kelas" value="{{ request('kelas') }}">
+            <input type="hidden" name="jurusan" id="wa-blast-jurusan" value="{{ request('jurusan') }}">
+            <input type="hidden" name="status" id="wa-blast-status" value="{{ request('status') }}">
+            <input type="hidden" name="eskul_status" id="wa-blast-eskul-status" value="{{ request('eskul_status') }}">
+
+            {{-- Hidden inputs untuk selected student IDs --}}
+            <div id="blast-selected-ids-container"></div>
+
+            {{-- Target Mode --}}
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Target Penerima</label>
+                <div class="space-y-2">
+                    <label class="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                        <input type="radio" name="mode" id="blast-mode-all" value="all" checked class="mt-0.5 text-emerald-600 focus:ring-emerald-500">
+                        <div class="text-xs">
+                            <span class="font-bold text-slate-800">Semua Siswa dengan Nomor WA Terdaftar</span>
+                            <span class="block text-[11px] text-slate-500 mt-0.5">Total saat ini: <b>{{ $totalWaStudents ?? 0 }}</b> siswa aktif ber-nomor WA.</span>
+                        </div>
+                    </label>
+
+                    <label class="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                        <input type="radio" name="mode" id="blast-mode-selected" value="selected" class="mt-0.5 text-emerald-600 focus:ring-emerald-500">
+                        <div class="text-xs">
+                            <span class="font-bold text-slate-800">Hanya Siswa yang Dipilih (Checkbox)</span>
+                            <span class="block text-[11px] text-slate-500 mt-0.5"><span id="blast-modal-selected-count">0</span> siswa saat ini dicentang di tabel.</span>
+                        </div>
+                    </label>
+
+                    <label class="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                        <input type="radio" name="mode" id="blast-mode-untokenized" value="untokenized" class="mt-0.5 text-emerald-600 focus:ring-emerald-500">
+                        <div class="text-xs">
+                            <span class="font-bold text-slate-800">Siswa yang Belum Memiliki Token Login</span>
+                            <span class="block text-[11px] text-slate-500 mt-0.5">Sistem akan otomatis menerbitkan token lalu mengirimkannya via WhatsApp.</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            {{-- Pilihan Template Pesan --}}
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Template Pesan</label>
+                <div class="flex flex-wrap gap-1.5 mb-2">
+                    <button type="button" onclick="setWaTemplate('token')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition cursor-pointer">
+                        🔑 Kredensial Token Login
+                    </button>
+                    <button type="button" onclick="setWaTemplate('pengumuman')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition cursor-pointer">
+                        📢 Pembukaan Pendaftaran
+                    </button>
+                    <button type="button" onclick="setWaTemplate('custom')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition cursor-pointer">
+                        ✏️ Pesan Kustom
+                    </button>
+                </div>
+
+                {{-- Tag variabel yang bisa disisipkan --}}
+                <div class="flex flex-wrap items-center gap-1 text-[11px] text-slate-500 mb-1.5">
+                    <span class="font-semibold text-slate-600">Sisipkan variabel:</span>
+                    <button type="button" onclick="insertWaTag('{nama}')" class="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-[10px] cursor-pointer">{nama}</button>
+                    <button type="button" onclick="insertWaTag('{token}')" class="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-[10px] cursor-pointer">{token}</button>
+                    <button type="button" onclick="insertWaTag('{nis}')" class="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-[10px] cursor-pointer">{nis}</button>
+                    <button type="button" onclick="insertWaTag('{kelas}')" class="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-[10px] cursor-pointer">{kelas}</button>
+                    <button type="button" onclick="insertWaTag('{link}')" class="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-[10px] cursor-pointer">{link}</button>
+                </div>
+
+                <textarea 
+                    name="pesan" 
+                    id="wa-blast-message-input" 
+                    rows="5" 
+                    required 
+                    oninput="updateWaBlastPreview()"
+                    placeholder="Tuliskan isi pesan WhatsApp di sini..."
+                    class="w-full border-slate-300 rounded-xl text-xs sm:text-sm font-sans focus:border-emerald-500 focus:ring-emerald-500 leading-relaxed"></textarea>
+            </div>
+
+            {{-- Live Preview Tampilan Pesan --}}
+            <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Pratinjau Pesan yang Diterima Siswa:</label>
+                <div class="rounded-xl border border-emerald-200 bg-[#eef7ee] p-3 text-xs text-slate-800 whitespace-pre-wrap font-sans shadow-xs leading-relaxed" id="wa-blast-preview-box">
+                    (Pratinjau pesan akan muncul di sini...)
+                </div>
+            </div>
+
+            <div class="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
+                <button type="button" onclick="closeWaBlastModal()" class="rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer">
+                    Batal
+                </button>
+                <button type="submit" id="btn-submit-wa-blast" {{ !($fonnte['connected'] ?? false) ? 'disabled' : '' }} class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+                    <x-icon name="send" class="h-3.5 w-3.5" />
+                    <span>Mulai Kirim WA Blast</span>
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -734,6 +885,116 @@ function handleDirectStudentUpload(input) {
         btn.innerHTML = `<svg class="animate-spin h-3.5 w-3.5 text-blue-600 inline mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Mengimpor ${file.name}...`;
     }
     document.getElementById('direct-student-import-form').submit();
+}
+
+const WA_TEMPLATES = {
+    token: "Halo {nama} ({kelas}),\nBerikut adalah kredensial akun kamu untuk Sistem Ekstrakurikuler SMK Bagimu Negeriku:\n\n*Token Login: {token}*\nNIS: {nis}\n\nSilakan buka tautan berikut untuk memilih ekstrakurikuler:\n{link}\n\nSimpan pesan ini dengan baik. Terima kasih!",
+    pengumuman: "Halo {nama} ({kelas}),\nPemberitahuan resmi: Pendaftaran kegiatan ekstrakurikuler SMK Bagimu Negeriku untuk periode baru telah dibuka!\n\nSilakan segera login ke sistem melalui tautan di bawah dan tentukan pilihan eskul terbaikmu:\n{link}\n\nJangan sampai terlambat ya!",
+    custom: "Halo {nama},\n\n[Tuliskan pengumuman atau instruksi Anda di sini]\n\nSalam,\nPengurus Ekstrakurikuler SMK Bagimu Negeriku"
+};
+
+function openWaBlastModal(mode = 'all') {
+    const modal = document.getElementById('modal-wa-blast');
+    if (!modal) return;
+
+    const selectedCheckboxes = document.querySelectorAll('.student-checkbox:checked');
+    const countSpan = document.getElementById('blast-modal-selected-count');
+    if (countSpan) countSpan.textContent = selectedCheckboxes.length;
+
+    if (mode === 'selected') {
+        const rad = document.getElementById('blast-mode-selected');
+        if (rad) rad.checked = true;
+    } else {
+        const rad = document.getElementById('blast-mode-all');
+        if (rad) rad.checked = true;
+    }
+
+    const container = document.getElementById('blast-selected-ids-container');
+    if (container) {
+        container.innerHTML = '';
+        selectedCheckboxes.forEach(cb => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'ids[]';
+            input.value = cb.value;
+            container.appendChild(input);
+        });
+    }
+
+    const textarea = document.getElementById('wa-blast-message-input');
+    if (textarea && !textarea.value.trim()) {
+        textarea.value = WA_TEMPLATES.token;
+    }
+    updateWaBlastPreview();
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeWaBlastModal() {
+    const modal = document.getElementById('modal-wa-blast');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
+
+function setWaTemplate(type) {
+    const textarea = document.getElementById('wa-blast-message-input');
+    if (textarea && WA_TEMPLATES[type]) {
+        textarea.value = WA_TEMPLATES[type];
+        updateWaBlastPreview();
+    }
+}
+
+function insertWaTag(tag) {
+    const textarea = document.getElementById('wa-blast-message-input');
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const val = textarea.value;
+    textarea.value = val.substring(0, start) + tag + val.substring(end);
+    textarea.focus();
+    textarea.selectionStart = textarea.selectionEnd = start + tag.length;
+    updateWaBlastPreview();
+}
+
+function updateWaBlastPreview() {
+    const textarea = document.getElementById('wa-blast-message-input');
+    const previewBox = document.getElementById('wa-blast-preview-box');
+    if (!textarea || !previewBox) return;
+
+    let text = textarea.value;
+    text = text.replace(/\{nama\}/g, 'Budi Santoso')
+               .replace(/\{nis\}/g, '10234')
+               .replace(/\{nisn\}/g, '0081234567')
+               .replace(/\{kelas\}/g, '10 RPL 1')
+               .replace(/\{token\}/g, 'K7X9PQ')
+               .replace(/\{link\}/g, window.location.origin + '/siswa/login')
+               .replace(/\{aplikasi\}/g, 'Bagimu Extra');
+
+    previewBox.textContent = text || '(Pratinjau pesan akan muncul di sini...)';
+}
+
+function handleWaBlastSubmit(form) {
+    const mode = form.querySelector('input[name="mode"]:checked')?.value || 'all';
+    const selectedCount = document.querySelectorAll('.student-checkbox:checked').length;
+    
+    if (mode === 'selected' && selectedCount === 0) {
+        alert('Pilih minimal satu data siswa pada tabel dengan mencentang checkbox.');
+        return false;
+    }
+
+    if (!confirm('Apakah Anda yakin ingin memulai pengiriman WhatsApp Blast ini sekarang?')) {
+        return false;
+    }
+
+    const btn = document.getElementById('btn-submit-wa-blast');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<svg class="animate-spin h-3.5 w-3.5 text-white inline mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Mengirim WA Blast...`;
+    }
+    return true;
 }
 </script>
 @endsection

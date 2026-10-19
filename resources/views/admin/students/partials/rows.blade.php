@@ -7,17 +7,34 @@
         <td class="py-3 px-3 font-mono text-xs text-slate-500">{{ $s->nisn ?? '—' }}</td>
         <td class="py-3 px-3">
             <div class="font-medium text-slate-800">{{ $s->nama }}</div>
-            @php $reg = $s->user?->registrations?->first(); @endphp
-            @if ($reg)
-                <div class="flex items-center gap-1 mt-0.5">
+            @php
+                $reg = $s->user?->registrations?->first();
+                $waNum = $s->whatsapp ?: ($s->wali_kontak ?: ($reg?->whatsapp ?? ''));
+            @endphp
+            <div class="flex flex-wrap items-center gap-1.5 mt-1">
+                @if ($waNum)
+                    <a href="https://wa.me/{{ \App\Support\Whatsapp::normalize($waNum) }}" target="_blank" rel="noopener noreferrer"
+                       class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
+                       title="Buka Chat WhatsApp">
+                        <x-icon name="phone" class="h-3 w-3 text-emerald-500" />
+                        <span>{{ $waNum }}</span>
+                    </a>
+                @else
+                    <span class="inline-flex items-center gap-1 text-[11px] text-slate-400" title="Nomor WA belum diisi">
+                        <x-icon name="phone" class="h-3 w-3 text-slate-300" />
+                        <span>Belum ada WA</span>
+                    </span>
+                @endif
+                <span class="text-slate-300 text-[10px]">•</span>
+                @if ($reg)
                     <span class="inline-flex items-center gap-1 rounded-md bg-blue-50 text-blue-800 border border-blue-200/70 px-1.5 py-0.5 text-[10px] font-bold">
                         <x-icon name="trophy" class="h-2.5 w-2.5 text-blue-600" />
                         <span>{{ $reg->eskul_utama }}</span>
                     </span>
-                </div>
-            @else
-                <span class="inline-block text-[10px] text-amber-600 font-medium mt-0.5 italic">Belum mendaftar eskul</span>
-            @endif
+                @else
+                    <span class="inline-block text-[10px] text-amber-600 font-medium italic">Belum mendaftar eskul</span>
+                @endif
+            </div>
         </td>
         <td class="py-3 px-3">
             <span class="inline-flex items-center rounded-lg bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 border border-blue-200/80 font-mono">{{ $s->kelas }}</span>

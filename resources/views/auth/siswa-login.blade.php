@@ -133,13 +133,26 @@
                     <p class="mt-1 text-xs sm:text-sm text-slate-500">Gunakan NIS dan Token 8 digit yang tertera di kartu pelajar Anda.</p>
                 </div>
 
+                @if (session('error'))
+                    <div class="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-xs font-semibold text-rose-800 flex items-start gap-2">
+                        <svg class="h-4 w-4 shrink-0 text-rose-600 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <span>{{ session('error') }}</span>
+                    </div>
+                @endif
+                @if (session('status'))
+                    <div class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 text-xs font-semibold text-emerald-800 flex items-start gap-2">
+                        <svg class="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        <span>{{ session('status') }}</span>
+                    </div>
+                @endif
+
                 <form method="POST" action="{{ route('siswa.login') }}" id="loginForm" novalidate class="space-y-4" x-data="{ loading: false, showToken: false }" @submit="handleSiswaLoginSubmit($event, $data)">
                     @csrf
 
                     <div>
                         <x-input-label for="nis" value="Nomor Induk Siswa (NIS)" />
                         <x-text-input id="nis" class="mt-1 block w-full text-base tracking-wider font-semibold placeholder:font-normal placeholder:tracking-normal" type="text"
-                                        inputmode="numeric" autocomplete="username" name="nis" :value="old('nis')"
+                                        inputmode="numeric" autocomplete="username" name="nis" :value="old('nis', $initialNis ?? request('nis', ''))"
                                         autofocus placeholder="cth: 10001" oninput="this.classList.remove('err')" />
                         <x-input-error :messages="$errors->get('nis')" class="mt-2" />
                     </div>
@@ -288,7 +301,17 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        @if ($errors->any())
+        @php
+            $stampMsg = 'Sandi salah';
+            if (session('error')) {
+                if (str_contains((string) session('error'), 'hangus')) {
+                    $stampMsg = 'Token hangus';
+                } elseif (str_contains((string) session('error'), 'terkunci')) {
+                    $stampMsg = 'Data terkunci';
+                }
+            }
+        @endphp
+        @if ($errors->any() || session('error'))
             var tokenInput = document.getElementById('token');
             var nisInput = document.getElementById('nis');
             @if ($errors->has('token'))
@@ -304,7 +327,7 @@
                 }
             @endif
             setTimeout(function () {
-                showToast('Sandi salah', 'error', 2500);
+                showToast('{{ $stampMsg }}', 'error', 2500);
             }, 100);
         @elseif (session('status'))
             setTimeout(function () {

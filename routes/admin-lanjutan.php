@@ -65,6 +65,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('settings/mfa', [SettingController::class, 'mfaGenerate'])->name('settings.mfa');
     Route::post('settings/mfa/confirm', [SettingController::class, 'mfaConfirm'])->name('settings.mfa.confirm');
     Route::post('settings/mfa/disable', [SettingController::class, 'mfaDisable'])->name('settings.mfa.disable');
+    Route::post('settings/fonnte/check', [SettingController::class, 'checkFonnte'])->name('settings.fonnte.check');
+    Route::post('settings/fonnte/save', [SettingController::class, 'saveFonnte'])->name('settings.fonnte.save');
+    Route::post('settings/fonnte/disconnect', [SettingController::class, 'disconnectFonnte'])->name('settings.fonnte.disconnect');
     });
 });
 

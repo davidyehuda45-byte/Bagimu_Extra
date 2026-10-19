@@ -47,6 +47,11 @@ Route::middleware('guest')->group(function () {
     Route::post('siswa/login', [SiswaLoginController::class, 'store'])
         ->middleware([\App\Http\Middleware\MaintenanceMode::class, 'throttle:10,1']);
 
+    // Direct / Magic Login siswa via link WA (sekali klik langsung login ke pilih eskul)
+    Route::get('siswa/masuk', [SiswaLoginController::class, 'directLogin'])
+        ->middleware([\App\Http\Middleware\MaintenanceMode::class, 'throttle:15,1'])
+        ->name('siswa.direct-login');
+
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
 
