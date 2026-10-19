@@ -6,9 +6,21 @@
    - Jika berhasil: stempel hijau permanen, jangan dikembalikan.
    ========================================================== */
 
+var _stempelTimer = null;
+var _stempelRemoveTimer = null;
+
 function showToast(message, type, duration) {
   type = type || "error";
   duration = duration || 2500;
+
+  if (_stempelTimer) {
+    clearTimeout(_stempelTimer);
+    _stempelTimer = null;
+  }
+  if (_stempelRemoveTimer) {
+    clearTimeout(_stempelRemoveTimer);
+    _stempelRemoveTimer = null;
+  }
 
   var card = document.querySelector(".card");
   var box = document.getElementById("toastContainer");
@@ -43,9 +55,9 @@ function showToast(message, type, duration) {
 
   // Jika error: kembalikan lagi seperti semula setelah durasi selesai
   if (type !== "success") {
-    setTimeout(function() {
+    _stempelTimer = setTimeout(function() {
       t.classList.add("hide");
-      setTimeout(function() {
+      _stempelRemoveTimer = setTimeout(function() {
         t.remove();
         // Kembalikan form seperti semula: bersihkan indikator err
         document.querySelectorAll("input.err").forEach(function(el) {

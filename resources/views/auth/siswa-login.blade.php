@@ -133,14 +133,14 @@
                     <p class="mt-1 text-xs sm:text-sm text-slate-500">Gunakan NIS dan Token 8 digit yang tertera di kartu pelajar Anda.</p>
                 </div>
 
-                <form method="POST" action="{{ route('siswa.login') }}" id="loginForm" class="space-y-4" x-data="{ loading: false, showToken: false }" @submit="handleSiswaLoginSubmit($event, $data)">
+                <form method="POST" action="{{ route('siswa.login') }}" id="loginForm" novalidate class="space-y-4" x-data="{ loading: false, showToken: false }" @submit="handleSiswaLoginSubmit($event, $data)">
                     @csrf
 
                     <div>
                         <x-input-label for="nis" value="Nomor Induk Siswa (NIS)" />
                         <x-text-input id="nis" class="mt-1 block w-full text-base tracking-wider font-semibold placeholder:font-normal placeholder:tracking-normal" type="text"
                                         inputmode="numeric" autocomplete="username" name="nis" :value="old('nis')"
-                                        required autofocus placeholder="cth: 10001" oninput="this.classList.remove('err')" />
+                                        autofocus placeholder="cth: 10001" oninput="this.classList.remove('err')" />
                         <x-input-error :messages="$errors->get('nis')" class="mt-2" />
                     </div>
 
@@ -153,7 +153,6 @@
                             <input id="token"
                                    :type="showToken ? 'text' : 'password'"
                                    name="token"
-                                   required
                                    maxlength="100"
                                    autocomplete="current-password"
                                    placeholder="••••••••"
@@ -213,6 +212,7 @@
 
         nisInput.classList.remove('err');
         tokenInput.classList.remove('err');
+        void nisInput.offsetWidth;
         void tokenInput.offsetWidth;
 
         var nisVal = nisInput.value.trim();
@@ -220,8 +220,14 @@
 
         // 1. Validasi Kolom Kosong: getar input & stempel sejenak lalu kembalikan seperti semula
         if (!nisVal || !tokenVal) {
-            if (!nisVal) nisInput.classList.add('err');
-            if (!tokenVal) tokenInput.classList.add('err');
+            if (!nisVal) {
+                nisInput.classList.add('err');
+                nisInput.focus();
+            }
+            if (!tokenVal) {
+                tokenInput.classList.add('err');
+                if (nisVal) tokenInput.focus();
+            }
             showToast('Wajib diisi', 'error', 2500);
             return;
         }
