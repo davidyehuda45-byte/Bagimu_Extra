@@ -58,17 +58,20 @@ class KehadiranController extends Controller
                 continue;
             }
 
-            Kehadiran::updateOrCreate(
-                [
+            if ($existing) {
+                $existing->update([
+                    'status' => $status,
+                    'keterangan' => $data['keterangan'][$registrationId] ?? null,
+                ]);
+            } else {
+                Kehadiran::create([
                     'eskul_id' => $eskul->id,
                     'registration_id' => $registrationId,
                     'tanggal' => $data['tanggal'],
-                ],
-                [
                     'status' => $status,
                     'keterangan' => $data['keterangan'][$registrationId] ?? null,
-                ]
-            );
+                ]);
+            }
             $disimpan++;
         }
 

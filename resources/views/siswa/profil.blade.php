@@ -79,35 +79,12 @@
         </form>
     </div>
 
-    {{-- Password --}}
+    {{-- Info Keamanan & Akses --}}
     <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 class="font-bold text-slate-900">{{ $user->password_set_at ? 'Ganti Password' : 'Atur Password' }}</h2>
-        @if (!$user->password_set_at)
-            <p class="mt-1 text-sm text-slate-500">Belum punya password. Atur di sini untuk login alternatif pakai NIS + password.</p>
-        @endif
-        <form method="POST" action="{{ route('siswa.profil.password') }}" class="mt-3 space-y-3">
-            @csrf
-            @if ($user->password_set_at)
-                <div>
-                    <label for="current_password" class="block text-sm font-medium text-slate-700">Password Lama</label>
-                    <input id="current_password" name="current_password" type="password" required autocomplete="current-password"
-                           class="mt-1 block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                </div>
-            @endif
-            <div>
-                <label for="password" class="block text-sm font-medium text-slate-700">Password Baru (min. 8)</label>
-                <input id="password" name="password" type="password" required minlength="8" autocomplete="new-password"
-                       class="mt-1 block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-            <div>
-                <label for="password_confirmation" class="block text-sm font-medium text-slate-700">Konfirmasi Password Baru</label>
-                <input id="password_confirmation" name="password_confirmation" type="password" required autocomplete="new-password"
-                       class="mt-1 block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-            <button class="w-full rounded-xl bg-blue-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-800">
-                {{ $user->password_set_at ? 'Ganti Password' : 'Simpan Password' }}
-            </button>
-        </form>
+        <h2 class="font-bold text-slate-900">Akses &amp; Keamanan Akun</h2>
+        <p class="mt-1 text-sm text-slate-600 leading-relaxed">
+            Akun siswa menggunakan <b>Token Sekali Pakai</b> dari kartu pelajar untuk melakukan pendaftaran ekstrakurikuler. Setelah pendaftaran selesai, data terkunci demi menjaga integritas data Anda. Siswa tidak memerlukan pengaturan kata sandi mandiri.
+        </p>
     </div>
 
     {{-- Notifikasi --}}
