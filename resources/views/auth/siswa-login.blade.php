@@ -42,14 +42,14 @@
         </div>
 
         {{-- Header Sekolah --}}
-        <div class="relative z-10 flex items-center gap-3.5">
-            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 border border-white/20 p-1.5 backdrop-blur-xs shadow-xs">
-                <x-school-logo :size="38" />
+        <div class="relative z-10 flex items-center gap-4">
+            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white/15 border border-white/25 p-2 backdrop-blur-xs shadow-md">
+                <x-school-logo :size="52" />
             </div>
             <div>
-                <p class="text-base font-extrabold tracking-tight text-white leading-tight">{{ config('app.name', 'Bagimu Extra') }}</p>
-                <p class="text-xs font-semibold text-blue-100">{{ $sekolah }}</p>
-                <p class="text-[11px] font-medium text-blue-200/90 mt-0.5">4B Berbudi • Berkualitas • Berdaya • Berhasil</p>
+                <p class="text-lg xl:text-xl font-black tracking-tight text-white leading-tight">{{ config('app.name', 'Bagimu Extra') }}</p>
+                <p class="text-xs sm:text-sm font-bold text-blue-100 tracking-wide mt-0.5">{{ $sekolah }}</p>
+                <p class="text-xs font-medium text-blue-200/95 mt-1 tracking-wide">4B Berbudi • Berkualitas • Berdaya • Berhasil</p>
             </div>
         </div>
 
@@ -104,14 +104,14 @@
     <div class="relative flex w-full items-center justify-center bg-slate-50/70 px-4 py-12 lg:w-1/2">
         <div class="relative z-10 w-full max-w-md">
             {{-- Mobile Logo --}}
-            <div class="mb-6 flex items-center gap-3 lg:hidden">
-                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 border border-blue-100 p-1 shadow-xs">
-                    <x-school-logo :size="36" />
+            <div class="mb-6 flex items-center gap-3.5 lg:hidden">
+                <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-50 border border-blue-100 p-1.5 shadow-xs">
+                    <x-school-logo :size="44" />
                 </div>
                 <div>
-                    <p class="font-bold text-slate-900 leading-tight">{{ config('app.name', 'Bagimu Extra') }}</p>
-                    <p class="text-xs text-slate-500">{{ $sekolah }}</p>
-                    <p class="text-[10px] text-blue-600 font-medium">4B Berbudi • Berkualitas • Berdaya • Berhasil</p>
+                    <p class="text-base sm:text-lg font-extrabold text-slate-900 leading-tight">{{ config('app.name', 'Bagimu Extra') }}</p>
+                    <p class="text-xs sm:text-sm font-semibold text-slate-600 mt-0.5">{{ $sekolah }}</p>
+                    <p class="text-[11px] sm:text-xs font-medium text-blue-600 mt-0.5 tracking-wide">4B Berbudi • Berkualitas • Berdaya • Berhasil</p>
                 </div>
             </div>
 
