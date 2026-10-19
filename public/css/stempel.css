@@ -18,20 +18,20 @@ input.err {
   75% { transform: translateX(6px); }
 }
 
-/* --- Stempel di Pojok Kanan Atas --- */
+/* --- Stempel di Pojok Kanan Atas (Digeser ke atas agar tidak menutupi tulisan Pembina) --- */
 .toast-container {
   position: absolute;
-  top: -24px;
-  right: -20px;
+  top: -85px;
+  right: -10px;
   z-index: 50;
   pointer-events: none;
 }
 .toast {
   position: relative;
-  width: 155px;
-  height: 155px;
+  width: 135px;
+  height: 135px;
   color: #1d4ed8;
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: .05em;
   line-height: 1.1;
@@ -82,7 +82,7 @@ input.err {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 110px;
+  width: 95px;
   transform: translate(-50%,-50%);
   display: flex;
   flex-direction: column;
@@ -150,16 +150,16 @@ input.err {
 
 @media (max-width: 640px) {
   .toast-container {
-    top: -16px;
-    right: -8px;
+    top: -65px;
+    right: -6px;
   }
   .toast {
-    width: 130px;
-    height: 130px;
-    font-size: 15px;
+    width: 120px;
+    height: 120px;
+    font-size: 14px;
   }
   .toast span {
-    width: 95px;
+    width: 85px;
   }
 }
 
