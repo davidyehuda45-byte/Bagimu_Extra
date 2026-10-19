@@ -18,11 +18,11 @@ input.err {
   75% { transform: translateX(6px); }
 }
 
-/* --- Stempel di Pojok Kanan Atas (Digeser ke atas-kanan agar tombol Pembina tidak tertutup) --- */
+/* --- Stempel di Pojok Kanan Atas Kartu Login --- */
 .toast-container {
   position: absolute;
-  top: -105px;
-  right: -28px;
+  top: -45px;
+  right: -20px;
   z-index: 50;
   pointer-events: none;
 }
@@ -146,8 +146,8 @@ input.err {
 
 @media (max-width: 640px) {
   .toast-container {
-    top: -85px;
-    right: -18px;
+    top: -35px;
+    right: -10px;
   }
   .toast {
     width: 110px;

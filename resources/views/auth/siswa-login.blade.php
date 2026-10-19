@@ -126,18 +126,6 @@
             </div>
 
             <div class="card relative rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-xl shadow-slate-200/50">
-                {{-- Tab Pilihan Pintu Masuk: Siswa & Pembina --}}
-                <div class="grid grid-cols-2 p-1.5 mb-6 bg-slate-100 rounded-2xl text-xs sm:text-sm font-bold text-center border border-slate-200/80">
-                    <div class="py-2.5 rounded-xl bg-blue-600 text-white shadow-xs flex items-center justify-center gap-2">
-                        <x-icon name="user" class="h-4 w-4" />
-                        <span>Siswa</span>
-                    </div>
-                    <a href="{{ route('pembina.login') }}" class="py-2.5 rounded-xl text-slate-600 hover:text-blue-700 hover:bg-white transition flex items-center justify-center gap-2">
-                        <x-icon name="user-group" class="h-4 w-4" />
-                        <span>Pembina</span>
-                    </a>
-                </div>
-
                 <div class="mb-5">
                     <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10 mb-2.5">
                         <x-icon name="user" class="h-3.5 w-3.5" /> Portal Siswa
@@ -210,6 +198,7 @@
 
                     <div class="mt-5 space-y-2 border-t border-slate-100 pt-4 text-center text-xs text-slate-500">
                         <p class="text-slate-400">Lupa token? Hubungi <span class="font-medium text-slate-600">admin/wali kelas</span> anda.</p>
+                        <p class="text-slate-500">Bukan siswa? <a href="{{ route('pembina.login') }}" class="font-semibold text-blue-600 hover:text-blue-700 hover:underline">Masuk sebagai Pembina / Guru &rarr;</a></p>
                         <div class="pt-1">
                             <a href="{{ route('home') }}" class="font-medium text-slate-600 hover:text-blue-700 hover:underline">
                                 &larr; Kembali ke Beranda
