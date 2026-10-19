@@ -10,7 +10,6 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" /></noscript>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="{{ asset('css/stempel.css') }}">
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
 @php($sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra')))
@@ -100,7 +99,7 @@
     </div>
 
     {{-- Panel Form Kanan - Latar Bersih Cerah Sesuai Mockup --}}
-    <div class="relative flex w-full items-center justify-center bg-slate-50/70 px-4 pt-28 pb-12 sm:pt-32 lg:w-1/2">
+    <div class="relative flex w-full items-center justify-center bg-slate-50/70 px-4 py-12 lg:w-1/2">
         <div class="relative z-10 w-full max-w-md">
             {{-- Mobile Logo --}}
             <div class="mb-6 flex items-center gap-3.5 lg:hidden">
@@ -112,7 +111,7 @@
                 </div>
             </div>
 
-            <div class="card relative rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-xl shadow-slate-200/50">
+            <div class="rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-xl shadow-slate-200/50">
                 {{-- Tab Pilihan Pintu Masuk: Siswa & Pembina --}}
                 <div class="grid grid-cols-2 p-1.5 mb-6 bg-slate-100 rounded-2xl text-xs sm:text-sm font-bold text-center border border-slate-200/80">
                     <div class="py-2.5 rounded-xl bg-blue-600 text-white shadow-xs flex items-center justify-center gap-2">
@@ -133,14 +132,14 @@
                     <p class="mt-1 text-xs sm:text-sm text-slate-500">Gunakan NIS dan Token 8 digit yang tertera di kartu pelajar Anda.</p>
                 </div>
 
-                <form method="POST" action="{{ route('siswa.login') }}" id="loginForm" class="space-y-4" x-data="{ loading: false, showToken: false }" @submit="if (!validateSiswaLogin($event, $data)) { loading = false; } else { loading = true; }">
+                <form method="POST" action="{{ route('siswa.login') }}" class="space-y-4" x-data="{ loading: false, showToken: false }" @submit="loading = true">
                     @csrf
 
                     <div>
                         <x-input-label for="nis" value="Nomor Induk Siswa (NIS)" />
                         <x-text-input id="nis" class="mt-1 block w-full text-base tracking-wider font-semibold placeholder:font-normal placeholder:tracking-normal" type="text"
                                         inputmode="numeric" autocomplete="username" name="nis" :value="old('nis')"
-                                        required autofocus placeholder="cth: 10001" oninput="this.classList.remove('err')" />
+                                        required autofocus placeholder="cth: 10001" />
                         <x-input-error :messages="$errors->get('nis')" class="mt-2" />
                     </div>
 
@@ -157,7 +156,6 @@
                                    maxlength="100"
                                    autocomplete="current-password"
                                    placeholder="••••••••"
-                                   oninput="this.classList.remove('err')"
                                    class="block w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 pr-10 text-base font-semibold tracking-wider text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal placeholder:font-normal focus:border-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-600/20" />
                             <button type="button" @click="showToken = !showToken" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-hidden" tabindex="-1">
                                 <svg x-show="!showToken" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -200,75 +198,5 @@
         </div>
     </div>
 </main>
-
-<script src="{{ asset('js/stempel.js') }}"></script>
-<script>
-    function validateSiswaLogin(e, alpineData) {
-        var nisInput = document.getElementById('nis');
-        var tokenInput = document.getElementById('token');
-        if (!nisInput || !tokenInput) return true;
-
-        nisInput.classList.remove('err');
-        tokenInput.classList.remove('err');
-
-        var n = nisInput.value.trim();
-        var t = tokenInput.value.trim();
-
-        if (!n || !t) {
-            e.preventDefault();
-            if (alpineData) alpineData.loading = false;
-            void tokenInput.offsetWidth;
-            showToast('Wajib diisi');
-            if (!n) nisInput.classList.add('err');
-            if (!t) tokenInput.classList.add('err');
-            return false;
-        }
-        return true;
-    }
-
-    @php
-        $tokenErr = $errors->first('token');
-        $stampText = 'Sandi salah';
-        if ($tokenErr) {
-            if (stripos($tokenErr, 'hangus') !== false) {
-                $stampText = 'Token hangus';
-            } elseif (stripos($tokenErr, 'terkunci') !== false) {
-                $stampText = 'Data terkunci';
-            } elseif (stripos($tokenErr, 'percobaan') !== false) {
-                $stampText = 'Coba nanti';
-            }
-        } elseif ($errors->has('nis')) {
-            $stampText = 'NIS salah';
-        } else {
-            $stampText = 'Gagal masuk';
-        }
-    @endphp
-
-    document.addEventListener('DOMContentLoaded', function () {
-        @if ($errors->any())
-            var tokenInput = document.getElementById('token');
-            var nisInput = document.getElementById('nis');
-            @if ($errors->has('token'))
-                if (tokenInput) {
-                    tokenInput.classList.add('err');
-                    tokenInput.select();
-                }
-            @endif
-            @if ($errors->has('nis'))
-                if (nisInput) {
-                    nisInput.classList.add('err');
-                    nisInput.select();
-                }
-            @endif
-            setTimeout(function () {
-                showToast(@json($stampText), 'error');
-            }, 100);
-        @elseif (session('status'))
-            setTimeout(function () {
-                showToast('Berhasil', 'success');
-            }, 100);
-        @endif
-    });
-</script>
 </body>
 </html>
