@@ -301,7 +301,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        @php
+        <?php
             $stampMsg = 'Sandi salah';
             if (session('error')) {
                 if (str_contains((string) session('error'), 'hangus')) {
@@ -310,7 +310,7 @@
                     $stampMsg = 'Data terkunci';
                 }
             }
-        @endphp
+        ?>
         @if ($errors->any() || session('error'))
             var tokenInput = document.getElementById('token');
             var nisInput = document.getElementById('nis');
