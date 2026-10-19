@@ -43,9 +43,7 @@
 
         {{-- Header Sekolah --}}
         <div class="relative z-10 flex items-center gap-4">
-            <div class="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-2xl bg-white/15 border border-white/25 p-2 backdrop-blur-xs shadow-md">
-                <x-school-logo :size="58" />
-            </div>
+            <x-school-logo :size="68" class="shadow-lg ring-4 ring-white/20" />
             <div>
                 <p class="text-xl xl:text-2xl font-black tracking-tight text-white leading-tight">{{ config('app.name', 'Bagimu Extra') }}</p>
                 <p class="text-xs sm:text-sm font-bold text-blue-100 tracking-wide mt-0.5">{{ $sekolah }}</p>
@@ -105,9 +103,7 @@
         <div class="relative z-10 w-full max-w-md">
             {{-- Mobile Logo --}}
             <div class="mb-6 flex items-center gap-3.5 lg:hidden">
-                <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-50 border border-blue-100 p-1.5 shadow-xs">
-                    <x-school-logo :size="44" />
-                </div>
+                <x-school-logo :size="52" class="shadow-sm" />
                 <div>
                     <p class="text-base sm:text-lg font-extrabold text-slate-900 leading-tight">{{ config('app.name', 'Bagimu Extra') }}</p>
                     <p class="text-xs sm:text-sm font-semibold text-slate-600 mt-0.5">{{ $sekolah }}</p>
