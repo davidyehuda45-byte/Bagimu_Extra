@@ -81,25 +81,26 @@
                 Jelajahi beragam kegiatan ekstrakurikuler unggulan, periksa jadwal latihan mingguan, dan lakukan pendaftaran langsung menggunakan NIS dan token kartu pelajar dari ponsel Anda.
             </p>
 
-            <div class="mt-8 flex flex-wrap items-center gap-3">
+            <div class="mt-8 flex flex-wrap items-center gap-3.5">
                 @if (auth()->check())
-                    <a href="{{ url('/dashboard') }}" class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-blue-700 hover:bg-blue-50 transition shadow-sm">
+                    <a href="{{ url('/dashboard') }}" class="group inline-flex h-12 items-center gap-2.5 rounded-2xl border border-transparent bg-white px-6 text-sm font-bold text-blue-700 shadow-md shadow-blue-950/20 hover:bg-blue-50/95 hover:shadow-lg active:scale-[0.98] transition-all duration-150">
+                        <x-icon name="home" class="h-4 w-4 text-blue-600 shrink-0 transition-transform group-hover:scale-110" />
                         <span>Buka Dashboard</span>
-                        <x-icon name="arrow-right" class="h-4 w-4" />
+                        <x-icon name="arrow-right" class="h-3.5 w-3.5 text-blue-500 shrink-0 transition-transform group-hover:translate-x-0.5" />
                     </a>
                 @else
-                    <a href="{{ route('siswa.login') }}" class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-blue-700 hover:bg-blue-50 transition shadow-sm">
-                        <x-icon name="user" class="h-4 w-4 text-blue-600" />
+                    <a href="{{ route('siswa.login') }}" class="group inline-flex h-12 items-center gap-2.5 rounded-2xl border border-transparent bg-white px-5 sm:px-6 text-sm font-bold text-blue-700 shadow-md shadow-blue-950/20 hover:bg-blue-50/95 hover:shadow-lg active:scale-[0.98] transition-all duration-150">
+                        <x-icon name="user" class="h-4 w-4 text-blue-600 shrink-0 transition-transform group-hover:scale-110" />
                         <span>Masuk Siswa (NIS + Token)</span>
                     </a>
-                    <a href="{{ route('pembina.login') }}" class="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-semibold text-white hover:bg-white/20 transition">
+                    <a href="{{ route('pembina.login') }}" class="group inline-flex h-12 items-center gap-2.5 rounded-2xl border border-white/35 bg-white/15 backdrop-blur-md px-5 sm:px-6 text-sm font-bold text-white shadow-xs hover:bg-white/25 hover:border-white/50 active:scale-[0.98] transition-all duration-150">
+                        <x-icon name="shield" class="h-4 w-4 text-white shrink-0 transition-transform group-hover:scale-110" />
                         <span>Login Pembina</span>
-                        <x-icon name="shield" class="h-4 w-4 text-blue-100" />
                     </a>
                 @endif
-                <a href="#eskul" class="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-semibold text-white hover:bg-white/20 transition">
+                <a href="#eskul" class="group inline-flex h-12 items-center gap-2.5 rounded-2xl border border-white/25 bg-white/10 backdrop-blur-md px-5 sm:px-6 text-sm font-bold text-white/95 shadow-xs hover:bg-white/20 hover:border-white/40 hover:text-white active:scale-[0.98] transition-all duration-150">
+                    <x-icon name="arrow-down" class="h-4 w-4 text-blue-100 shrink-0 transition-transform group-hover:translate-y-0.5" />
                     <span>Lihat Katalog Eskul</span>
-                    <x-icon name="arrow-down" class="h-4 w-4 text-blue-100" />
                 </a>
             </div>
         </div>
