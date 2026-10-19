@@ -43,11 +43,11 @@
 
         {{-- Header Sekolah --}}
         <div class="relative z-10 flex items-center gap-4">
-            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white/15 border border-white/25 p-2 backdrop-blur-xs shadow-md">
-                <x-school-logo :size="52" />
+            <div class="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-2xl bg-white/15 border border-white/25 p-2 backdrop-blur-xs shadow-md">
+                <x-school-logo :size="58" />
             </div>
             <div>
-                <p class="text-lg xl:text-xl font-black tracking-tight text-white leading-tight">{{ config('app.name', 'Bagimu Extra') }}</p>
+                <p class="text-xl xl:text-2xl font-black tracking-tight text-white leading-tight">{{ config('app.name', 'Bagimu Extra') }}</p>
                 <p class="text-xs sm:text-sm font-bold text-blue-100 tracking-wide mt-0.5">{{ $sekolah }}</p>
                 <p class="text-xs font-medium text-blue-200/95 mt-1 tracking-wide">4B Berbudi • Berkualitas • Berdaya • Berhasil</p>
             </div>
