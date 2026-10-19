@@ -7,6 +7,10 @@
     <h1 class="text-lg font-bold">Buat Pengajuan Izin</h1>
     <p class="text-sm text-gray-600">Periode: <span class="font-semibold">{{ $registration->periode }}</span></p>
 
+    <div class="mt-3 rounded-xl border border-blue-200 bg-blue-50/70 p-3.5 text-xs text-blue-900 leading-relaxed">
+        ℹ️ <b>Pemberitahuan:</b> Pencatatan kehadiran, izin, dan sakit siswa dilakukan dan didata langsung oleh Pembina pada lembar presensi eskul. Anda dapat melampirkan surat bukti di bawah jika diperlukan.
+    </div>
+
     <form method="POST" action="{{ route('siswa.izin.store') }}" enctype="multipart/form-data" class="mt-4 space-y-4">
         @csrf
 
