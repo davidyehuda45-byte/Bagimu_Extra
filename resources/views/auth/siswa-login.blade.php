@@ -182,7 +182,7 @@
                     </button>
 
                     <div class="mt-5 space-y-2 border-t border-slate-100 pt-4 text-center text-xs text-slate-500">
-                        <p class="text-slate-400">Lupa token? Hubungi bagian <span class="font-medium text-slate-600">Tata Usaha (TU)</span> sekolah untuk cetak ulang token.</p>
+                        <p class="text-slate-400">Lupa token? Hubungi <span class="font-medium text-slate-600">admin/wali kelas</span> anda.</p>
                         <div class="pt-1">
                             <a href="{{ route('home') }}" class="font-medium text-slate-600 hover:text-blue-700 hover:underline">
                                 &larr; Kembali ke Beranda

@@ -84,7 +84,7 @@ export default function LoginSiswa() {
                         {showHelp && (
                             <div className="rounded-2xl bg-amber-50 border border-amber-200/80 p-3.5 text-xs text-amber-900 animate-fade-in leading-relaxed">
                                 <strong className="font-bold block mb-0.5">Informasi Token Siswa:</strong>
-                                Token login dibagikan oleh Bagian Kesiswaan atau Wali Kelas Anda saat pembagian rombel. Jika hilang, silakan hubungi Tata Usaha (TU) untuk penerbitan token baru.
+                                Token login dibagikan oleh Bagian Kesiswaan atau Wali Kelas Anda saat pembagian rombel. Jika hilang, silakan hubungi admin/wali kelas Anda untuk penerbitan token baru.
                             </div>
                         )}
 
