@@ -56,10 +56,7 @@
                 <a href="{{ route('siswa.login') }}" class="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 transition shadow-xs shadow-blue-600/20">
                     <x-icon name="user" class="h-3.5 w-3.5" />
                     <span>Masuk Siswa</span>
-                </a>
-                <a href="{{ route('pembina.login') }}" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-blue-700 hover:border-blue-300 transition shadow-xs">
-                    <x-icon name="shield" class="h-3.5 w-3.5 text-blue-600" />
-                    <span>Login Pembina</span>
+                    <x-icon name="arrow-right" class="h-3.5 w-3.5" />
                 </a>
             @endif
         </div>
