@@ -21,17 +21,17 @@ input.err {
 /* --- Stempel di Pojok Kanan Atas Kartu Login --- */
 .toast-container {
   position: absolute;
-  top: -45px;
-  right: -20px;
+  top: -52px;
+  right: -24px;
   z-index: 50;
   pointer-events: none;
 }
 .toast {
   position: relative;
-  width: 125px;
-  height: 125px;
+  width: 145px;
+  height: 145px;
   color: #1d4ed8;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 800;
   letter-spacing: .05em;
   line-height: 1.1;
@@ -78,7 +78,7 @@ input.err {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 95px;
+  width: 110px;
   transform: translate(-50%,-50%);
   display: flex;
   flex-direction: column;
@@ -134,7 +134,7 @@ input.err {
   color: #166534;
 }
 .toast.success span {
-  font-size: 14px;
+  font-size: 16px;
   letter-spacing: .08em;
 }
 .toast.success .ring, .toast.success .shock {
@@ -146,16 +146,16 @@ input.err {
 
 @media (max-width: 640px) {
   .toast-container {
-    top: -35px;
-    right: -10px;
+    top: -42px;
+    right: -12px;
   }
   .toast {
-    width: 110px;
-    height: 110px;
-    font-size: 13px;
+    width: 125px;
+    height: 125px;
+    font-size: 14px;
   }
   .toast span {
-    width: 78px;
+    width: 95px;
   }
 }
 
