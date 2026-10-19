@@ -10,7 +10,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" /></noscript>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="{{ asset('css/stempel.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/stempel.css') }}?v={{ filemtime(public_path('css/stempel.css')) }}">
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
 @php($sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra')))
@@ -200,7 +200,7 @@
     </div>
 </main>
 
-<script src="{{ asset('js/stempel.js') }}"></script>
+<script src="{{ asset('js/stempel.js') }}?v={{ filemtime(public_path('js/stempel.js')) }}"></script>
 <script>
     function handleSiswaLoginSubmit(e, alpineData) {
         var form = document.getElementById('loginForm');

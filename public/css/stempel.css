@@ -18,20 +18,20 @@ input.err {
   75% { transform: translateX(6px); }
 }
 
-/* --- Stempel di Pojok Kanan Atas (Digeser ke atas agar tidak menutupi tulisan Pembina) --- */
+/* --- Stempel di Pojok Kanan Atas (Digeser ke atas-kanan agar tombol Pembina tidak tertutup) --- */
 .toast-container {
   position: absolute;
-  top: -85px;
-  right: -10px;
+  top: -105px;
+  right: -28px;
   z-index: 50;
   pointer-events: none;
 }
 .toast {
   position: relative;
-  width: 135px;
-  height: 135px;
+  width: 125px;
+  height: 125px;
   color: #1d4ed8;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 800;
   letter-spacing: .05em;
   line-height: 1.1;
@@ -59,11 +59,7 @@ input.err {
   fill: var(--toast-bg, #ffffff);
 }
 .toast .ink {
-  fill: #2563eb;
-  opacity: 0;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: ink .45s cubic-bezier(.2,.8,.3,1) .52s forwards;
+  display: none !important;
 }
 .toast .shock {
   fill: none;
@@ -138,28 +134,28 @@ input.err {
   color: #166534;
 }
 .toast.success span {
-  font-size: 15px;
+  font-size: 14px;
   letter-spacing: .08em;
 }
 .toast.success .ring, .toast.success .shock {
   stroke: #22c55e;
 }
 .toast.success .ink {
-  fill: #22c55e;
+  display: none !important;
 }
 
 @media (max-width: 640px) {
   .toast-container {
-    top: -65px;
-    right: -6px;
+    top: -85px;
+    right: -18px;
   }
   .toast {
-    width: 120px;
-    height: 120px;
-    font-size: 14px;
+    width: 110px;
+    height: 110px;
+    font-size: 13px;
   }
   .toast span {
-    width: 85px;
+    width: 78px;
   }
 }
 
