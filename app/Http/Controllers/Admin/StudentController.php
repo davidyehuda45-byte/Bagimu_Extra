@@ -11,6 +11,7 @@ use App\Models\AdminLog;
 use App\Models\Periode;
 use App\Models\Student;
 use App\Models\User;
+use App\Services\FonnteService;
 use App\Support\LoginToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -116,6 +117,11 @@ class StudentController extends Controller
             ->sort(SORT_NATURAL)
             ->values();
 
+        $fonnte = (new FonnteService)->getStatus();
+        $totalWaStudents = Student::query()->where('status', 'AKTIF')->where(function ($q) {
+            $q->whereNotNull('whatsapp')->where('whatsapp', '!=', '');
+        })->count();
+
         if ($request->ajax()) {
             return response()->json([
                 'rows' => view('admin.students.partials.rows', compact('students', 'periode'))->render(),
@@ -124,7 +130,7 @@ class StudentController extends Controller
             ]);
         }
 
-        return view('admin.students.index', compact('students', 'jurusanList', 'statusList', 'tingkatList', 'kelasList', 'periode'));
+        return view('admin.students.index', compact('students', 'jurusanList', 'statusList', 'tingkatList', 'kelasList', 'periode', 'fonnte', 'totalWaStudents'));
     }
 
     public function create()
@@ -340,6 +346,141 @@ class StudentController extends Controller
         }
 
         return redirect()->back()->with('status', $message);
+    }
+
+    public function waBlast(Request $request, FonnteService $fonnte)
+    {
+        $status = $fonnte->getStatus();
+        if (! $status['connected']) {
+            $msg = 'WhatsApp Gateway (Fonnte) belum terhubung. Silakan hubungkan API Key Fonnte di menu Pengaturan terlebih dahulu.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+
+            return back()->with('error', $msg);
+        }
+
+        $request->validate([
+            'mode' => ['required', 'string', 'in:all,selected,untokenized'],
+            'pesan' => ['required', 'string', 'max:2000'],
+            'ids' => ['nullable', 'array'],
+        ]);
+
+        $mode = $request->input('mode', 'all');
+        $selectedIds = (array) $request->input('ids', []);
+        $pesanTemplate = $request->input('pesan');
+
+        if ($mode === 'selected') {
+            if (empty($selectedIds)) {
+                return back()->with('error', 'Pilih minimal satu data siswa untuk dikirim.');
+            }
+            $students = Student::with(['user', 'user.registrations'])->whereIn('id', $selectedIds)->get();
+        } else {
+            $query = $this->filterStudentsQuery($request)->with(['user', 'user.registrations']);
+            if ($mode === 'untokenized') {
+                $query->whereHas('user', function ($u) {
+                    $u->whereNull('login_token')->orWhereNotNull('login_token_revoked_at');
+                });
+            }
+            $students = $query->get();
+        }
+
+        // Filter hanya siswa yang memiliki nomor WhatsApp
+        $targets = $students->filter(function ($s) {
+            $reg = $s->user?->registrations?->first();
+            $wa = $s->whatsapp ?: ($s->wali_kontak ?: ($reg?->whatsapp ?? ''));
+
+            return ! empty(trim((string) $wa));
+        });
+
+        if ($targets->isEmpty()) {
+            $msg = 'Tidak ada siswa dengan nomor WhatsApp terdaftar pada target yang dipilih.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+
+            return back()->with('warning', $msg);
+        }
+
+        @set_time_limit(300);
+
+        $successCount = 0;
+        $failCount = 0;
+        $appName = config('app.name', 'Bagimu Extra');
+        $loginUrl = route('siswa.login');
+
+        foreach ($targets as $student) {
+            $reg = $student->user?->registrations?->first();
+            $rawWa = $student->whatsapp ?: ($student->wali_kontak ?: ($reg?->whatsapp ?? ''));
+            $normWa = \App\Support\Whatsapp::normalize($rawWa);
+
+            if (! $normWa) {
+                $failCount++;
+                continue;
+            }
+
+            $user = $student->user;
+            if (! $user) {
+                $user = User::create([
+                    'name' => $student->nama,
+                    'email' => $student->nis.'@siswa.local',
+                    'username' => $student->nis,
+                    'password' => Hash::make(Str::random(16)),
+                    'role' => Role::STUDENT,
+                ]);
+                $student->update(['user_id' => $user->id]);
+            }
+
+            $token = $user->login_token;
+            if (! $token || $user->login_token_revoked_at) {
+                $token = LoginToken::issue($user);
+            }
+
+            $directLoginUrl = route('siswa.direct-login', [
+                'nis' => $student->nis,
+                'token' => $token,
+            ]);
+
+            $replacements = [
+                '{nama}' => $student->nama,
+                '{nis}' => $student->nis,
+                '{nisn}' => $student->nisn ?? '-',
+                '{kelas}' => $student->kelas,
+                '{token}' => $token,
+                '{link}' => $directLoginUrl,
+                '{login_url}' => $loginUrl,
+                '{aplikasi}' => $appName,
+                '{eskul}' => $reg?->eskul_utama ?? 'Belum memilih',
+            ];
+
+            $renderedMessage = str_replace(array_keys($replacements), array_values($replacements), $pesanTemplate);
+
+            $sendResult = $fonnte->sendMessage($normWa, $renderedMessage);
+
+            if ($sendResult['success']) {
+                $successCount++;
+            } else {
+                $failCount++;
+            }
+
+            usleep(30000); // 30ms
+        }
+
+        AdminLog::record('student.wa_blast', 'student', null, "WA Blast: {$successCount} sukses, {$failCount} gagal (Target: {$targets->count()})");
+
+        $statusMsg = "WA Blast selesai: {$successCount} pesan berhasil dikirim".($failCount > 0 ? ", {$failCount} gagal." : '.');
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'sent' => $successCount,
+                'failed' => $failCount,
+                'total' => $targets->count(),
+                'message' => $statusMsg,
+            ]);
+        }
+
+        return redirect()->back()->with('status', $statusMsg);
     }
 
     public function statusRombel(Request $request)

@@ -18,6 +18,7 @@ Route::middleware(['auth', 'role:student', \App\Http\Middleware\MaintenanceMode:
     Route::get('/pengumuman', [DashboardController::class, 'pengumuman'])->name('pengumuman');
 
     Route::get('/status', [StatusController::class, 'index'])->name('status');
+    Route::post('/status/kirim-email', [StatusController::class, 'kirimEmail'])->name('status.kirim-email')->middleware('throttle:5,1');
 
     Route::post('/notifikasi/{notifikasi}/baca', [NotifikasiController::class, 'read'])->name('notifikasi.baca');
 

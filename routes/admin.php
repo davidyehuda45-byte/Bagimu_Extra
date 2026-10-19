@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\RekapController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\WaBlastController;
 use App\Http\Controllers\Admin\WindowController;
 use Illuminate\Support\Facades\Route;
 
@@ -73,6 +74,7 @@ Route::middleware(['auth', 'role:admin,operator,kepala_sekolah', \App\Http\Middl
 
     Route::post('students/bulk-token', [StudentController::class, 'bulkToken'])->name('students.bulk-token');
     Route::post('students/bulk-delete', [StudentController::class, 'bulkDelete'])->name('students.bulk-delete');
+    Route::post('students/wa-blast', [StudentController::class, 'waBlast'])->name('students.wa-blast');
     Route::get('students/status-rombel', [StudentController::class, 'statusRombel'])->name('students.status-rombel');
     Route::get('students/export', [StudentController::class, 'export'])->name('students.export');
     Route::get('students/import', [StudentController::class, 'importForm'])->name('students.import');
@@ -81,4 +83,10 @@ Route::middleware(['auth', 'role:admin,operator,kepala_sekolah', \App\Http\Middl
     Route::resource('students', StudentController::class);
     Route::post('students/{student}/token', [StudentController::class, 'issueToken'])->name('students.token');
     Route::post('students/{student}/revoke', [StudentController::class, 'revokeToken'])->name('students.revoke');
+
+    Route::get('wa-blast', [WaBlastController::class, 'index'])->name('wa-blast.index');
+    Route::post('wa-blast/check', [WaBlastController::class, 'checkToken'])->name('wa-blast.check');
+    Route::post('wa-blast/save-token', [WaBlastController::class, 'saveToken'])->name('wa-blast.save-token');
+    Route::post('wa-blast/disconnect', [WaBlastController::class, 'disconnectToken'])->name('wa-blast.disconnect');
+    Route::post('wa-blast/send', [WaBlastController::class, 'send'])->name('wa-blast.send');
 });

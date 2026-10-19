@@ -115,6 +115,12 @@
                         <span>Kenaikan Kelas</span>
                     </a>
                 @endif
+                @if ($isAdmin)
+                    <a href="{{ route('admin.wa-blast.index') }}" class="{{ $link(Route::is('admin.wa-blast.*')) }}">
+                        <x-icon name="send" class="h-4 w-4 shrink-0" />
+                        <span>WA Blast</span>
+                    </a>
+                @endif
             </div>
         </div>
     @endif

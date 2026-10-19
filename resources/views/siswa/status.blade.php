@@ -56,12 +56,18 @@
             <a href="{{ route('siswa.daftar') }}" class="mt-3 inline-block rounded-xl bg-blue-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-800">Daftar Sekarang</a>
         </div>
     @else
-        <div class="no-print flex items-center justify-between gap-3">
+        <div class="no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <p class="text-xs text-slate-500">Bukti resmi pendaftaran ekstrakurikuler yang telah tercatat di sistem.</p>
-            <button onclick="window.print()" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs sm:text-sm font-bold text-white hover:bg-blue-700 transition shadow-xs shadow-blue-600/20 cursor-pointer shrink-0">
-                <x-icon name="printer" class="h-4 w-4" />
-                <span>Cetak / Simpan PDF</span>
-            </button>
+            <div class="flex items-center gap-2 shrink-0">
+                <button type="button" x-data="" x-on:click.prevent="$dispatch('open-modal', 'kirim-email-modal')" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs sm:text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition shadow-xs cursor-pointer">
+                    <x-icon name="mail" class="h-4 w-4 text-slate-500" />
+                    <span>Kirim ke Email</span>
+                </button>
+                <button onclick="window.print()" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs sm:text-sm font-bold text-white hover:bg-blue-700 transition shadow-xs shadow-blue-600/20 cursor-pointer">
+                    <x-icon name="printer" class="h-4 w-4" />
+                    <span>Cetak / Simpan PDF</span>
+                </button>
+            </div>
         </div>
 
         {{-- Bukti Pendaftaran Siswa --}}
@@ -176,6 +182,57 @@
                 @endforeach
             </ul>
         </div>
+    @endif
+
+    @if ($aktif)
+        <x-modal name="kirim-email-modal" maxWidth="md">
+            <form method="POST" action="{{ route('siswa.status.kirim-email') }}" class="p-6">
+                @csrf
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-2.5">
+                        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                            <x-icon name="mail" class="h-5 w-5" />
+                        </div>
+                        <h3 class="text-base font-bold text-slate-900">Kirim Bukti via Email</h3>
+                    </div>
+                    <button type="button" x-on:click="$dispatch('close')" class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer">
+                        <x-icon name="x" class="h-5 w-5" />
+                    </button>
+                </div>
+
+                <div class="mt-4">
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Masukkan alamat email Anda atau orang tua untuk menerima salinan digital bukti pendaftaran ekstrakurikuler ini.
+                    </p>
+
+                    <div class="mt-4">
+                        <label for="email_tujuan" class="block text-xs font-semibold uppercase tracking-wider text-slate-600">Alamat Email Tujuan</label>
+                        <input
+                            type="email"
+                            id="email_tujuan"
+                            name="email"
+                            required
+                            value="{{ old('email', (filter_var($user->email ?? '', FILTER_VALIDATE_EMAIL) && !str_ends_with($user->email ?? '', '@siswa.local')) ? $user->email : '') }}"
+                            placeholder="nama@gmail.com"
+                            class="mt-1.5 block w-full rounded-xl border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500 shadow-xs"
+                        />
+                        @error('email')
+                            <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end gap-2.5">
+                    <button type="button" x-on:click="$dispatch('close')" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer">
+                        Batal
+                    </button>
+                    <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2 text-xs font-bold text-white hover:bg-blue-700 transition shadow-xs shadow-blue-600/20 cursor-pointer">
+                        <x-icon name="send" class="h-3.5 w-3.5" />
+                        <span>Kirim Sekarang</span>
+                    </button>
+                </div>
+            </form>
+        </x-modal>
     @endif
 </div>
 @endsection

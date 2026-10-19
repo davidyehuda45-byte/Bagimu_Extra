@@ -20,9 +20,27 @@ use Illuminate\View\View;
 
 class SiswaLoginController extends Controller
 {
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('auth.siswa-login');
+        return view('auth.siswa-login', [
+            'initialNis' => $request->query('nis', ''),
+        ]);
+    }
+
+    /**
+     * Direct / Magic Login siswa via link dari WhatsApp (sekali klik langsung login).
+     */
+    public function directLogin(Request $request): RedirectResponse
+    {
+        $nis = trim((string) $request->query('nis'));
+        $token = trim((string) $request->query('token'));
+
+        if (empty($nis) || empty($token)) {
+            return redirect()->route('siswa.login')
+                ->with('error', 'Tautan login tidak lengkap. Silakan masukkan NIS dan Token Anda secara manual.');
+        }
+
+        return $this->executeLogin($request, $nis, $token, true);
     }
 
     /**
@@ -36,24 +54,44 @@ class SiswaLoginController extends Controller
             'token' => ['required', 'string', 'max:100'],
         ]);
 
-        // Normalisasi khusus token: buang spasi/strip (password dipakai mentah).
-        $normal = preg_replace('/[\s-]+/', '', $data['token']);
+        return $this->executeLogin($request, $data['nis'], $data['token'], false);
+    }
 
-        $throttleKey = 'siswa-login:'.$request->ip().':'.$data['nis'];
+    private function executeLogin(Request $request, string $nis, string $rawToken, bool $isDirectLogin = false): RedirectResponse
+    {
+        // Normalisasi khusus token: buang spasi/strip (password dipakai mentah).
+        $normal = preg_replace('/[\s-]+/', '', $rawToken);
+
+        $throttleKey = 'siswa-login:'.$request->ip().':'.$nis;
 
         if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
             $seconds = RateLimiter::availableIn($throttleKey);
+            $msg = "Terlalu banyak percobaan. Coba lagi dalam {$seconds} detik.";
+
+            if ($isDirectLogin) {
+                return redirect()->route('siswa.login')->with('error', $msg)->withInput(['nis' => $nis]);
+            }
 
             throw ValidationException::withMessages([
-                'token' => "Terlalu banyak percobaan. Coba lagi dalam {$seconds} detik.",
+                'token' => $msg,
             ]);
         }
 
-        $master = Student::where('nis', $data['nis'])->first();
+        $master = Student::where('nis', $nis)->first();
 
         if (! $master || $master->status !== 'AKTIF') {
             // Pesan generik sama seperti kredensial salah agar NIS valid tidak bisa dienumerasi.
-            $this->fail($request, $throttleKey, null, null, 'NIS tidak dikenal', 'Token atau password salah. Periksa kembali kartu pelajar Anda, atau hubungi TU bila belum punya token.', 'token');
+            return $this->handleFailure(
+                $request,
+                $throttleKey,
+                null,
+                null,
+                'NIS tidak dikenal',
+                'Token atau password salah. Periksa kembali kartu pelajar Anda, atau hubungi TU bila belum punya token.',
+                'token',
+                $isDirectLogin,
+                $nis
+            );
         }
 
         $user = $master->user ?? User::where('username', $master->nis)->first();
@@ -79,27 +117,31 @@ class SiswaLoginController extends Controller
             ->exists();
 
         if ($sudahPilih) {
-            $this->fail(
+            return $this->handleFailure(
                 $request,
                 $throttleKey,
                 $user->getAuthIdentifier(),
                 $user->email,
                 'Pendaftaran terkunci',
                 'Data Anda sudah terkunci karena sudah memilih ekstrakurikuler. Token pendaftaran bersifat sekali pakai dan tidak dapat digunakan lagi.',
-                'token'
+                'token',
+                $isDirectLogin,
+                $nis
             );
         }
 
         // Cek jika token sudah pernah dipakai/dihanguskan
         if ($user->login_token_hash && $user->login_token_revoked_at !== null && LoginToken::verify($normal, $user->login_token_hash)) {
-            $this->fail(
+            return $this->handleFailure(
                 $request,
                 $throttleKey,
                 $user->getAuthIdentifier(),
                 $user->email,
                 'Token sudah hangus',
                 'Token ini sudah pernah digunakan (sekali pakai). Silakan hubungi bagian Tata Usaha (TU) jika butuh bantuan.',
-                'token'
+                'token',
+                $isDirectLogin,
+                $nis
             );
         }
 
@@ -108,10 +150,20 @@ class SiswaLoginController extends Controller
             && LoginToken::verify($normal, $user->login_token_hash);
 
         $passOk = $user->password_set_at !== null
-            && Hash::check($data['token'], $user->password);
+            && Hash::check($rawToken, $user->password);
 
         if (! $tokenOk && ! $passOk) {
-            $this->fail($request, $throttleKey, $user->getAuthIdentifier(), null, 'Kredensial salah', 'Token atau password salah. Periksa kembali kartu login Anda, atau hubungi TU bila belum punya token.', 'token');
+            return $this->handleFailure(
+                $request,
+                $throttleKey,
+                $user->getAuthIdentifier(),
+                null,
+                'Kredensial salah',
+                'Token atau password salah. Periksa kembali kartu login Anda, atau hubungi TU bila belum punya token.',
+                'token',
+                $isDirectLogin,
+                $nis
+            );
         }
 
         RateLimiter::clear($throttleKey);
@@ -134,6 +186,11 @@ class SiswaLoginController extends Controller
             'reason' => null,
         ]);
 
+        if ($isDirectLogin) {
+            return redirect()->route('siswa.daftar')
+                ->with('status', 'Halo '.$master->nama.', kamu berhasil masuk! Silakan tentukan pilihan ekstrakurikuler kamu.');
+        }
+
         // Siswa tidak punya akses /admin/* dan /pembina/*: kembalikan ke pilih eskul.
         $tujuan = session()->pull('url.intended', '/siswa/daftar');
         $path = parse_url((string) $tujuan, PHP_URL_PATH) ?? '';
@@ -144,7 +201,7 @@ class SiswaLoginController extends Controller
         return redirect()->to($tujuan);
     }
 
-    private function fail(
+    private function handleFailure(
         Request $request,
         string $throttleKey,
         string|int|null $userId,
@@ -152,7 +209,9 @@ class SiswaLoginController extends Controller
         string $reason,
         string $message,
         string $field = 'nis',
-    ): never {
+        bool $isDirectLogin = false,
+        string $nis = ''
+    ): RedirectResponse {
         RateLimiter::hit($throttleKey);
 
         LoginHistory::create([
@@ -163,6 +222,12 @@ class SiswaLoginController extends Controller
             'success' => false,
             'reason' => $reason,
         ]);
+
+        if ($isDirectLogin) {
+            return redirect()->route('siswa.login')
+                ->with('error', $message)
+                ->withInput(['nis' => $nis]);
+        }
 
         throw ValidationException::withMessages([$field => $message]);
     }

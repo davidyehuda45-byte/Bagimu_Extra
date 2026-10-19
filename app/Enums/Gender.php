@@ -14,4 +14,12 @@ enum Gender: string
             self::PEREMPUAN => 'Perempuan',
         };
     }
+
+    public function short(): string
+    {
+        return match ($this) {
+            self::LAKI_LAKI => 'L',
+            self::PEREMPUAN => 'P',
+        };
+    }
 }
