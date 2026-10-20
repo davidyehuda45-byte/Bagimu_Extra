@@ -95,6 +95,98 @@
   top: 1rem;
 }
 
+/* ==========================================================
+   ANIMASI PERPINDAHAN HALAMAN (SMOOTH PAGE TRANSITIONS)
+   ========================================================== */
+
+/* Modern Native Cross-Document View Transitions */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: 160ms cubic-bezier(0.4, 0, 1, 1) both pageViewFadeOut;
+}
+
+::view-transition-new(root) {
+  animation: 320ms cubic-bezier(0.16, 1, 0.3, 1) both pageViewFadeIn;
+}
+
+@keyframes pageViewFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.996);
+  }
+}
+
+@keyframes pageViewFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pertahankan elemen persisten (Sidebar & Header) agar mulus tanpa kedip saat navigasi */
+#staff-sidebar-nav,
+aside.lg\:flex {
+  view-transition-name: staff-sidebar;
+}
+
+header.sticky {
+  view-transition-name: sticky-header;
+}
+
+/* Top Progress Bar Glowing Gradient */
+#app-page-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(90deg, #2563eb 0%, #38bdf8 50%, #60a5fa 100%);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.7), 0 0 4px rgba(37, 99, 235, 0.9);
+  z-index: 999999;
+  pointer-events: none;
+  opacity: 0;
+  border-radius: 0 9999px 9999px 0;
+  transform: translateZ(0);
+}
+
+/* Animasi Masuk Konten Halaman (Smooth Page Entrance) */
+#konten-utama,
+main:not(.no-page-enter),
+.animate-page-enter {
+  animation: pageContentEnter 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: opacity, transform;
+}
+
+@keyframes pageContentEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* State Halaman Saat Keluar / Berpindah (Page Exit Feedback) */
+.page-is-leaving {
+  opacity: 0.85 !important;
+  transform: translateY(-4px) scale(0.997) !important;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 1, 1), transform 0.2s cubic-bezier(0.4, 0, 1, 1) !important;
+  pointer-events: none !important;
+}
+
 /* ---------- Aksesibilitas: Hormati preferensi reduced-motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -105,12 +197,28 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  #app-page-progress,
+  #konten-utama,
+  main,
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
 }
 
 /* ---------- Cetak ---------- */
 @media print {
-  .no-print {
+  .no-print,
+  #app-page-progress {
     display: none !important;
+  }
+  #konten-utama,
+  main {
+    animation: none !important;
+    transform: none !important;
   }
   .print-area {
     box-shadow: none !important;
