@@ -22,7 +22,7 @@
         <div class="pointer-events-none absolute top-1/2 -right-20 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl z-0"></div>
 
         {{-- Foto Gedung SMK Bagimu Negeriku di Sudut Kanan Bawah --}}
-        <div class="pointer-events-none absolute bottom-0 right-0 h-[68%] xl:h-[75%] max-h-[820px] w-auto select-none z-0">
+        <div class="pointer-events-none absolute bottom-0 right-0 h-[82%] xl:h-[90%] 2xl:h-[95%] max-h-[960px] w-auto select-none z-0">
             <img src="{{ asset('images/gedung-mockup.png') }}?v={{ filemtime(public_path('images/gedung-mockup.png')) }}"
                  alt="Gedung SMK Bagimu Negeriku"
                  class="h-full w-auto object-contain object-right-bottom drop-shadow-2xl" />
