@@ -1,4 +1,4 @@
-// Smooth Page Navigation Transitions & Top Progress Bar
+// Smooth & Responsive Page Navigation Indicator
 (function () {
     if (typeof window === 'undefined') return;
 
@@ -36,16 +36,16 @@
         const bar = getOrCreateProgressBar();
         if (!bar) return;
 
-        bar.style.transition = 'width 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease';
-        setProgress(28);
+        bar.style.transition = 'width 0.3s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.15s ease';
+        setProgress(32);
 
         progressTimer = setInterval(() => {
             if (progressVal < 70) {
-                setProgress(progressVal + Math.random() * 12 + 4);
-            } else if (progressVal < 88) {
-                setProgress(progressVal + Math.random() * 4 + 1);
+                setProgress(progressVal + 10);
+            } else if (progressVal < 86) {
+                setProgress(progressVal + 3);
             }
-        }, 180);
+        }, 200);
     }
 
     function finishProgress() {
@@ -56,7 +56,7 @@
         const bar = getOrCreateProgressBar();
         if (!bar) return;
 
-        bar.style.transition = 'width 0.2s ease-out, opacity 0.3s ease 0.15s';
+        bar.style.transition = 'width 0.15s ease-out, opacity 0.2s ease 0.08s';
         bar.style.width = '100%';
         bar.style.opacity = '0';
 
@@ -65,14 +65,10 @@
                 bar.style.transition = 'none';
                 bar.style.width = '0%';
             }
-        }, 500);
+        }, 350);
     }
 
-    function getMainElement() {
-        return document.getElementById('konten-utama') || document.getElementById('app-content') || document.querySelector('main') || document.body;
-    }
-
-    // Intercept internal link clicks
+    // Intercept internal link clicks to show sleek progress bar without jarring page shifts
     document.addEventListener('click', function (e) {
         const link = e.target.closest('a');
         if (!link) return;
@@ -103,20 +99,14 @@
             // Must be same origin
             if (url.origin !== window.location.origin) return;
 
-            // If same page with just hash change, ignore
+            // If same page with just hash change or reload, ignore
             if (url.pathname === window.location.pathname && url.search === window.location.search) {
                 if (url.hash) return;
-                // Clicking current page again
                 return;
             }
 
-            // Start transition
+            // Start subtle top progress bar
             startProgress();
-
-            const main = getMainElement();
-            if (main) {
-                main.classList.add('page-is-leaving');
-            }
         } catch (_) {
             // Ignore parse errors
         }
@@ -133,12 +123,11 @@
         }, 20);
     });
 
-    // Reset and trigger entrance on pageshow (initial load and bfcache)
+    // Reset and trigger smooth entrance on pageshow (initial load and bfcache)
     window.addEventListener('pageshow', function () {
         finishProgress();
-        const main = getMainElement();
+        const main = document.getElementById('konten-utama') || document.querySelector('main');
         if (main) {
-            main.classList.remove('page-is-leaving');
             main.classList.remove('animate-page-enter');
             void main.offsetWidth; // Force DOM reflow to restart CSS animation cleanly
             main.classList.add('animate-page-enter');

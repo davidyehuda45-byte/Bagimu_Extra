@@ -96,95 +96,42 @@
 }
 
 /* ==========================================================
-   ANIMASI PERPINDAHAN HALAMAN (SMOOTH PAGE TRANSITIONS)
+   ANIMASI PERPINDAHAN HALAMAN (SMOOTH, CLEAN & ENAK DILIHAT)
    ========================================================== */
 
-/* Modern Native Cross-Document View Transitions */
-@view-transition {
-  navigation: auto;
-}
-
-::view-transition-old(root) {
-  animation: 160ms cubic-bezier(0.4, 0, 1, 1) both pageViewFadeOut;
-}
-
-::view-transition-new(root) {
-  animation: 320ms cubic-bezier(0.16, 1, 0.3, 1) both pageViewFadeIn;
-}
-
-@keyframes pageViewFadeOut {
-  from {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.996);
-  }
-}
-
-@keyframes pageViewFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Pertahankan elemen persisten (Sidebar & Header) agar mulus tanpa kedip saat navigasi */
-#staff-sidebar-nav,
-aside.lg\:flex {
-  view-transition-name: staff-sidebar;
-}
-
-header.sticky {
-  view-transition-name: sticky-header;
-}
-
-/* Top Progress Bar Glowing Gradient */
+/* Top Progress Bar - Garis Tipis Elegan (Gaya GitHub / Vercel) */
 #app-page-progress {
   position: fixed;
   top: 0;
   left: 0;
   width: 0%;
-  height: 3px;
-  background: linear-gradient(90deg, #2563eb 0%, #38bdf8 50%, #60a5fa 100%);
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.7), 0 0 4px rgba(37, 99, 235, 0.9);
+  height: 2.5px;
+  background: #2563eb;
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.7), 0 0 2px rgba(96, 165, 250, 0.9);
   z-index: 999999;
   pointer-events: none;
   opacity: 0;
-  border-radius: 0 9999px 9999px 0;
+  border-radius: 0 2px 2px 0;
   transform: translateZ(0);
 }
 
-/* Animasi Masuk Konten Halaman (Smooth Page Entrance) */
+/* Animasi Masuk Konten yang Lembut, Cepat, dan Nyaman di Mata (Tidak Memantul / Goyang) */
 #konten-utama,
 main:not(.no-page-enter),
 .animate-page-enter {
-  animation: pageContentEnter 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: smoothContentFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
   will-change: opacity, transform;
 }
 
-@keyframes pageContentEnter {
+@keyframes smoothContentFadeIn {
   0% {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(4px);
   }
   100% {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-/* State Halaman Saat Keluar / Berpindah (Page Exit Feedback) */
-.page-is-leaving {
-  opacity: 0.85 !important;
-  transform: translateY(-4px) scale(0.997) !important;
-  transition: opacity 0.2s cubic-bezier(0.4, 0, 1, 1), transform 0.2s cubic-bezier(0.4, 0, 1, 1) !important;
-  pointer-events: none !important;
 }
 
 /* ---------- Aksesibilitas: Hormati preferensi reduced-motion ---------- */
@@ -199,9 +146,7 @@ main:not(.no-page-enter),
   }
   #app-page-progress,
   #konten-utama,
-  main,
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
+  main {
     animation: none !important;
     transition: none !important;
     transform: none !important;
