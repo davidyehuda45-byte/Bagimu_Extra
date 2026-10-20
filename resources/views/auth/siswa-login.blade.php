@@ -15,32 +15,11 @@
 <body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
 @php($sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra')))
 <main class="flex min-h-screen">
-    {{-- Panel Branding Desktop - Sesuai Mockup (Biru Penuh dengan Gedung SMK Bagimu Negeriku) --}}
-    <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-b from-[#1d62d8] via-[#1e58c8] to-[#154bb0] p-10 xl:p-14 text-white lg:flex">
+    {{-- Panel Branding Desktop - Sesuai Mockup (Biru Cerah & Bersih dengan Gedung SMK Bagimu Negeriku) --}}
+    <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-b from-[#2b6ee8] via-[#2563eb] to-[#1e58d4] p-10 xl:p-14 text-white lg:flex">
         {{-- Ambient Glow Lembut di Belakang --}}
-        <div class="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-blue-400/25 blur-3xl z-0"></div>
-        <div class="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-blue-700/50 blur-3xl z-0"></div>
-
-        {{-- Titik-Titik Putih Pola Grid Halus & Rapi (Sleek Dot Matrix Pattern) --}}
-        <svg class="pointer-events-none absolute inset-0 h-full w-full opacity-25 z-0" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <pattern id="dot-grid-siswa" width="26" height="26" patternUnits="userSpaceOnUse">
-                    <circle cx="2" cy="2" r="1.25" fill="#ffffff" />
-                </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#dot-grid-siswa)" />
-        </svg>
-
-        {{-- Titik-Titik Aksentuasi Berkilau Halus (Constellation Dots) --}}
-        <div class="pointer-events-none absolute inset-0 overflow-hidden z-0">
-            <span class="absolute top-[14%] left-[18%] h-1.5 w-1.5 rounded-full bg-white/80 shadow-[0_0_8px_rgba(255,255,255,0.9)]"></span>
-            <span class="absolute top-[26%] left-[74%] h-2 w-2 rounded-full bg-white/70 shadow-[0_0_10px_rgba(255,255,255,0.8)]"></span>
-            <span class="absolute top-[42%] left-[12%] h-1 w-1 rounded-full bg-white/60 shadow-[0_0_6px_rgba(255,255,255,0.7)]"></span>
-            <span class="absolute top-[58%] left-[84%] h-1.5 w-1.5 rounded-full bg-white/80 shadow-[0_0_8px_rgba(255,255,255,0.9)]"></span>
-            <span class="absolute top-[72%] left-[24%] h-2 w-2 rounded-full bg-white/70 shadow-[0_0_10px_rgba(255,255,255,0.8)]"></span>
-            <span class="absolute top-[86%] left-[68%] h-1.5 w-1.5 rounded-full bg-white/60 shadow-[0_0_6px_rgba(255,255,255,0.7)]"></span>
-            <span class="absolute top-[34%] left-[48%] h-1 w-1 rounded-full bg-white/50 shadow-[0_0_6px_rgba(255,255,255,0.6)]"></span>
-        </div>
+        <div class="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-sky-300/25 blur-3xl z-0"></div>
+        <div class="pointer-events-none absolute top-1/2 -right-20 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl z-0"></div>
 
         {{-- Foto Gedung SMK Bagimu Negeriku di Sudut Kanan Bawah --}}
         <div class="pointer-events-none absolute bottom-0 right-0 h-[68%] xl:h-[75%] max-h-[820px] w-auto select-none z-0">
