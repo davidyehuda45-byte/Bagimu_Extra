@@ -95,6 +95,45 @@
   top: 1rem;
 }
 
+/* ==========================================================
+   ANIMASI PERPINDAHAN HALAMAN (SMOOTH, CLEAN & ENAK DILIHAT)
+   ========================================================== */
+
+/* Top Progress Bar - Garis Tipis Elegan (Gaya GitHub / Vercel) */
+#app-page-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 2.5px;
+  background: #2563eb;
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.7), 0 0 2px rgba(96, 165, 250, 0.9);
+  z-index: 999999;
+  pointer-events: none;
+  opacity: 0;
+  border-radius: 0 2px 2px 0;
+  transform: translateZ(0);
+}
+
+/* Animasi Masuk Konten yang Lembut, Cepat, dan Nyaman di Mata (Tidak Memantul / Goyang) */
+#konten-utama,
+main:not(.no-page-enter),
+.animate-page-enter {
+  animation: smoothContentFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: opacity, transform;
+}
+
+@keyframes smoothContentFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ---------- Aksesibilitas: Hormati preferensi reduced-motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -105,12 +144,26 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  #app-page-progress,
+  #konten-utama,
+  main {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
 }
 
 /* ---------- Cetak ---------- */
 @media print {
-  .no-print {
+  .no-print,
+  #app-page-progress {
     display: none !important;
+  }
+  #konten-utama,
+  main {
+    animation: none !important;
+    transform: none !important;
   }
   .print-area {
     box-shadow: none !important;

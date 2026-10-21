@@ -17,7 +17,7 @@
     $sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra'));
 @endphp
 <main class="flex min-h-screen">
-    {{-- Panel Branding Desktop --}}
+    {{-- Panel Branding Desktop - Dark Corporate Khusus Admin --}}
     <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-b from-slate-900 via-slate-800 to-slate-950 p-10 xl:p-14 text-white lg:flex">
         <div class="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-blue-500/15 blur-3xl z-0"></div>
         <div class="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-slate-700/30 blur-3xl z-0"></div>
@@ -31,7 +31,7 @@
             <rect width="100%" height="100%" fill="url(#dot-grid-admin)" />
         </svg>
 
-        <div class="pointer-events-none absolute bottom-0 right-0 h-[68%] xl:h-[75%] max-h-[820px] w-auto select-none z-0 opacity-40">
+        <div class="pointer-events-none absolute bottom-0 right-0 h-[82%] xl:h-[90%] 2xl:h-[95%] max-h-[960px] w-auto select-none z-0 opacity-40">
             <img src="{{ asset('images/gedung-mockup.png') }}?v={{ filemtime(public_path('images/gedung-mockup.png')) }}"
                  alt="Gedung SMK Bagimu Negeriku"
                  class="h-full w-auto object-contain object-right-bottom drop-shadow-2xl grayscale" />

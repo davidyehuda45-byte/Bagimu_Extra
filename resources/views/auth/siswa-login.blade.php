@@ -17,35 +17,14 @@
     $sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra'));
 @endphp
 <main class="flex min-h-screen">
-    {{-- Panel Branding Desktop - Sesuai Mockup (Biru Penuh dengan Gedung SMK Bagimu Negeriku) --}}
-    <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-b from-[#1d62d8] via-[#1e58c8] to-[#154bb0] p-10 xl:p-14 text-white lg:flex">
+    {{-- Panel Branding Desktop - Sesuai Mockup (Biru Cerah & Bersih dengan Gedung SMK Bagimu Negeriku) --}}
+    <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-b from-[#2b6ee8] via-[#2563eb] to-[#1e58d4] p-10 xl:p-14 text-white lg:flex">
         {{-- Ambient Glow Lembut di Belakang --}}
-        <div class="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-blue-400/25 blur-3xl z-0"></div>
-        <div class="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-blue-700/50 blur-3xl z-0"></div>
-
-        {{-- Titik-Titik Putih Pola Grid Halus & Rapi (Sleek Dot Matrix Pattern) --}}
-        <svg class="pointer-events-none absolute inset-0 h-full w-full opacity-25 z-0" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <pattern id="dot-grid-siswa" width="26" height="26" patternUnits="userSpaceOnUse">
-                    <circle cx="2" cy="2" r="1.25" fill="#ffffff" />
-                </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#dot-grid-siswa)" />
-        </svg>
-
-        {{-- Titik-Titik Aksentuasi Berkilau Halus (Constellation Dots) --}}
-        <div class="pointer-events-none absolute inset-0 overflow-hidden z-0">
-            <span class="absolute top-[14%] left-[18%] h-1.5 w-1.5 rounded-full bg-white/80 shadow-[0_0_8px_rgba(255,255,255,0.9)]"></span>
-            <span class="absolute top-[26%] left-[74%] h-2 w-2 rounded-full bg-white/70 shadow-[0_0_10px_rgba(255,255,255,0.8)]"></span>
-            <span class="absolute top-[42%] left-[12%] h-1 w-1 rounded-full bg-white/60 shadow-[0_0_6px_rgba(255,255,255,0.7)]"></span>
-            <span class="absolute top-[58%] left-[84%] h-1.5 w-1.5 rounded-full bg-white/80 shadow-[0_0_8px_rgba(255,255,255,0.9)]"></span>
-            <span class="absolute top-[72%] left-[24%] h-2 w-2 rounded-full bg-white/70 shadow-[0_0_10px_rgba(255,255,255,0.8)]"></span>
-            <span class="absolute top-[86%] left-[68%] h-1.5 w-1.5 rounded-full bg-white/60 shadow-[0_0_6px_rgba(255,255,255,0.7)]"></span>
-            <span class="absolute top-[34%] left-[48%] h-1 w-1 rounded-full bg-white/50 shadow-[0_0_6px_rgba(255,255,255,0.6)]"></span>
-        </div>
+        <div class="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-sky-300/25 blur-3xl z-0"></div>
+        <div class="pointer-events-none absolute top-1/2 -right-20 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl z-0"></div>
 
         {{-- Foto Gedung SMK Bagimu Negeriku di Sudut Kanan Bawah --}}
-        <div class="pointer-events-none absolute bottom-0 right-0 h-[68%] xl:h-[75%] max-h-[820px] w-auto select-none z-0">
+        <div class="pointer-events-none absolute bottom-0 right-0 h-[82%] xl:h-[90%] 2xl:h-[95%] max-h-[960px] w-auto select-none z-0">
             <img src="{{ asset('images/gedung-mockup.png') }}?v={{ filemtime(public_path('images/gedung-mockup.png')) }}"
                  alt="Gedung SMK Bagimu Negeriku"
                  class="h-full w-auto object-contain object-right-bottom drop-shadow-2xl" />
@@ -128,18 +107,6 @@
             </div>
 
             <div class="card relative rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-xl shadow-slate-200/50">
-                {{-- Tab Pilihan Pintu Masuk: Siswa & Pembina --}}
-                <div class="grid grid-cols-2 p-1.5 mb-6 bg-slate-100 rounded-2xl text-xs sm:text-sm font-bold text-center border border-slate-200/80">
-                    <div class="py-2.5 rounded-xl bg-blue-600 text-white shadow-xs flex items-center justify-center gap-2">
-                        <x-icon name="user" class="h-4 w-4" />
-                        <span>Siswa</span>
-                    </div>
-                    <a href="{{ route('pembina.login') }}" class="py-2.5 rounded-xl text-slate-600 hover:text-blue-700 hover:bg-white transition flex items-center justify-center gap-2">
-                        <x-icon name="user-group" class="h-4 w-4" />
-                        <span>Pembina</span>
-                    </a>
-                </div>
-
                 <div class="mb-5">
                     <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10 mb-2.5">
                         <x-icon name="user" class="h-3.5 w-3.5" /> Portal Siswa
@@ -212,6 +179,7 @@
 
                     <div class="mt-5 space-y-2 border-t border-slate-100 pt-4 text-center text-xs text-slate-500">
                         <p class="text-slate-400">Lupa token? Hubungi <span class="font-medium text-slate-600">admin/wali kelas</span> anda.</p>
+                        <p class="text-slate-500">Bukan siswa? <a href="{{ route('pembina.login') }}" class="font-semibold text-blue-600 hover:text-blue-700 hover:underline">Masuk sebagai Pembina / Guru &rarr;</a></p>
                         <div class="pt-1">
                             <a href="{{ route('home') }}" class="font-medium text-slate-600 hover:text-blue-700 hover:underline">
                                 &larr; Kembali ke Beranda
