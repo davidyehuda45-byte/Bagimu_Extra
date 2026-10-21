@@ -186,16 +186,27 @@ class SiswaLoginController extends Controller
             'reason' => null,
         ]);
 
+        \App\Models\AdminLog::record(
+            'auth.siswa_login',
+            'Student',
+            $master->id,
+            "Siswa {$master->nama} (NIS: {$master->nis}) berhasil login.",
+            'SUCCESS',
+            $user->email,
+            $user->id,
+            'STUDENT'
+        );
+
         if ($isDirectLogin) {
             return redirect()->route('siswa.daftar')
                 ->with('status', 'Halo '.$master->nama.', kamu berhasil masuk! Silakan tentukan pilihan ekstrakurikuler kamu.');
         }
 
-        // Siswa tidak punya akses /admin/* dan /pembina/*: kembalikan ke pilih eskul.
-        $tujuan = session()->pull('url.intended', '/siswa/daftar');
+        // Siswa tidak punya akses /admin/* dan /pembina/*: kembalikan ke aturan/daftar eskul.
+        $tujuan = session()->pull('url.intended', route('siswa.aturan'));
         $path = parse_url((string) $tujuan, PHP_URL_PATH) ?? '';
         if (str_starts_with($path, '/admin') || str_starts_with($path, '/pembina')) {
-            $tujuan = '/siswa/daftar';
+            $tujuan = route('siswa.aturan');
         }
 
         if ($request->wantsJson()) {
@@ -229,6 +240,17 @@ class SiswaLoginController extends Controller
             'success' => false,
             'reason' => $reason,
         ]);
+
+        \App\Models\AdminLog::record(
+            'auth.siswa_login_failed',
+            'Student',
+            $userId,
+            "Gagal login siswa (NIS: {$nis}): {$reason}",
+            'FAILED',
+            $email ?? ($nis . '@siswa.local'),
+            $userId,
+            'STUDENT'
+        );
 
         if ($isDirectLogin) {
             return redirect()->route('siswa.login')

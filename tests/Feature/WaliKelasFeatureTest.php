@@ -66,11 +66,11 @@ class WaliKelasFeatureTest extends TestCase
         return [$waliUser, $kelas, $s1, $reg1];
     }
 
-    public function test_wali_kelas_can_login_via_admin_login(): void
+    public function test_wali_kelas_can_login_via_pembina_login(): void
     {
         [$waliUser] = $this->siapkanData();
 
-        $response = $this->post('/admin/login', [
+        $response = $this->post('/pembina/login', [
             'login' => 'walibudi',
             'password' => 'password123',
         ]);

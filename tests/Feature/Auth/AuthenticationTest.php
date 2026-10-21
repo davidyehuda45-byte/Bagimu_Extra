@@ -28,15 +28,15 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect('/dashboard');
+        $response->assertRedirect('/admin');
     }
 
     public function test_pembina_login_diarahkan_ke_dashboard_pembina(): void
     {
         $user = User::factory()->create(['role' => Role::PEMBINA]);
 
-        $response = $this->withSession(['url.intended' => 'http://localhost/admin/dashboard'])
-            ->post('/admin/login', [
+        $response = $this->withSession(['url.intended' => 'http://localhost/pembina'])
+            ->post('/pembina/login', [
                 'login' => $user->email,
                 'password' => 'password',
             ]);
@@ -55,7 +55,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect('/dashboard');
+        $response->assertRedirect('/admin');
     }
 
     public function test_login_ditolak_bila_password_salah(): void
@@ -108,7 +108,7 @@ class AuthenticationTest extends TestCase
 
     public function test_halaman_login_guru_menggunakan_judul_login_guru_khusus(): void
     {
-        $response = $this->get('/admin/login');
+        $response = $this->get('/pembina/login');
         $response->assertOk();
         $response->assertSee('Login Staf / Pembina');
         $response->assertDontSee('Login Guru & Staf');

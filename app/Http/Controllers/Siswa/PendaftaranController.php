@@ -32,7 +32,10 @@ class PendaftaranController extends Controller
             ->first();
     }
 
-    public function create(): View
+    /**
+     * Langkah 1 alur siswa: Ketentuan dan aturan pendaftaran.
+     */
+    public function aturan(): View|RedirectResponse
     {
         $user = auth()->user()->load('student');
         $periode = $this->periodeAktif();
@@ -40,6 +43,32 @@ class PendaftaranController extends Controller
         $existing = $periode
             ? Registration::where('user_id', $user->id)->where('periode', $periode->periode)->first()
             : null;
+
+        if ($existing) {
+            return redirect()->route('siswa.sukses');
+        }
+
+        return view('siswa.aturan', [
+            'user' => $user,
+            'periode' => $periode,
+        ]);
+    }
+
+    /**
+     * Langkah 2 alur siswa: Pilih ekstrakurikuler.
+     */
+    public function create(): View|RedirectResponse
+    {
+        $user = auth()->user()->load('student');
+        $periode = $this->periodeAktif();
+
+        $existing = $periode
+            ? Registration::where('user_id', $user->id)->where('periode', $periode->periode)->first()
+            : null;
+
+        if ($existing) {
+            return redirect()->route('siswa.sukses');
+        }
 
         $window = $periode ? PendaftaranWindow::find($periode->periode) : null;
         $windowOpen = $window ? $window->isOpen() : false;
@@ -90,7 +119,7 @@ class PendaftaranController extends Controller
     }
 
     /**
-     * Daftar baru maupun ubah data: status selalu APPROVED (tanpa antrean).
+     * Langkah 3: Simpan pilihan eskul siswa.
      */
     public function store(Request $request): RedirectResponse
     {
@@ -98,7 +127,7 @@ class PendaftaranController extends Controller
         $periode = $this->periodeAktif();
 
         if (! $periode) {
-            return redirect()->route('siswa.status')->with('status', 'Belum ada periode pendaftaran yang dibuka.');
+            return redirect()->route('siswa.aturan')->with('error', 'Belum ada periode pendaftaran yang dibuka.');
         }
 
         $request->validate([
@@ -114,27 +143,19 @@ class PendaftaranController extends Controller
             ->where('periode', $periode->periode)
             ->first();
 
-        // Batas pendaftaran per siswa per periode (default 1, dari setting periode).
-        $maks = max(1, (int) ($periode->max_eskul_per_siswa ?? 1));
-        $jumlah = Registration::where('user_id', $user->id)
-            ->where('periode', $periode->periode)
-            ->count();
-
         // Pilihan final: tidak dapat diubah lagi setelah terkirim.
-        if ($jumlah >= $maks) {
-            $sudah = $existing?->eskul_utama ?? 'eskul';
-            return redirect()->route('siswa.status')
-                ->with('status', "Anda sudah terdaftar {$sudah} periode {$periode->periode} ({$jumlah}/{$maks}). Pilihan tidak dapat diubah lagi.");
+        if ($existing) {
+            return redirect()->route('siswa.sukses')
+                ->with('status', "Data pendaftaran Anda sudah terkunci pada {$existing->eskul_utama}.");
         }
 
         // Syarat kelayakan: akun aktif + tingkat kelas + semester.
-        // Master dicari via relasi, fallback NIS == username (akun lama belum tertaut).
         $master = $user->student ?? Student::where('nis', $user->username)->first();
         $masterAktif = $master && $master->status === 'AKTIF';
 
         if (! $masterAktif) {
-            return redirect()->route('siswa.status')
-                ->with('status', 'Akun Anda tidak aktif atau data siswa belum terdaftar. Hubungi TU.');
+            return redirect()->route('siswa.aturan')
+                ->with('error', 'Akun Anda tidak aktif atau data siswa belum terdaftar. Hubungi TU.');
         }
 
         $kelasInput = $request->input('kelas');
@@ -161,7 +182,7 @@ class PendaftaranController extends Controller
 
         $window = PendaftaranWindow::find($periode->periode);
         if (! $window || ! $window->isOpen()) {
-            return redirect()->route('siswa.status')->with('status', 'Pendaftaran sedang tidak dibuka.');
+            return redirect()->route('siswa.aturan')->with('error', 'Pendaftaran sedang tidak dibuka.');
         }
 
         try {
@@ -194,7 +215,7 @@ class PendaftaranController extends Controller
                     'gender' => $request->input('gender') ? (\App\Enums\Gender::tryFrom($request->input('gender')) ?? $master->gender ?? \App\Enums\Gender::LAKI_LAKI) : ($master->gender ?? \App\Enums\Gender::LAKI_LAKI),
                     'whatsapp' => $wa,
                     'eskul_utama' => $dipakai,
-                    'eskul_cadangan' => $request->input('eskul_cadangan'),
+                    'eskul_cadangan' => null,
                     'alasan' => $request->input('alasan'),
                     'alasan_penolakan' => null,
                     'status' => Status::APPROVED,
@@ -215,7 +236,7 @@ class PendaftaranController extends Controller
         } catch (\Illuminate\Database\QueryException $e) {
             $sudah = Registration::where('user_id', $user->id)->where('periode', $periode->periode)->first();
             if ($sudah) {
-                return redirect()->route('siswa.status')
+                return redirect()->route('siswa.sukses')
                     ->with('status', "Anda sudah terdaftar {$sudah->eskul_utama} periode {$periode->periode}.");
             }
             throw $e;
@@ -224,13 +245,33 @@ class PendaftaranController extends Controller
         // Token bersifat sekali pakai: langsung hanguskan token setelah pendaftaran berhasil
         \App\Support\LoginToken::revoke($user);
 
-        $pesan = "Pendaftaran berhasil. Anda resmi terdaftar {$dipakai}. Data telah terkunci.";
+        $pesan = "Pendaftaran berhasil! Anda resmi terdaftar pada {$dipakai}. Data Anda telah tersimpan dan terkunci.";
 
         Notifier::statusPendaftaran($registration);
 
-        return redirect()->route('siswa.status')
+        return redirect()->route('siswa.sukses')
             ->with('status', $pesan)
+            ->with('eskul', $dipakai)
             ->with('just_registered', true);
+    }
+
+    /**
+     * Langkah 4: Halaman sukses pendaftaran + hitung mundur 5 detik auto-logout.
+     */
+    public function sukses(): View
+    {
+        $user = auth()->user()->load('student');
+        $periode = $this->periodeAktif();
+
+        $registration = $periode
+            ? Registration::where('user_id', $user->id)->where('periode', $periode->periode)->latest()->first()
+            : null;
+
+        return view('siswa.sukses', [
+            'user' => $user,
+            'registration' => $registration,
+            'periode' => $periode,
+        ]);
     }
 
     /**

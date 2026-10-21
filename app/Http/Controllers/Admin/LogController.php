@@ -24,6 +24,8 @@ class LogController extends Controller
                 $query->where(function ($sub) use ($q) {
                     $sub->where('detail', 'like', "%{$q}%")
                         ->orWhere('admin_email', 'like', "%{$q}%")
+                        ->orWhere('ip_address', 'like', "%{$q}%")
+                        ->orWhere('actor_role', 'like', "%{$q}%")
                         ->orWhere('target_id', 'like', "%{$q}%");
                 });
             })

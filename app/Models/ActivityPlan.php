@@ -11,6 +11,8 @@ class ActivityPlan extends Model
     protected $fillable = [
         'eskul_id',
         'tanggal',
+        'jam_mulai',
+        'jam_selesai',
         'jenis',
         'agenda',
         'tujuan',

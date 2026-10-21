@@ -3,51 +3,47 @@
 @section('title', 'Detail Kegiatan')
 
 @section('content')
-<div class="w-full space-y-4">
-    <a href="{{ route('pembina.kegiatan.index') }}" class="text-sm text-blue-600 hover:underline">&larr; Kembali ke Kegiatan Saya</a>
+<div class="w-full max-w-2xl mx-auto space-y-4">
+    <a href="{{ route('pembina.kegiatan.index') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-700">← Kembali ke Kegiatan Saya</a>
 
-    <div class="rounded-lg border bg-white p-4 shadow-sm">
-        <div class="flex flex-wrap items-start justify-between gap-2">
+    <div class="rounded-3xl border border-slate-200/90 bg-white p-6 shadow-xs space-y-4">
+        <div class="flex flex-wrap items-start justify-between gap-2 border-b border-slate-100 pb-4">
             <div>
-                <h1 class="text-xl font-bold">{{ $kegiatan->agenda }}</h1>
-                <p class="mt-1 text-sm text-gray-600">{{ $kegiatan->eskul->name ?? '-' }} · {{ $kegiatan->tanggal->format('d-m-Y') }}</p>
+                <span class="inline-block rounded-md bg-blue-50 px-2 py-0.5 text-xs font-bold text-blue-700 mb-1">
+                    {{ $kegiatan->jenis->label() }}
+                </span>
+                <h1 class="text-xl font-bold text-slate-900">{{ $kegiatan->agenda }}</h1>
+                <p class="mt-0.5 text-xs text-slate-500">{{ $kegiatan->eskul->name ?? '-' }} • {{ $kegiatan->tanggal->format('d/m/Y') }}</p>
             </div>
-            <span class="inline-block rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">{{ $kegiatan->jenis->label() }}</span>
         </div>
 
-        <dl class="mt-4 space-y-2 text-sm">
-            <div class="grid grid-cols-3 gap-2 border-b pb-2">
-                <dt class="font-medium text-gray-500">Tujuan</dt>
-                <dd class="col-span-2">{{ $kegiatan->tujuan ?? '-' }}</dd>
+        <dl class="space-y-3 text-xs sm:text-sm">
+            <div class="grid grid-cols-3 gap-2 border-b border-slate-100 pb-2.5">
+                <dt class="font-medium text-slate-500">Waktu / Jam</dt>
+                <dd class="col-span-2 font-semibold text-slate-800">
+                    {{ $kegiatan->jam_mulai ? $kegiatan->jam_mulai . ' – ' . ($kegiatan->jam_selesai ?? 'Selesai') : 'Belum diatur' }}
+                </dd>
             </div>
-            <div class="grid grid-cols-3 gap-2 border-b pb-2">
-                <dt class="font-medium text-gray-500">Materi</dt>
-                <dd class="col-span-2">{{ $kegiatan->materi ?? '-' }}</dd>
-            </div>
-            <div class="grid grid-cols-3 gap-2 border-b pb-2">
-                <dt class="font-medium text-gray-500">Lokasi</dt>
-                <dd class="col-span-2">{{ $kegiatan->lokasi ?? '-' }}</dd>
-            </div>
-            <div class="grid grid-cols-3 gap-2 border-b pb-2">
-                <dt class="font-medium text-gray-500">Dokumentasi</dt>
-                <dd class="col-span-2">{{ $kegiatan->dokumentasi ?? '-' }}</dd>
-            </div>
-            <div class="grid grid-cols-3 gap-2 border-b pb-2">
-                <dt class="font-medium text-gray-500">Hasil</dt>
-                <dd class="col-span-2">{{ $kegiatan->hasil ?? '-' }}</dd>
+            <div class="grid grid-cols-3 gap-2 border-b border-slate-100 pb-2.5">
+                <dt class="font-medium text-slate-500">Lokasi / Tempat</dt>
+                <dd class="col-span-2 font-medium text-slate-800">{{ $kegiatan->lokasi ?: 'Belum ditentukan' }}</dd>
             </div>
             <div class="grid grid-cols-3 gap-2">
-                <dt class="font-medium text-gray-500">Kendala</dt>
-                <dd class="col-span-2">{{ $kegiatan->kendala ?? '-' }}</dd>
+                <dt class="font-medium text-slate-500">Catatan / Kendala</dt>
+                <dd class="col-span-2 text-slate-700 whitespace-pre-line">{{ $kegiatan->kendala ?: 'Tidak ada kendala/catatan khusus.' }}</dd>
             </div>
         </dl>
 
-        <div class="mt-4 flex gap-2 text-sm">
-            <a href="{{ route('pembina.kegiatan.edit', $kegiatan) }}" class="rounded bg-amber-500 px-4 py-2 font-medium text-white hover:bg-amber-600">Ubah</a>
-            <form method="POST" action="{{ route('pembina.kegiatan.destroy', $kegiatan) }}" onsubmit="return confirm('Hapus kegiatan ini?')">
+        <div class="mt-6 flex items-center gap-2 pt-4 border-t border-slate-100 text-xs">
+            <a href="{{ route('pembina.kegiatan.edit', $kegiatan) }}" class="rounded-xl bg-amber-500 px-4 py-2 font-bold text-white hover:bg-amber-600 transition shadow-2xs">
+                Ubah Kegiatan
+            </a>
+            <form method="POST" action="{{ route('pembina.kegiatan.destroy', $kegiatan) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kegiatan ini?')">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="rounded bg-red-600 px-4 py-2 font-medium text-white hover:bg-red-700">Hapus</button>
+                <button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 font-bold text-white hover:bg-rose-700 transition shadow-2xs cursor-pointer">
+                    Hapus
+                </button>
             </form>
         </div>
     </div>

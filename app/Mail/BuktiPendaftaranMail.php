@@ -22,9 +22,7 @@ class BuktiPendaftaranMail extends Mailable
         public Registration $registration,
     ) {
         $this->jadwals = Eskul::where('name', $registration->eskul_utama)->first()?->jadwals ?? collect();
-        $this->verifyUrl = $registration->verify_token
-            ? route('verify.show', $registration->verify_token)
-            : route('verify.form', ['kode' => $registration->kode()]);
+        $this->verifyUrl = url('/');
     }
 
     public function envelope(): Envelope

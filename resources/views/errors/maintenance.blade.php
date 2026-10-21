@@ -104,9 +104,6 @@
                 <a href="{{ route('siswa.login') }}" class="text-slate-400 hover:text-blue-700 hover:underline transition">
                     Portal Siswa
                 </a>
-                <a href="{{ route('verify.form') }}" class="text-slate-400 hover:text-blue-700 hover:underline transition">
-                    Verifikasi
-                </a>
                 <a href="{{ route('admin.login') }}" class="text-slate-400 hover:text-blue-700 hover:underline transition">
                     Pintu Masuk Staf &rarr;
                 </a>

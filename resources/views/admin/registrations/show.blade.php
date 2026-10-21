@@ -110,20 +110,14 @@
 @if (auth()->user()->hasRole(\App\Enums\Role::ADMIN, \App\Enums\Role::OPERATOR))
 <div class="grid gap-4 sm:grid-cols-2 mb-4">
     <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 class="font-bold text-sm text-slate-900 mb-3">Kartu & Sertifikat</h2>
+        <h2 class="font-bold text-sm text-slate-900 mb-3">Keamanan Kartu Pelajar</h2>
         <div class="flex flex-wrap gap-2 text-sm">
-            <form method="POST" action="{{ route('admin.registrations.cabut', $registration) }}" onsubmit="return confirm('Cabut kartu & terbitkan QR baru? QR lama hangus.')">
+            <form method="POST" action="{{ route('admin.registrations.cabut', $registration) }}" onsubmit="return confirm('Cabut kartu & terbitkan token baru? Token lama hangus.')">
                 @csrf
-                <button class="px-4 py-2 rounded-xl border border-slate-300 font-semibold hover:bg-slate-50">Cabut Kartu & QR Baru</button>
+                <button class="px-4 py-2 rounded-xl border border-slate-300 font-semibold hover:bg-slate-50">Cabut Kartu & Reset Token</button>
             </form>
-            @if ($registration->status->value === 'APPROVED' && !$registration->certificate)
-                <form method="POST" action="{{ route('admin.registrations.sertifikat', $registration) }}">
-                    @csrf
-                    <button class="px-4 py-2 rounded-xl bg-blue-700 text-white font-bold hover:bg-blue-800">Terbitkan Sertifikat</button>
-                </form>
-            @endif
         </div>
-        <p class="mt-2 text-[11px] text-slate-400">QR lama hangus saat dicabut. Sertifikat idempoten (1 per pendaftar).</p>
+        <p class="mt-2 text-[11px] text-slate-400">Gunakan bila kartu pelajar fisik siswa hilang atau dicetak ulang.</p>
     </div>
 
     {{-- Token & password --}}

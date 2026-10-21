@@ -13,7 +13,9 @@
     <link rel="stylesheet" href="{{ asset('css/stempel.css') }}?v={{ filemtime(public_path('css/stempel.css')) }}">
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
-@php($sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra')))
+@php
+    $sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra'));
+@endphp
 <main class="flex min-h-screen">
     {{-- Panel Branding Desktop - Sesuai Mockup (Biru Penuh dengan Gedung SMK Bagimu Negeriku) --}}
     <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-b from-[#1d62d8] via-[#1e58c8] to-[#154bb0] p-10 xl:p-14 text-white lg:flex">

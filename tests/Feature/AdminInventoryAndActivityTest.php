@@ -3,13 +3,10 @@
 namespace Tests\Feature;
 
 use App\Enums\ActivityJenis;
-use App\Enums\ItemKondisi;
 use App\Enums\Role;
 use App\Models\ActivityPlan;
 use App\Models\AdminLog;
-use App\Models\Certificate;
 use App\Models\Eskul;
-use App\Models\InventoryItem;
 use App\Models\Registration;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -36,10 +33,10 @@ class AdminInventoryAndActivityTest extends TestCase
         AdminLog::create([
             'admin_id' => (string) $admin->id,
             'admin_email' => 'admin@sekolah.sch.id',
-            'action' => 'inventory.store',
-            'target_type' => 'InventoryItem',
+            'action' => 'eskuls.store',
+            'target_type' => 'Eskul',
             'target_id' => '1',
-            'detail' => 'Tambah barang Bola Basket Molten (10).',
+            'detail' => 'Tambah eskul Bola Basket Molten.',
         ]);
 
         AdminLog::create([
@@ -64,48 +61,48 @@ class AdminInventoryAndActivityTest extends TestCase
         $resAction->assertDontSee('Bola Basket Molten');
     }
 
-    public function test_admin_dapat_mengelola_inventaris(): void
+    public function test_admin_dapat_menghapus_eskul_tanpa_pendaftar(): void
     {
         $admin = $this->admin();
-        $eskul = Eskul::create(['name' => 'Basket', 'aktif' => true]);
+        $eskul = Eskul::create(['name' => 'Klub Robotik', 'aktif' => true]);
 
-        // Create
-        $responseCreate = $this->actingAs($admin)->post('/admin/inventory', [
-            'eskul_id' => $eskul->id,
-            'nama' => 'Bola Basket Spalding',
-            'jumlah' => 5,
-            'kondisi' => 'BAIK',
-            'keterangan' => 'Kondisi baru pengadaan 2026',
-        ]);
-        $responseCreate->assertRedirect('/admin/inventory');
-        $this->assertDatabaseHas('inventory_items', [
-            'nama' => 'Bola Basket Spalding',
-            'jumlah' => 5,
-            'kondisi' => 'BAIK',
+        // Pastikan tombol hapus terlihat di halaman index dan edit
+        $resIndex = $this->actingAs($admin)->get('/admin/eskuls');
+        $resIndex->assertOk();
+        $resIndex->assertSee('Hapus');
+
+        $resEdit = $this->actingAs($admin)->get("/admin/eskuls/{$eskul->id}/edit");
+        $resEdit->assertOk();
+        $resEdit->assertSee('Hapus Ekstrakurikuler');
+
+        // Lakukan penghapusan
+        $resDelete = $this->actingAs($admin)->delete("/admin/eskuls/{$eskul->id}");
+        $resDelete->assertRedirect('/admin/eskuls');
+        $this->assertDatabaseMissing('eskuls', ['id' => $eskul->id]);
+    }
+
+    public function test_admin_ditolak_menghapus_eskul_dengan_pendaftar(): void
+    {
+        $admin = $this->admin();
+        $eskul = Eskul::create(['name' => 'Futsal', 'aktif' => true]);
+        $studentUser = User::factory()->create(['role' => Role::STUDENT]);
+
+        Registration::create([
+            'user_id' => $studentUser->id,
+            'nis' => '10001',
+            'kelas' => 'X RPL 1',
+            'jurusan' => 'RPL',
+            'usia' => 16,
+            'gender' => 'LAKI_LAKI',
+            'eskul_utama' => 'Futsal',
+            'status' => 'APPROVED',
+            'periode' => '2026/2027',
+            'jalur' => 'REGULER',
         ]);
 
-        $item = InventoryItem::where('nama', 'Bola Basket Spalding')->firstOrFail();
-
-        // Update
-        $responseUpdate = $this->actingAs($admin)->put("/admin/inventory/{$item->id}", [
-            'eskul_id' => $eskul->id,
-            'nama' => 'Bola Basket Spalding Pro',
-            'jumlah' => 4,
-            'kondisi' => 'RUSAK_RINGAN',
-            'keterangan' => '1 bola bocor',
-        ]);
-        $responseUpdate->assertRedirect('/admin/inventory');
-        $this->assertDatabaseHas('inventory_items', [
-            'id' => $item->id,
-            'nama' => 'Bola Basket Spalding Pro',
-            'jumlah' => 4,
-            'kondisi' => 'RUSAK_RINGAN',
-        ]);
-
-        // Delete
-        $responseDelete = $this->actingAs($admin)->delete("/admin/inventory/{$item->id}");
-        $responseDelete->assertRedirect('/admin/inventory');
-        $this->assertDatabaseMissing('inventory_items', ['id' => $item->id]);
+        $resDelete = $this->actingAs($admin)->delete("/admin/eskuls/{$eskul->id}");
+        $resDelete->assertSessionHasErrors('eskul');
+        $this->assertDatabaseHas('eskuls', ['id' => $eskul->id]);
     }
 
     public function test_pembina_dapat_mengelola_kegiatan_eskulnya_saja(): void
@@ -145,41 +142,6 @@ class AdminInventoryAndActivityTest extends TestCase
         $this->assertDatabaseMissing('activity_plans', ['id' => $kegiatan->id]);
     }
 
-    public function test_admin_dapat_melihat_halaman_cetak_sertifikat(): void
-    {
-        $admin = $this->admin();
-        $siswa = User::factory()->create(['name' => 'Budi Santoso', 'role' => Role::STUDENT]);
-
-        $reg = Registration::create([
-            'user_id' => $siswa->id,
-            'periode' => '2026/2027',
-            'kelas' => 'XI RPL 1',
-            'nis' => '10099',
-            'jurusan' => 'RPL',
-            'usia' => 17,
-            'gender' => 'LAKI_LAKI',
-            'eskul_utama' => 'Robotik',
-            'status' => 'APPROVED',
-            'nilai' => 92,
-            'predikat' => 'A',
-            'verify_token' => 'token-sertifikat-12345',
-        ]);
-
-        $cert = Certificate::create([
-            'registration_id' => $reg->id,
-            'nomor' => 'SRT-2026-ABCDEF',
-            'doc_version' => 1,
-            'diterbitkan_oleh' => $admin->email,
-        ]);
-
-        $response = $this->actingAs($admin)->get("/admin/certificates/{$cert->id}/cetak");
-        $response->assertOk();
-        $response->assertSee('Budi Santoso');
-        $response->assertSee('SRT-2026-ABCDEF');
-        $response->assertSee('Robotik');
-        $response->assertSee('Predikat A');
-    }
-
     public function test_admin_dapat_mengelola_akun_staf_dan_reset_password(): void
     {
         $admin = $this->admin();
@@ -191,8 +153,7 @@ class AdminInventoryAndActivityTest extends TestCase
         // 2. Admin can access admin/users index
         $responseIndex = $this->actingAs($admin)->get('/admin/users');
         $responseIndex->assertOk();
-        $responseIndex->assertSee('Kelola Akun Staf');
-        $responseIndex->assertSee($admin->email);
+        $responseIndex->assertSee('Kelola Pembina Ekstrakurikuler');
 
         // 3. Admin creates a new staff account
         $responseStore = $this->actingAs($admin)->post('/admin/users', [
@@ -238,46 +199,5 @@ class AdminInventoryAndActivityTest extends TestCase
 
         $responseSelfDelete = $this->actingAs($admin)->delete("/admin/users/{$admin->id}");
         $responseSelfDelete->assertSessionHasErrors('user');
-    }
-
-    public function test_admin_dapat_mencatat_peminjaman_dan_pengembalian_barang(): void
-    {
-        $admin = $this->admin();
-        $eskul = Eskul::create(['name' => 'Badminton', 'aktif' => true]);
-
-        $item = InventoryItem::create([
-            'eskul_id' => $eskul->id,
-            'nama' => 'Raket Yonex',
-            'jumlah' => 3,
-            'kondisi' => 'BAIK',
-        ]);
-
-        // 1. Borrow 2 items
-        $responseBorrow = $this->actingAs($admin)->post("/admin/inventory/{$item->id}/loans", [
-            'peminjam' => 'Ahmad Siswa',
-            'jumlah' => 2,
-            'tgl_pinjam' => now()->toDateString(),
-        ]);
-        $responseBorrow->assertRedirect();
-        $this->assertDatabaseHas('inventory_loans', [
-            'item_id' => $item->id,
-            'peminjam' => 'Ahmad Siswa',
-            'jumlah' => 2,
-            'status' => 'DIPINJAM',
-        ]);
-
-        // 2. Cannot borrow more than available stock (only 1 left)
-        $responseExcess = $this->actingAs($admin)->post("/admin/inventory/{$item->id}/loans", [
-            'peminjam' => 'Budi Siswa',
-            'jumlah' => 2,
-            'tgl_pinjam' => now()->toDateString(),
-        ]);
-        $responseExcess->assertSessionHasErrors('jumlah');
-
-        // 3. Return the loan
-        $loan = $item->loans()->first();
-        $responseReturn = $this->actingAs($admin)->put(route('admin.loans.kembali', $loan));
-        $responseReturn->assertRedirect();
-        $this->assertEquals('KEMBALI', $loan->fresh()->status);
     }
 }

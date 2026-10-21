@@ -71,7 +71,7 @@ class FiturTambahanTest extends TestCase
             'whatsapp' => '081234567890',
             'eskul_utama' => 'Futsal',
             'alasan' => 'Ingin sehat.',
-        ])->assertRedirect('/siswa/status');
+        ])->assertRedirect('/siswa/sukses');
 
         $this->assertDatabaseHas('inapp_notifications', [
             'user_id' => $siswa->id,
@@ -148,45 +148,6 @@ class FiturTambahanTest extends TestCase
         $resXls->assertOk();
         $this->assertStringContainsString('application/vnd.ms-excel', $resXls->headers->get('Content-Type'));
         $this->assertStringContainsString('Siswa Tes', $resXls->streamedContent());
-    }
-
-    public function test_siswa_upload_bukti_izin_dan_pencegahan_idor(): void
-    {
-        Storage::fake('public');
-        [$siswa, $reg, $eskul] = $this->siapkan();
-        $reg->update(['status' => Status::APPROVED]);
-
-        $file = UploadedFile::fake()->image('surat_sakit.jpg');
-
-        // Siswa uploads izin for their own eskul with file
-        $response = $this->actingAs($siswa)->post('/siswa/izin', [
-            'eskul' => 'Futsal',
-            'tanggal' => now()->toDateString(),
-            'jenis' => 'SAKIT',
-            'alasan' => 'Demam tinggi butuh istirahat.',
-            'bukti' => $file,
-        ]);
-
-        $response->assertRedirect('/siswa/izin');
-        $this->assertDatabaseHas('izin', [
-            'registration_id' => $reg->id,
-            'eskul_id' => $eskul->id,
-            'jenis' => 'SAKIT',
-        ]);
-
-        $izin = Izin::where('registration_id', $reg->id)->first();
-        $this->assertNotNull($izin->bukti);
-        Storage::disk('public')->assertExists($izin->bukti);
-
-        // IDOR prevention: Siswa cannot submit izin for an eskul they are not registered to
-        $otherEskul = Eskul::create(['name' => 'Robotik', 'aktif' => true]);
-        $responseSpoofed = $this->actingAs($siswa)->post('/siswa/izin', [
-            'eskul' => 'Robotik',
-            'tanggal' => now()->toDateString(),
-            'jenis' => 'SAKIT',
-            'alasan' => 'Izin tidak valid.',
-        ]);
-        $responseSpoofed->assertSessionHasErrors('eskul');
     }
 
     public function test_admin_bisa_mengubah_jadwal_eskul(): void

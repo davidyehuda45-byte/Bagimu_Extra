@@ -75,7 +75,7 @@ class ParitasTest extends TestCase
         [$siswa] = $this->siapkan();
 
         $this->actingAs($siswa)->post('/siswa/daftar', $this->daftarPayload())
-            ->assertRedirect('/siswa/status');
+            ->assertRedirect('/siswa/sukses');
 
         $this->assertDatabaseHas('registrations', ['user_id' => $siswa->id, 'status' => 'APPROVED']);
         // Nomor WA otomatis tersambung ke direktori siswa.
@@ -117,24 +117,6 @@ class ParitasTest extends TestCase
         }
     }
 
-    public function test_nomor_sertifikat_format_lama(): void
-    {
-        [$siswa, $eskul] = $this->siapkan();
-        $reg = Registration::create([
-            'user_id' => $siswa->id, 'periode' => '2026/2027', 'kelas' => '10 RPL 1',
-            'nis' => '10001', 'jurusan' => 'RPL', 'usia' => 16, 'gender' => 'LAKI_LAKI',
-            'eskul_utama' => 'Futsal', 'status' => 'APPROVED',
-        ]);
-
-        $this->actingAs($this->admin())->post('/admin/certificates', [
-            'registration_id' => $reg->id,
-        ])->assertRedirect();
-
-        $nomor = $reg->fresh()->certificate->nomor;
-        $this->assertMatchesRegularExpression('/^SRT-\d{4}-[A-HJ-NP-Z2-9]{6}$/', $nomor);
-        $this->assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $reg->fresh()->verify_token);
-    }
-
     public function test_kode_pendaftaran_dan_verifikasi(): void
     {
         [$siswa, $eskul] = $this->siapkan();
@@ -146,13 +128,6 @@ class ParitasTest extends TestCase
         ]);
 
         $this->assertMatchesRegularExpression('/^ESK-[0-9A-Z]{10}$/', $reg->kode());
-
-        // Verifikasi via kode ESK-…
-        $this->get('/verify?kode='.$reg->kode())->assertOk()->assertSee('TERDAFTAR');
-
-        // Kartu dicabut → tidak berlaku.
-        $reg->update(['card_revoked_at' => now()]);
-        $this->get('/verify/'.$reg->verify_token)->assertOk()->assertSee('tidak berlaku');
     }
 
     public function test_hapus_data_pendaftaran(): void
@@ -196,29 +171,6 @@ class ParitasTest extends TestCase
             'password' => 'rahasia-baru',
         ])->assertRedirect();
         $this->assertTrue(Hash::check('rahasia-baru', $user->fresh()->password));
-
-        // Sertifikat idempoten.
-        $this->actingAs($admin)->post("/admin/registrations/{$reg->id}/sertifikat")->assertRedirect();
-        $this->actingAs($admin)->post("/admin/registrations/{$reg->id}/sertifikat")->assertRedirect();
-        $this->assertSame(1, \App\Models\Certificate::where('registration_id', $reg->id)->count());
-    }
-
-    public function test_password_siswa_dan_login_alternatif(): void
-    {
-        [$siswa] = $this->siapkan();
-
-        // Atur password (belum pernah → tanpa password lama).
-        $this->actingAs($siswa)->post('/siswa/profil/password', [
-            'password' => 'sandi-siswa-1',
-            'password_confirmation' => 'sandi-siswa-1',
-        ])->assertRedirect();
-        $this->assertNotNull($siswa->fresh()->password_set_at);
-
-        // Login pakai NIS + password.
-        $this->post('/logout');
-        $this->post('/siswa/login', ['nis' => '10001', 'token' => 'sandi-siswa-1'])
-            ->assertRedirect('/siswa/daftar');
-        $this->assertAuthenticatedAs($siswa);
     }
 
     public function test_ecard_disetujui_dan_qr(): void
@@ -231,7 +183,7 @@ class ParitasTest extends TestCase
             'verify_token' => bin2hex(random_bytes(32)),
         ]);
 
-        $this->actingAs($siswa)->get('/siswa/status')->assertOk()->assertSee('Bukti Pendaftaran');
+        $this->actingAs($siswa)->get('/siswa/status')->assertRedirect('/siswa/sukses');
     }
 
     public function test_halaman_admin_baru(): void
@@ -245,8 +197,6 @@ class ParitasTest extends TestCase
         ] as $url) {
             $this->actingAs($admin)->get($url)->assertOk();
         }
-
-        $this->actingAs($admin)->get('/verify')->assertOk();
     }
 
     public function test_kepala_sekolah_baca_saja(): void
@@ -353,7 +303,7 @@ class ParitasTest extends TestCase
         [$siswa] = $this->siapkan();
 
         $this->actingAs($siswa)->post('/siswa/daftar', $this->daftarPayload(['kelas' => 'XI RPL 1']))
-            ->assertRedirect('/siswa/status');
+            ->assertRedirect('/siswa/sukses');
 
         $this->assertDatabaseHas('registrations', ['user_id' => $siswa->id, 'kelas' => '11 RPL 1']);
         $this->assertSame(11, \App\Support\Kelas::tingkat('XI Kuliner 2'));
@@ -435,7 +385,7 @@ class ParitasTest extends TestCase
         // Kelas 11 semester 1 boleh.
         AppSetting::set('eskul.semester_aktif', '1');
         $this->actingAs($siswa)->post('/siswa/daftar', $this->daftarPayload(['kelas' => '11 RPL 1']))
-            ->assertRedirect('/siswa/status');
+            ->assertRedirect('/siswa/sukses');
     }
 
     public function test_undangan_staf(): void
@@ -460,7 +410,6 @@ class ParitasTest extends TestCase
 
         $this->actingAs($pembina)->get('/admin/kehadiran')->assertForbidden();
         $this->actingAs($pembina)->get('/admin/nilai')->assertForbidden();
-        $this->actingAs($pembina)->get('/admin/izin')->assertForbidden();
 
         // Izin eskul sendiri tetap bisa diputus.
         $reg = Registration::create([

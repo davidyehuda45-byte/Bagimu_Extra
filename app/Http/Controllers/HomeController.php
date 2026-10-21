@@ -8,7 +8,7 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $eskuls = Eskul::with('jadwals')->where('aktif', true)->orderBy('name')->get();
+        $eskuls = Eskul::with(['jadwals', 'pembina'])->where('aktif', true)->orderBy('name')->get();
 
         $urutanHari = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'];
         $jadwal = collect($urutanHari)->mapWithKeys(function ($hari) use ($eskuls) {

@@ -130,21 +130,28 @@ class ScanController extends Controller
             $kode = trim(end($parts));
         }
 
+        // 1. Cari via NIS langsung (angka maupun alfanumerik kartu pelajar)
+        $byNis = Registration::with('user')
+            ->where('nis', $kode)
+            ->latest('id')
+            ->first();
+        if ($byNis) {
+            return $byNis;
+        }
+
+        // 2. Cari via username akun siswa (terkoneksi NIS)
+        $byUser = Registration::with('user')
+            ->whereHas('user', fn ($q) => $q->where('username', $kode))
+            ->latest('id')
+            ->first();
+        if ($byUser) {
+            return $byUser;
+        }
+
         if (preg_match('/^[0-9a-fA-F]{32,64}$/', $kode)) {
             return Registration::with('user')
                 ->where('verify_token', strtolower($kode))
                 ->first();
-        }
-
-        // Cari via NIS Kartu Pelajar
-        if (preg_match('/^\d{3,25}$/', $kode)) {
-            $byNis = Registration::with('user')
-                ->where('nis', $kode)
-                ->latest('id')
-                ->first();
-            if ($byNis) {
-                return $byNis;
-            }
         }
 
         return Registration::dariKode($kode)?->load('user');

@@ -48,6 +48,13 @@
                                 <a href="{{ route('admin.eskuls.edit', $eskul) }}" class="inline-flex items-center gap-1 rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 hover:bg-amber-100 transition shadow-sm">
                                     <x-icon name="pencil" class="h-3 w-3" /> Ubah
                                 </a>
+                                <form method="POST" action="{{ route('admin.eskuls.destroy', $eskul) }}" onsubmit="return confirm('Hapus permanen ekstrakurikuler {{ $eskul->name }}? Tindakan ini tidak dapat dibatalkan.')" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="inline-flex items-center gap-1 rounded-lg border border-rose-300 bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-100 transition shadow-sm" title="Hapus eskul">
+                                        <x-icon name="trash" class="h-3 w-3" /> Hapus
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AdminLog;
 use App\Models\AppSetting;
-use App\Services\FonnteService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -41,7 +40,6 @@ class SettingController extends Controller
         $users = \App\Models\User::whereIn('role', [
             \App\Enums\Role::ADMIN,
             \App\Enums\Role::OPERATOR,
-            \App\Enums\Role::PEMBINA,
             \App\Enums\Role::KEPALA_SEKOLAH,
         ])->orderBy('name')->paginate(20);
 
@@ -54,7 +52,6 @@ class SettingController extends Controller
             'me' => $me,
             'qrUrl' => $qrUrl,
             'users' => $users,
-            'fonnte' => (new FonnteService)->getStatus(),
             'elig' => [
                 'kelas' => AppSetting::get('eskul.kelas_allowed', '10,11'),
                 'semester' => AppSetting::get('eskul.semester_aktif', '1'),
@@ -192,44 +189,5 @@ class SettingController extends Controller
         AdminLog::record('settings.mfa_disable', 'User', $me->id, 'MFA dinonaktifkan.');
 
         return back()->with('status', 'MFA dinonaktifkan.');
-    }
-
-    public function checkFonnte(Request $request, FonnteService $fonnte): JsonResponse
-    {
-        $request->validate([
-            'token' => ['required', 'string'],
-        ]);
-
-        $result = $fonnte->validateToken($request->token);
-
-        return response()->json($result);
-    }
-
-    public function saveFonnte(Request $request, FonnteService $fonnte): RedirectResponse
-    {
-        $request->validate([
-            'token' => ['required', 'string'],
-        ]);
-
-        $result = $fonnte->validateToken($request->token);
-
-        if (! ($result['valid'] ?? false)) {
-            return back()->with('error', $result['message'] ?? 'Token Fonnte tidak valid.');
-        }
-
-        $fonnte->saveToken($request->token, $result);
-
-        AdminLog::record('settings.fonnte_connect', 'AppSetting', null, "Menghubungkan WhatsApp Gateway Fonnte (Device: {$result['device']})");
-
-        return back()->with('status', 'WhatsApp Gateway (Fonnte) berhasil dihubungkan.');
-    }
-
-    public function disconnectFonnte(FonnteService $fonnte): RedirectResponse
-    {
-        $fonnte->disconnect();
-
-        AdminLog::record('settings.fonnte_disconnect', 'AppSetting', null, 'Memutus WhatsApp Gateway Fonnte');
-
-        return back()->with('status', 'Koneksi WhatsApp Gateway Fonnte berhasil diputus.');
     }
 }

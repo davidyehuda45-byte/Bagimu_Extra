@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Enums\LoginMethod;
 use App\Enums\Role;
 use App\Http\Controllers\Controller;
+use App\Models\AdminLog;
 use App\Models\LoginHistory;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,27 +18,36 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
-class StaffLoginController extends Controller
+class AdminLoginController extends Controller
 {
-    /** Role yang boleh masuk via pintu staf (admin panel + pembina + wali kelas). */
-    private const ADMIN_PANEL_ROLES = [Role::ADMIN, Role::OPERATOR, Role::KEPALA_SEKOLAH, Role::PEMBINA, Role::WALI_KELAS];
+    /** Role yang diizinkan masuk ke portal Administrator */
+    private const ALLOWED_ROLES = [Role::ADMIN, Role::OPERATOR, Role::KEPALA_SEKOLAH];
 
     public function create(): View
     {
         return view('auth.admin-login');
     }
 
-    public function store(Request $request): RedirectResponse|\Illuminate\Http\JsonResponse
+    public function store(Request $request): RedirectResponse|JsonResponse
     {
         $data = $request->validate([
             'login' => ['required', 'string'],
             'password' => ['required', 'string'],
         ]);
 
-        $throttleKey = 'staff-login:'.$request->ip();
+        $throttleKey = 'admin-login:' . $request->ip();
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5, 300)) {
             $seconds = RateLimiter::availableIn($throttleKey);
+
+            AdminLog::record(
+                'auth.throttle',
+                'User',
+                null,
+                "Percobaan login admin diblokir rate limiter ({$seconds} detik).",
+                'FAILED',
+                $data['login']
+            );
 
             throw ValidationException::withMessages([
                 'login' => "Terlalu banyak percobaan login gagal. Silakan coba lagi dalam {$seconds} detik.",
@@ -49,23 +60,35 @@ class StaffLoginController extends Controller
             : User::where('username', $login)->first();
 
         if (! $user || ! $user->password || ! Hash::check($data['password'], $user->password)) {
-            $this->hitAndLog($request, $throttleKey, $user?->getAuthIdentifier(), $login, 'Kredensial salah');
+            $this->logFailure($request, $throttleKey, $user?->id, $login, 'Kredensial login admin salah');
 
             throw ValidationException::withMessages([
-                'login' => 'Username/email atau password salah.',
+                'login' => 'Username/email atau password admin salah.',
             ]);
         }
 
-        if (! in_array($user->role, self::ADMIN_PANEL_ROLES, true)) {
-            $reason = $user->role === Role::STUDENT ? 'Akun siswa mencoba masuk panel staf' : 'Bukan akun staf';
-            $this->hitAndLog($request, $throttleKey, $user->getAuthIdentifier(), $user->email, $reason);
-
-            $pesan = $user->role === Role::STUDENT
-                ? 'Ini halaman login staf/pembina. Akun siswa silakan login lewat halaman login siswa.'
-                : 'Hanya staf (admin/operator/kepala sekolah/pembina) yang memiliki akses masuk ke panel ini.';
+        // Pengecekan ketat: Pembina DILARANG login di portal admin
+        if ($user->role === Role::PEMBINA) {
+            $this->logFailure($request, $throttleKey, $user->id, $user->email, 'Pembina mencoba login ke portal Admin');
 
             throw ValidationException::withMessages([
-                'login' => $pesan,
+                'login' => 'Akun Pembina tidak diizinkan masuk melalui portal Administrator. Silakan login melalui halaman Pembina.',
+            ]);
+        }
+
+        if ($user->role === Role::STUDENT) {
+            $this->logFailure($request, $throttleKey, $user->id, $user->email, 'Siswa mencoba login ke portal Admin');
+
+            throw ValidationException::withMessages([
+                'login' => 'Portal ini khusus Administrator. Siswa silakan login melalui halaman login siswa.',
+            ]);
+        }
+
+        if (! in_array($user->role, self::ALLOWED_ROLES, true)) {
+            $this->logFailure($request, $throttleKey, $user->id, $user->email, 'Role tanpa izin mencoba login ke portal Admin');
+
+            throw ValidationException::withMessages([
+                'login' => 'Akun Anda tidak memiliki hak akses ke panel Administrator.',
             ]);
         }
 
@@ -97,49 +120,21 @@ class StaffLoginController extends Controller
         LoginHistory::create([
             'user_id' => $user->getAuthIdentifier(),
             'email' => $user->email,
-            'ip_hash' => hash('sha256', $request->ip().' '.config('app.key')),
+            'ip_hash' => hash('sha256', $request->ip() . ' ' . config('app.key')),
             'method' => LoginMethod::USERNAME,
             'success' => true,
             'reason' => null,
         ]);
 
-        // Pembina tidak punya akses /admin/*: bila halaman tujuan login
-        // adalah halaman admin (mis. dari bookmark), arahkan ke dashboard pembina.
-        if ($user->role === Role::PEMBINA) {
-            $tujuan = session()->pull('url.intended', route('pembina.dashboard'));
-            $path = parse_url((string) $tujuan, PHP_URL_PATH) ?? '';
-            if (str_starts_with($path, '/admin')) {
-                $tujuan = route('pembina.dashboard');
-            }
+        AdminLog::record(
+            'auth.admin_login',
+            'User',
+            $user->id,
+            "Administrator {$user->name} ({$user->email}) berhasil login.",
+            'SUCCESS'
+        );
 
-            if ($request->wantsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'redirect' => $tujuan,
-                ]);
-            }
-
-            return redirect()->to($tujuan);
-        }
-
-        if ($user->role === Role::WALI_KELAS) {
-            $tujuan = session()->pull('url.intended', route('wali-kelas.dashboard'));
-            $path = parse_url((string) $tujuan, PHP_URL_PATH) ?? '';
-            if (str_starts_with($path, '/admin')) {
-                $tujuan = route('wali-kelas.dashboard');
-            }
-
-            if ($request->wantsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'redirect' => $tujuan,
-                ]);
-            }
-
-            return redirect()->to($tujuan);
-        }
-
-        $tujuan = session()->pull('url.intended', '/dashboard');
+        $tujuan = session()->pull('url.intended', route('admin.dashboard'));
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -151,22 +146,33 @@ class StaffLoginController extends Controller
         return redirect()->to($tujuan);
     }
 
-    private function hitAndLog(
+    private function logFailure(
         Request $request,
         string $throttleKey,
         string|int|null $userId,
         ?string $email,
-        string $reason,
+        string $reason
     ): void {
         RateLimiter::hit($throttleKey);
 
         LoginHistory::create([
             'user_id' => $userId,
             'email' => $email,
-            'ip_hash' => hash('sha256', $request->ip().' '.config('app.key')),
+            'ip_hash' => hash('sha256', $request->ip() . ' ' . config('app.key')),
             'method' => LoginMethod::USERNAME,
             'success' => false,
             'reason' => $reason,
         ]);
+
+        AdminLog::record(
+            'auth.admin_login_failed',
+            'User',
+            $userId,
+            "Gagal login admin ({$email}): {$reason}",
+            'FAILED',
+            $email,
+            $userId,
+            'GUEST'
+        );
     }
 }

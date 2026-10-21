@@ -46,13 +46,11 @@ class KegiatanController extends Controller
         return [
             'eskul_id' => ['required', Rule::in($milikIds->all())],
             'tanggal' => ['required', 'date', 'after_or_equal:'.now()->subYear()->toDateString(), 'before_or_equal:'.now()->addYear()->toDateString()],
+            'jam_mulai' => ['nullable', 'string', 'max:10'],
+            'jam_selesai' => ['nullable', 'string', 'max:10'],
             'jenis' => ['required', Rule::in(array_column(ActivityJenis::cases(), 'value'))],
             'agenda' => ['required', 'string', 'max:200'],
-            'tujuan' => ['nullable', 'string'],
-            'materi' => ['nullable', 'string'],
             'lokasi' => ['nullable', 'string', 'max:100'],
-            'dokumentasi' => ['nullable', 'string', 'max:255'],
-            'hasil' => ['nullable', 'string'],
             'kendala' => ['nullable', 'string'],
         ];
     }

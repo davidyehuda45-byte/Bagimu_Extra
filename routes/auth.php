@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
@@ -9,8 +10,8 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\MfaController;
+use App\Http\Controllers\Auth\PembinaLoginController;
 use App\Http\Controllers\Auth\SiswaLoginController;
-use App\Http\Controllers\Auth\StaffLoginController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,17 +21,18 @@ Route::middleware('guest')->group(function () {
 
     Route::redirect('register', '/siswa/login');
 
-    // Pintu login staf & pembina (URL khusus /admin/login atau /pembina/login): username/email + password.
-    Route::get('admin/login', [StaffLoginController::class, 'create'])
+    // Pintu login admin (URL khusus /admin/login): form dan controller tersendiri
+    Route::get('admin/login', [AdminLoginController::class, 'create'])
         ->name('admin.login');
 
-    Route::post('admin/login', [StaffLoginController::class, 'store'])
+    Route::post('admin/login', [AdminLoginController::class, 'store'])
         ->middleware('throttle:10,1');
 
-    Route::get('pembina/login', [StaffLoginController::class, 'create'])
+    // Pintu login staf & pembina (URL khusus /pembina/login): form dan controller tersendiri
+    Route::get('pembina/login', [PembinaLoginController::class, 'create'])
         ->name('pembina.login');
 
-    Route::post('pembina/login', [StaffLoginController::class, 'store'])
+    Route::post('pembina/login', [PembinaLoginController::class, 'store'])
         ->middleware('throttle:10,1');
 
     Route::get('admin/mfa', [MfaController::class, 'create'])

@@ -77,7 +77,7 @@
                                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs">
                                             <div>
                                                 <label class="block font-medium mb-1">Hari</label>
-                                                <select name="hari" required class="w-full rounded border px-2 py-1 text-xs bg-white">
+                                                <select name="hari" required class="w-full rounded-lg border border-slate-300 pl-2 pr-7 py-1 text-xs bg-white focus:border-blue-600 focus:outline-hidden">
                                                     @foreach (['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'] as $hari)
                                                         <option value="{{ $hari }}" @selected($jadwal->hari === $hari)>{{ ucfirst(strtolower($hari)) }}</option>
                                                     @endforeach
@@ -118,7 +118,7 @@
             @csrf
             <div>
                 <label class="mb-1 block text-xs font-medium">Hari</label>
-                <select name="hari" class="w-full rounded border px-2 py-1.5 text-sm" required>
+                <select name="hari" class="w-full rounded-xl border border-slate-300 pl-3 pr-8 py-2 text-xs sm:text-sm bg-white focus:border-blue-600 focus:outline-hidden" required>
                     <option value="">Pilih hari</option>
                     @foreach (['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'] as $hari)
                         <option value="{{ $hari }}" @selected(old('hari') === $hari)>{{ ucfirst(strtolower($hari)) }}</option>
@@ -314,7 +314,7 @@
                                         <td class="px-3 py-2 text-slate-600 font-mono">{{ $r->nis ?? '-' }}</td>
                                         <td class="px-3 py-2 text-slate-700">{{ $r->kelas }}</td>
                                         <td class="px-3 py-2">
-                                            <select name="status[{{ $r->id }}]" class="rounded-xl border-slate-300 py-1.5 px-2.5 text-xs font-bold text-slate-800 bg-white shadow-2xs focus:border-blue-500 focus:ring-blue-500 cursor-pointer" @disabled($locked)>
+                                            <select name="status[{{ $r->id }}]" class="rounded-xl border-slate-300 py-1.5 pl-2.5 pr-8 text-xs font-bold text-slate-800 bg-white shadow-2xs focus:border-blue-500 focus:ring-blue-500 cursor-pointer" @disabled($locked)>
                                                 <option value="HADIR" class="font-bold text-emerald-700" @selected(($ada?->status->value ?? 'HADIR') === 'HADIR')>Hadir</option>
                                                 <option value="IZIN" class="font-bold text-blue-700" @selected(($ada?->status->value ?? 'HADIR') === 'IZIN')>Izin</option>
                                                 <option value="SAKIT" class="font-bold text-amber-700" @selected(($ada?->status->value ?? 'HADIR') === 'SAKIT')>Sakit</option>

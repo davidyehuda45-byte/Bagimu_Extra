@@ -56,16 +56,6 @@ class Notifier
         );
     }
 
-    public static function sertifikatTerbit(Registration $registration, string $nomor): void
-    {
-        self::kePengguna(
-            $registration->user_id,
-            'Sertifikat terbit',
-            "Sertifikat eskul {$registration->eskul_utama} (No. {$nomor}) sudah terbit. Lihat di halaman Status."
-        );
-        self::catat(NotifChannel::INAPP, 'user:'.$registration->user_id, 'SERTIFIKAT_TERBIT', "cert-{$registration->id}");
-    }
-
     public static function pengumumanBaru(string $judul): void
     {
         $now = now();

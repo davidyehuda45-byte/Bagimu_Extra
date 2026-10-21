@@ -35,9 +35,9 @@
         </div>
         <div class="flex items-center gap-2 self-end sm:self-center">
             @if ($existing)
-                <a href="{{ route('siswa.status') }}" class="inline-flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-3.5 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100 transition-colors">
-                    <x-icon name="id-card" class="h-3.5 w-3.5" />
-                    <span>Kartu Digital</span>
+                <a href="{{ route('siswa.sukses') }}" class="inline-flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-3.5 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100 transition-colors">
+                    <x-icon name="check" class="h-3.5 w-3.5" />
+                    <span>Status Pendaftaran</span>
                 </a>
             @endif
             <form method="POST" action="{{ route('logout') }}" class="inline-block m-0">
@@ -132,9 +132,9 @@
 
                 {{-- Tombol Aksi --}}
                 <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                    <a href="{{ route('siswa.status') }}" class="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-700 px-6 py-3.5 text-xs font-bold text-white shadow-md shadow-blue-700/20 hover:bg-blue-800 transition-colors">
+                    <a href="{{ route('siswa.sukses') }}" class="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-700 px-6 py-3.5 text-xs font-bold text-white shadow-md shadow-blue-700/20 hover:bg-blue-800 transition-colors">
                         <x-icon name="check" class="h-4 w-4" />
-                        <span>Lihat Bukti Pendaftaran</span>
+                        <span>Lihat Status Pendaftaran</span>
                     </a>
                     <form method="POST" action="{{ route('logout') }}" class="sm:w-auto">
                         @csrf

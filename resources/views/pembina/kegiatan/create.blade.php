@@ -3,69 +3,95 @@
 @section('title', 'Tambah Kegiatan')
 
 @section('content')
-<div class="w-full space-y-4">
+<div class="w-full max-w-2xl mx-auto space-y-4">
     <div>
-        <h1 class="text-xl font-bold">Tambah Kegiatan</h1>
-        <p class="text-sm text-gray-600">Isi rencana kegiatan eskul yang Anda ampu.</p>
+        <a href="{{ route('pembina.kegiatan.index') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-700">← Kembali ke Daftar Kegiatan</a>
+        <h1 class="text-xl font-bold text-slate-900 mt-1">Tambah Jadwal Kegiatan</h1>
+        <p class="text-xs sm:text-sm text-slate-500">Rencanakan agenda kegiatan atau latihan ekstrakurikuler.</p>
     </div>
 
-    <form method="POST" action="{{ route('pembina.kegiatan.store') }}" class="space-y-3 rounded-lg border bg-white p-4 text-sm shadow-sm">
+    <form method="POST" action="{{ route('pembina.kegiatan.store') }}" class="space-y-4 rounded-3xl border border-slate-200/90 bg-white p-6 text-sm shadow-xs">
         @csrf
+
         <div>
-            <label class="mb-1 block font-medium">Eskul</label>
-            <select name="eskul_id" class="w-full rounded border px-2 py-1.5" required>
-                <option value="">Pilih eskul</option>
+            <label class="mb-1 block font-semibold text-slate-700 text-xs">Ekstrakurikuler</label>
+            <select name="eskul_id" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600" required>
                 @foreach ($eskuls as $eskul)
                     <option value="{{ $eskul->id }}" @selected(old('eskul_id') == $eskul->id)>{{ $eskul->name }}</option>
                 @endforeach
             </select>
+            @error('eskul_id')
+                <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+            @enderror
         </div>
+
         <div class="grid gap-3 sm:grid-cols-2">
             <div>
-                <label class="mb-1 block font-medium">Tanggal</label>
-                <input type="date" name="tanggal" value="{{ old('tanggal') }}" class="w-full rounded border px-2 py-1.5" required>
+                <label class="mb-1 block font-semibold text-slate-700 text-xs">Tanggal Pelaksanaan</label>
+                <input type="date" name="tanggal" value="{{ old('tanggal', today()->toDateString()) }}" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600" required>
+                @error('tanggal')
+                    <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                @enderror
             </div>
             <div>
-                <label class="mb-1 block font-medium">Jenis</label>
-                <select name="jenis" class="w-full rounded border px-2 py-1.5" required>
-                    <option value="">Pilih jenis</option>
-                    <option value="LATIHAN" @selected(old('jenis') === 'LATIHAN')>Latihan</option>
-                    <option value="LOMBA" @selected(old('jenis') === 'LOMBA')>Lomba</option>
-                    <option value="ACARA" @selected(old('jenis') === 'ACARA')>Acara</option>
+                <label class="mb-1 block font-semibold text-slate-700 text-xs">Jenis Kegiatan</label>
+                <select name="jenis" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600" required>
+                    <option value="LATIHAN" @selected(old('jenis') === 'LATIHAN')>Latihan Rutin</option>
+                    <option value="LOMBA" @selected(old('jenis') === 'LOMBA')>Lomba / Kompetisi</option>
+                    <option value="ACARA" @selected(old('jenis') === 'ACARA')>Acara / Pertemuan Khusus</option>
                 </select>
+                @error('jenis')
+                    <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                @enderror
             </div>
         </div>
-        <div>
-            <label class="mb-1 block font-medium">Agenda</label>
-            <input type="text" name="agenda" value="{{ old('agenda') }}" maxlength="255" class="w-full rounded border px-2 py-1.5" placeholder="Contoh: Latihan passing bawah" required>
+
+        {{-- Waktu Jam Mulai & Jam Selesai --}}
+        <div class="grid gap-3 sm:grid-cols-2">
+            <div>
+                <label class="mb-1 block font-semibold text-slate-700 text-xs">Jam Mulai</label>
+                <input type="time" name="jam_mulai" value="{{ old('jam_mulai', '15:00') }}" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600">
+                @error('jam_mulai')
+                    <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                @enderror
+            </div>
+            <div>
+                <label class="mb-1 block font-semibold text-slate-700 text-xs">Jam Selesai</label>
+                <input type="time" name="jam_selesai" value="{{ old('jam_selesai', '17:00') }}" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600">
+                @error('jam_selesai')
+                    <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                @enderror
+            </div>
         </div>
+
         <div>
-            <label class="mb-1 block font-medium">Tujuan</label>
-            <textarea name="tujuan" rows="2" class="w-full rounded border px-2 py-1.5" placeholder="Tujuan kegiatan">{{ old('tujuan') }}</textarea>
+            <label class="mb-1 block font-semibold text-slate-700 text-xs">Agenda Kegiatan</label>
+            <input type="text" name="agenda" value="{{ old('agenda') }}" maxlength="200" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600" placeholder="Contoh: Latihan passing dan strategi pertahanan" required>
+            @error('agenda')
+                <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+            @enderror
         </div>
+
         <div>
-            <label class="mb-1 block font-medium">Materi</label>
-            <textarea name="materi" rows="2" class="w-full rounded border px-2 py-1.5" placeholder="Materi yang disampaikan">{{ old('materi') }}</textarea>
+            <label class="mb-1 block font-semibold text-slate-700 text-xs">Lokasi / Tempat (Opsional)</label>
+            <input type="text" name="lokasi" value="{{ old('lokasi') }}" maxlength="100" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600" placeholder="Contoh: Lapangan Utama atau Gedung Olahraga">
+            @error('lokasi')
+                <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+            @enderror
         </div>
+
         <div>
-            <label class="mb-1 block font-medium">Lokasi</label>
-            <input type="text" name="lokasi" value="{{ old('lokasi') }}" maxlength="255" class="w-full rounded border px-2 py-1.5" placeholder="Contoh: Lapangan utama">
+            <label class="mb-1 block font-semibold text-slate-700 text-xs">Kendala / Catatan (Opsional)</label>
+            <textarea name="kendala" rows="2" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600" placeholder="Catatan khusus atau perlengkapan yang perlu disiapkan">{{ old('kendala') }}</textarea>
         </div>
-        <div>
-            <label class="mb-1 block font-medium">Dokumentasi</label>
-            <input type="text" name="dokumentasi" value="{{ old('dokumentasi') }}" maxlength="255" class="w-full rounded border px-2 py-1.5" placeholder="Tautan dokumentasi (opsional)">
-        </div>
-        <div>
-            <label class="mb-1 block font-medium">Hasil</label>
-            <textarea name="hasil" rows="2" class="w-full rounded border px-2 py-1.5" placeholder="Hasil kegiatan (diisi setelah pelaksanaan)">{{ old('hasil') }}</textarea>
-        </div>
-        <div>
-            <label class="mb-1 block font-medium">Kendala</label>
-            <textarea name="kendala" rows="2" class="w-full rounded border px-2 py-1.5" placeholder="Kendala yang dihadapi">{{ old('kendala') }}</textarea>
-        </div>
-        <div class="flex gap-2">
-            <button type="submit" class="rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700">Simpan</button>
-            <a href="{{ route('pembina.kegiatan.index') }}" class="rounded border px-4 py-2 hover:bg-gray-50">Batal</a>
+
+        <div class="flex items-center gap-2 pt-2 border-t border-slate-100">
+            <button type="submit" class="rounded-xl bg-blue-700 px-5 py-2.5 text-xs font-bold text-white hover:bg-blue-800 transition shadow-xs">
+                Simpan Rencana Kegiatan
+            </button>
+            <a href="{{ route('pembina.kegiatan.index') }}" class="rounded-xl border border-slate-300 px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition">
+                Batal
+            </a>
         </div>
     </form>
 </div>

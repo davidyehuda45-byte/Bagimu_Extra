@@ -66,4 +66,20 @@
         </div>
     @endif
 </div>
+
+<div class="mt-6 w-full rounded-2xl border border-rose-200 bg-rose-50/50 p-5 shadow-sm">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+            <h3 class="text-sm font-bold text-rose-800">Hapus Ekstrakurikuler</h3>
+            <p class="text-xs text-rose-600 mt-0.5">Eskul hanya dapat dihapus bila belum memiliki siswa pendaftar. Bila sudah ada pendaftar, nonaktifkan opsi "Aktif" di formulir atas.</p>
+        </div>
+        <form method="POST" action="{{ route('admin.eskuls.destroy', $eskul) }}" onsubmit="return confirm('Hapus permanen ekstrakurikuler {{ $eskul->name }}? Tindakan ini tidak dapat dibatalkan.')">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-700 shadow-sm transition">
+                <x-icon name="trash" class="h-4 w-4" /> Hapus Eskul Ini
+            </button>
+        </form>
+    </div>
+</div>
 @endsection

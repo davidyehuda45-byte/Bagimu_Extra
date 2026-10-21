@@ -57,14 +57,4 @@ class Eskul extends Model
     {
         return $this->hasMany(ActivityPlan::class);
     }
-
-    public function inventoryItems(): HasMany
-    {
-        return $this->hasMany(InventoryItem::class);
-    }
-
-    public function achievements(): HasMany
-    {
-        return $this->hasMany(Achievement::class);
-    }
 }

@@ -1,34 +1,28 @@
 <?php
 
-use App\Http\Controllers\Siswa\DashboardController;
-use App\Http\Controllers\Siswa\IzinController;
-use App\Http\Controllers\Siswa\KehadiranController;
-use App\Http\Controllers\Siswa\NotifikasiController;
 use App\Http\Controllers\Siswa\PendaftaranController;
-use App\Http\Controllers\Siswa\ProfilController;
-use App\Http\Controllers\Siswa\StatusController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'role:student', \App\Http\Middleware\MaintenanceMode::class])->prefix('siswa')->name('siswa.')->group(function () {
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+Route::middleware(['auth', 'role:student', \App\Http\Middleware\MaintenanceMode::class])
+    ->prefix('siswa')
+    ->name('siswa.')
+    ->group(function () {
+        // Alur Siswa yang Disederhanakan:
+        // 1. Ketentuan & Aturan (default beranda siswa)
+        Route::get('/', [PendaftaranController::class, 'aturan'])->name('dashboard');
+        Route::get('/aturan', [PendaftaranController::class, 'aturan'])->name('aturan');
 
-    Route::get('/daftar', [PendaftaranController::class, 'create'])->name('daftar');
-    Route::post('/daftar', [PendaftaranController::class, 'store'])->name('daftar.store');
+        // 2. Pilih Eskul
+        Route::get('/daftar', [PendaftaranController::class, 'create'])->name('daftar');
+        Route::post('/daftar', [PendaftaranController::class, 'store'])->name('daftar.store');
 
-    Route::get('/pengumuman', [DashboardController::class, 'pengumuman'])->name('pengumuman');
+        // 3. Konfirmasi Sukses + 5 detik auto-logout
+        Route::get('/sukses', [PendaftaranController::class, 'sukses'])->name('sukses');
 
-    Route::get('/status', [StatusController::class, 'index'])->name('status');
-    Route::post('/status/kirim-email', [StatusController::class, 'kirimEmail'])->name('status.kirim-email')->middleware('throttle:5,1');
-
-    Route::post('/notifikasi/{notifikasi}/baca', [NotifikasiController::class, 'read'])->name('notifikasi.baca');
-
-    Route::get('/kehadiran', [KehadiranController::class, 'index'])->name('kehadiran');
-
-    Route::get('/izin', [IzinController::class, 'index'])->name('izin.index');
-    Route::get('/izin/buat', [IzinController::class, 'create'])->name('izin.create');
-    Route::post('/izin', [IzinController::class, 'store'])->name('izin.store');
-
-    Route::get('/profil', [ProfilController::class, 'show'])->name('profil');
-    Route::put('/profil', [ProfilController::class, 'update'])->name('profil.update');
-    Route::post('/profil/password', [ProfilController::class, 'password'])->name('profil.password');
-});
+        // Pengalihan aman untuk rute lama yang dihapus
+        Route::redirect('/status', '/siswa/sukses')->name('status');
+        Route::redirect('/profil', '/siswa/aturan')->name('profil');
+        Route::redirect('/kehadiran', '/siswa/aturan')->name('kehadiran');
+        Route::redirect('/izin', '/siswa/aturan')->name('izin');
+        Route::redirect('/pengumuman', '/siswa/aturan')->name('pengumuman');
+    });

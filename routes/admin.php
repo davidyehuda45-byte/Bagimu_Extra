@@ -70,7 +70,6 @@ Route::middleware(['auth', 'role:admin,operator,kepala_sekolah', \App\Http\Middl
     Route::post('registrations/{registration}/cabut', [RegistrationController::class, 'cabutKartu'])->name('registrations.cabut');
     Route::post('registrations/{registration}/token', [RegistrationController::class, 'resetToken'])->name('registrations.token');
     Route::post('registrations/{registration}/password', [RegistrationController::class, 'resetPassword'])->name('registrations.password');
-    Route::post('registrations/{registration}/sertifikat', [RegistrationController::class, 'terbitkanSertifikat'])->name('registrations.sertifikat');
 
     Route::post('students/bulk-token', [StudentController::class, 'bulkToken'])->name('students.bulk-token');
     Route::post('students/bulk-delete', [StudentController::class, 'bulkDelete'])->name('students.bulk-delete');

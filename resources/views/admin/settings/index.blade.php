@@ -9,7 +9,7 @@
 
 {{-- Pengguna staf --}}
 <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm mb-4">
-    <h2 class="font-bold text-slate-900 text-sm mb-3">Akun Admin & Pembina</h2>
+    <h2 class="font-bold text-slate-900 text-sm mb-3">Akun Administrator & Operator</h2>
     <div class="overflow-x-auto mb-4">
         <table class="min-w-full text-sm">
             <thead>
@@ -36,7 +36,7 @@
                                     @csrf
                                     @method('PUT')
                                     <select name="role" class="rounded-lg border-slate-300 py-1 text-xs">
-                                        @foreach (['ADMIN' => 'Admin', 'OPERATOR' => 'Operator', 'PEMBINA' => 'Pembina', 'KEPALA_SEKOLAH' => 'Kepala Sekolah'] as $val => $label)
+                                        @foreach (['ADMIN' => 'Admin', 'OPERATOR' => 'Operator', 'KEPALA_SEKOLAH' => 'Kepala Sekolah'] as $val => $label)
                                             <option value="{{ $val }}" @selected($u->role->value === $val)>{{ $label }}</option>
                                         @endforeach
                                     </select>
@@ -57,7 +57,7 @@
         </table>
     </div>
     <div class="mb-4">{{ $users->links() }}</div>
-    <h3 class="font-bold text-sm text-slate-900 mb-2">Tambah Akun</h3>
+    <h3 class="font-bold text-sm text-slate-900 mb-2">Tambah Akun Admin/Operator</h3>
     <form method="POST" action="{{ route('admin.users.store') }}" class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
         @csrf
         <div><label class="block font-medium text-slate-700 mb-1">Nama</label><input name="name" required maxlength="100" class="w-full border-slate-300 rounded-xl"></div>
@@ -68,13 +68,12 @@
             <select name="role" class="w-full border-slate-300 rounded-xl">
                 <option value="ADMIN">Admin</option>
                 <option value="OPERATOR">Operator</option>
-                <option value="PEMBINA">Pembina</option>
                 <option value="KEPALA_SEKOLAH">Kepala Sekolah</option>
             </select>
         </div>
         <div class="flex items-end"><button class="px-4 py-2 rounded-xl bg-blue-700 text-white font-bold hover:bg-blue-800">Buat Akun</button></div>
     </form>
-    <p class="mt-2 text-[11px] text-slate-400">Setelah akun Pembina dibuat, tugaskan eskul via Master Eskul → Kelola.</p>
+    <p class="mt-2 text-xs text-slate-500">Catatan: Pengelolaan dan penugasan akun Pembina dilakukan di menu <a href="{{ route('admin.users.index') }}" class="text-blue-600 font-semibold hover:underline">Kelola Pembina</a>.</p>
 </div>
 
 {{-- Identitas --}}

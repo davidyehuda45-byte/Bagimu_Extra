@@ -7,7 +7,6 @@ use App\Enums\PeriodeStatus;
 use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\AdminLog;
-use App\Models\Certificate;
 use App\Models\Eskul;
 use App\Models\NilaiHistory;
 use App\Models\Periode;
@@ -140,7 +139,7 @@ class RegistrationController extends Controller
 
     public function show(Registration $registration)
     {
-        $registration->load(['user', 'statusHistory', 'kehadiran', 'nilaiHistory', 'certificate']);
+        $registration->load(['user', 'statusHistory', 'kehadiran', 'nilaiHistory']);
 
         $kehadiranTotal = $registration->kehadiran->count();
 
@@ -283,33 +282,6 @@ class RegistrationController extends Controller
         AdminLog::record('user.reset_password', 'User', $user->id, "Reset password {$user->username}.");
 
         return back()->with('status', 'Password direset. Sampaikan password baru ke siswa (siswa juga dapat notifikasi in-app).');
-    }
-
-    public function terbitkanSertifikat(Registration $registration)
-    {
-        if ($registration->certificate) {
-            return back()->with('status', "Sudah memiliki sertifikat {$registration->certificate->nomor}.");
-        }
-
-        $cert = DB::transaction(function () use ($registration) {
-            if (empty($registration->verify_token)) {
-                $registration->verify_token = bin2hex(random_bytes(32));
-                $registration->save();
-            }
-
-            return Certificate::create([
-                'registration_id' => $registration->id,
-                'nomor' => CertificateController::nomorBaru(),
-                'doc_version' => 1,
-                'diterbitkan_oleh' => auth()->user()->email,
-            ]);
-        });
-
-        AdminLog::record('certificates.store', 'Certificate', (string) $cert->id, "Terbit sertifikat {$cert->nomor} untuk registrasi #{$registration->id}.");
-
-        Notifier::sertifikatTerbit($registration->fresh(), $cert->nomor);
-
-        return back()->with('status', "Sertifikat {$cert->nomor} berhasil diterbitkan.");
     }
 
     public function destroy(Registration $registration)

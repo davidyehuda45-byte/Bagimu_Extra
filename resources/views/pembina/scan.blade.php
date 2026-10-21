@@ -1,183 +1,258 @@
 @extends('layouts.staff')
 
-@section('title', 'Scan Presensi — '.$eskul->name)
+@section('title', 'Scan Presensi Kamera HP — '.$eskul->name)
 
 @section('content')
 <div class="mx-auto w-full max-w-2xl space-y-4">
     <div>
-        <a href="{{ route('pembina.eskul.show', $eskul) }}" class="text-sm font-medium text-blue-600 hover:text-blue-700">← Kembali ke {{ $eskul->name }}</a>
-        <h1 class="mt-1 text-xl font-bold text-slate-900">Scan Presensi Siswa</h1>
-        <p class="text-sm text-slate-500">{{ $eskul->name }} • hasil scan otomatis tercatat HADIR dan tersambung ke absensi.</p>
+        <a href="{{ route('pembina.dashboard') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-700">← Kembali ke Dashboard Pembina</a>
+        <h1 class="mt-1 text-xl font-bold text-slate-900">Scan Presensi Siswa (Kamera HP)</h1>
+        <p class="text-xs sm:text-sm text-slate-500">{{ $eskul->name }} • Hasil pemindaian langsung mencatat kehadiran siswa dan tersimpan ke daftar hadir.</p>
         @if (! empty($pertemuan))
-            <p class="mt-1 inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800">
-                <x-icon name="calendar-check" class="h-3.5 w-3.5" /> Pertemuan {{ $pertemuan->nomor }} • {{ $pertemuan->tanggal->format('d M Y') }}
+            <p class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800">
+                <x-icon name="calendar-check" class="h-3.5 w-3.5" /> Pertemuan Ke-{{ $pertemuan->nomor }} • {{ $pertemuan->tanggal->format('d/m/Y') }}
             </p>
         @endif
     </div>
 
+    {{-- Tanggal Presensi --}}
     <x-card>
-        <label for="scan-tanggal" class="block text-xs font-semibold text-slate-600">Tanggal presensi</label>
-        <input id="scan-tanggal" type="date" value="{{ $tanggal }}" max="{{ today()->toDateString() }}"
-               class="mt-1 w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
+        <div class="flex items-center justify-between">
+            <div>
+                <label for="scan-tanggal" class="block text-xs font-bold text-slate-700">Tanggal Pertemuan Presensi</label>
+                <p class="text-[11px] text-slate-400">Pilih tanggal jika ingin mencatat untuk tanggal hari ini atau sebelumnya</p>
+            </div>
+            <input id="scan-tanggal" type="date" value="{{ $tanggal }}" max="{{ today()->toDateString() }}"
+                   class="rounded-xl border-slate-300 text-xs sm:text-sm font-semibold focus:border-blue-500 focus:ring-blue-500 py-1.5 px-3">
+        </div>
     </x-card>
 
+    {{-- Area Kamera Scanner --}}
     <x-card>
-        <h2 class="flex items-center gap-2 font-bold text-slate-900">
-            <x-icon name="qr" class="h-5 w-5 text-blue-700" /> Pindai Kode QR Presensi
-        </h2>
-        <div id="scan-unsupported" class="hidden">
-            <x-empty-state icon="qr" title="Kamera tidak didukung" message="Browser ini tidak mendukung pemindai kamera. Ketik kode ESK manual di bawah." />
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+            <h2 class="flex items-center gap-2 font-bold text-slate-900 text-sm">
+                <svg class="h-4 w-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01"/><path d="M17 7h.01"/><path d="M7 17h.01"/><path d="M17 17h.01"/></svg>
+                Pemindai Kamera HP / Barcode Kartu Pelajar
+            </h2>
+            <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                Kamera Real-time
+            </span>
         </div>
-        <div id="scan-area" class="mt-3">
-            <video id="scan-video" playsinline muted class="aspect-video w-full rounded-xl bg-slate-900 object-cover"></video>
-            <div class="mt-3 flex flex-wrap gap-2">
-                <button id="scan-start" type="button" class="rounded-xl bg-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-blue-800">
-                    Mulai Kamera
-                </button>
-                <button id="scan-stop" type="button" class="hidden rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-                    Hentikan
+
+        <div id="scanner-box" class="overflow-hidden rounded-2xl bg-slate-900 text-white relative min-h-[260px] flex flex-col items-center justify-center p-3">
+            <div id="reader" class="w-full"></div>
+            <div id="camera-placeholder" class="text-center py-10 space-y-3">
+                <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-white">
+                    <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                </div>
+                <p class="text-xs text-slate-300 max-w-xs px-4">Arahkan kamera ke QR Code atau Barcode yang tertera di Kartu Pelajar siswa.</p>
+                <button id="btn-start-camera" type="button" class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-xs font-bold text-white hover:bg-emerald-600 transition shadow-sm cursor-pointer">
+                    <span>Mulai Kamera HP</span>
                 </button>
             </div>
-            <p class="mt-2 text-[11px] text-slate-400">Arahkan QR presensi siswa ke kamera. Di HP, izinkan akses kamera bila diminta.</p>
+            <div id="camera-active-controls" class="hidden mt-3 w-full flex items-center justify-between bg-slate-800/80 p-2.5 rounded-xl text-xs">
+                <span class="text-emerald-400 font-semibold flex items-center gap-1.5">
+                    <span class="h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    Kamera Aktif
+                </span>
+                <button id="btn-stop-camera" type="button" class="rounded-lg bg-rose-600 px-3 py-1 font-bold text-white hover:bg-rose-700 transition cursor-pointer">
+                    Hentikan Kamera
+                </button>
+            </div>
         </div>
-        <div id="scan-hasil" aria-live="polite" class="mt-3 space-y-2"></div>
+
+        {{-- Log Hasil Scan --}}
+        <div id="scan-hasil" aria-live="polite" class="mt-4 space-y-2"></div>
     </x-card>
 
+    {{-- Alternatif Ketik Manual NIS --}}
     <x-card>
-        <h2 class="flex items-center gap-2 font-bold text-slate-900">
-            <x-icon name="pencil" class="h-5 w-5 text-blue-700" /> Ketik Manual
+        <h2 class="flex items-center gap-2 font-bold text-slate-900 text-sm">
+            <x-icon name="pencil" class="h-4 w-4 text-blue-700" /> Input Cepat Manual (NIS Siswa)
         </h2>
         <p class="mt-1 text-xs text-slate-500">
-            Ketik kode pendaftaran (ESK-...) siswa atau kelola status kehadiran/izin langsung pada lembar absensi pertemuan.
+            Jika kartu pelajar buram atau kamera tidak dapat digunakan, Anda dapat mengetik NIS siswa di bawah ini:
         </p>
         <form id="scan-manual" method="POST" action="{{ route('pembina.scan.store', $eskul) }}" class="mt-3 flex gap-2">
             @csrf
             <input type="hidden" name="tanggal" id="manual-tanggal" value="{{ $tanggal }}">
-            <input name="kode" type="text" required placeholder="cth: ESK-000000003F"
-                   class="min-w-0 flex-1 rounded-xl border-slate-300 font-mono text-sm focus:border-blue-500 focus:ring-blue-500">
-            <button class="shrink-0 rounded-xl bg-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-blue-800">Catat Hadir</button>
+            <input name="kode" type="text" required placeholder="Ketik NIS siswa (cth: 10001)"
+                   class="min-w-0 flex-1 rounded-xl border-slate-300 font-mono text-xs sm:text-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2">
+            <button class="shrink-0 rounded-xl bg-blue-700 px-4 py-2 text-xs font-bold text-white hover:bg-blue-800 transition shadow-xs cursor-pointer">
+                Catat Hadir
+            </button>
         </form>
         @error('kode')
-            <p class="mt-1 text-xs font-medium text-rose-600">{{ $message }}</p>
+            <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
         @enderror
     </x-card>
 
+    {{-- Daftar Terpindai Sesi Ini --}}
     <x-card>
-        <h2 class="font-bold text-slate-900">Terpindai sesi ini (<span id="scan-count">0</span>)</h2>
-        <ul id="scan-daftar" class="mt-2 divide-y divide-slate-100 text-sm">
-            <li id="scan-kosong" class="py-2 text-slate-400">Belum ada.</li>
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <h2 class="font-bold text-slate-900 text-sm">Siswa Terpindai Sesi Ini</h2>
+            <span class="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-bold text-blue-700">
+                <span id="scan-count">0</span> Siswa Hadir
+            </span>
+        </div>
+        <ul id="scan-daftar" class="mt-3 divide-y divide-slate-100 text-xs sm:text-sm">
+            <li id="scan-kosong" class="py-4 text-center text-slate-400 italic">Belum ada siswa yang dipindai pada sesi ini.</li>
         </ul>
     </x-card>
 </div>
 
+{{-- Library HTML5-QRCode untuk dukungan segala merk HP (Android & iOS Safari) --}}
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script>
 (function () {
-    const video = document.getElementById('scan-video');
-    const btnStart = document.getElementById('scan-start');
-    const btnStop = document.getElementById('scan-stop');
+    const btnStart = document.getElementById('btn-start-camera');
+    const btnStop = document.getElementById('btn-stop-camera');
+    const cameraPlaceholder = document.getElementById('camera-placeholder');
+    const activeControls = document.getElementById('camera-active-controls');
     const hasil = document.getElementById('scan-hasil');
     const daftar = document.getElementById('scan-daftar');
     const kosong = document.getElementById('scan-kosong');
     const count = document.getElementById('scan-count');
     const inputTanggal = document.getElementById('scan-tanggal');
+    const manualTanggal = document.getElementById('manual-tanggal');
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     const url = @json(route('pembina.scan.store', $eskul));
-    let stream = null, raf = null, detector = null, terakhir = '', jedaSampai = 0, jumlah = 0;
-    const sudahCatat = new Set();
 
-    if (!('BarcodeDetector' in window)) {
-        document.getElementById('scan-unsupported').classList.remove('hidden');
-        document.getElementById('scan-area').classList.add('hidden');
-    }
+    let html5QrCode = null;
+    let isProcessing = false;
+    let lastScannedCode = '';
+    let lastScanTime = 0;
+    let jumlah = 0;
+    const recordedSet = new Set();
 
-    document.getElementById('manual-tanggal').value = inputTanggal.value;
     inputTanggal.addEventListener('change', () => {
-        document.getElementById('manual-tanggal').value = inputTanggal.value;
+        manualTanggal.value = inputTanggal.value;
     });
 
-    function pesan(ok, teks) {
-        const div = document.createElement('div');
-        div.className = 'rounded-xl border p-3 text-sm ' + (ok
-            ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-            : 'border-rose-200 bg-rose-50 text-rose-700');
-        div.textContent = teks;
-        hasil.prepend(div);
-        while (hasil.children.length > 4) hasil.lastChild.remove();
+    // Suara Beep Sukses via Web Audio API (Tanpa asset external)
+    function playBeep() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
+            gain.gain.setValueAtTime(0.15, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.15);
+        } catch (e) {}
     }
 
-    function tambahDaftar(nama, kelas) {
+    function showFeedback(ok, teks) {
+        const div = document.createElement('div');
+        div.className = 'rounded-2xl border p-3.5 text-xs sm:text-sm font-semibold flex items-center justify-between gap-2 shadow-2xs ' +
+            (ok ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-rose-200 bg-rose-50 text-rose-700');
+        div.innerHTML = `<span>${teks}</span><span class="text-[11px] opacity-75">${new Date().toLocaleTimeString()}</span>`;
+        hasil.prepend(div);
+        while (hasil.children.length > 3) hasil.lastChild.remove();
+    }
+
+    function addToList(nama, kelas) {
         kosong?.remove();
         jumlah++;
         count.textContent = jumlah;
         const li = document.createElement('li');
-        li.className = 'py-2';
-        li.innerHTML = '<span class="font-semibold"></span> <span class="text-slate-400"></span>';
-        li.querySelector('span').textContent = nama;
-        li.querySelectorAll('span')[1].textContent = kelas || '';
+        li.className = 'py-2.5 flex items-center justify-between';
+        li.innerHTML = `
+            <div class="flex items-center gap-2">
+                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">✓</span>
+                <span class="font-bold text-slate-800">${nama}</span>
+            </div>
+            <span class="text-xs font-semibold text-slate-500">${kelas || 'Siswa'}</span>
+        `;
         daftar.prepend(li);
     }
 
-    async function kirim(kode) {
-        const res = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': token,
-            },
-            body: JSON.stringify({ kode: kode, tanggal: inputTanggal.value }),
-        });
-        const data = await res.json().catch(() => ({}));
-        if (res.ok && data.ok) {
-            pesan(true, data.pesan);
-            const kunci = kode + '|' + inputTanggal.value;
-            if (!sudahCatat.has(kunci)) {
-                sudahCatat.add(kunci);
-                tambahDaftar(data.nama, data.kelas);
+    async function sendScanData(scannedText) {
+        if (isProcessing) return;
+        const now = Date.now();
+        if (scannedText === lastScannedCode && (now - lastScanTime) < 3000) {
+            return; // Debounce scan yang sama dalam 3 detik
+        }
+        lastScannedCode = scannedText;
+        lastScanTime = now;
+        isProcessing = true;
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                },
+                body: JSON.stringify({ kode: scannedText, tanggal: inputTanggal.value }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.ok) {
+                playBeep();
+                showFeedback(true, `✓ HADIR: ${data.nama} (${data.kelas || '-'})`);
+                const uniqueKey = scannedText + '|' + inputTanggal.value;
+                if (!recordedSet.has(uniqueKey)) {
+                    recordedSet.add(uniqueKey);
+                    addToList(data.nama, data.kelas);
+                }
+            } else {
+                showFeedback(false, data.pesan || 'Kartu pelajar / NIS tidak terdaftar pada eskul ini.');
             }
-        } else {
-            pesan(false, data.pesan || 'Gagal memproses QR.');
+        } catch (err) {
+            showFeedback(false, 'Terjadi gangguan jaringan saat mengirim data.');
+        } finally {
+            setTimeout(() => { isProcessing = false; }, 800);
         }
     }
 
-    async function loop() {
-        if (!stream) return;
-        try {
-            const codes = await detector.detect(video);
-            const now = Date.now();
-            if (codes.length && now > jedaSampai && codes[0].rawValue !== terakhir) {
-                terakhir = codes[0].rawValue;
-                jedaSampai = now + 2500;
-                kirim(terakhir);
-            }
-        } catch (e) {}
-        raf = requestAnimationFrame(() => setTimeout(loop, 400));
-    }
+    async function startScanner() {
+        cameraPlaceholder.classList.add('hidden');
+        activeControls.classList.remove('hidden');
 
-    btnStart.addEventListener('click', async () => {
         try {
-            detector = new BarcodeDetector({ formats: ['qr_code'] });
-            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
-            video.srcObject = stream;
-            await video.play();
-            btnStart.classList.add('hidden');
-            btnStop.classList.remove('hidden');
-            loop();
-        } catch (e) {
-            pesan(false, 'Kamera tidak dapat dibuka. Ketik kode manual di bawah.');
+            html5QrCode = new Html5Qrcode('reader');
+            const config = {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.0,
+            };
+
+            await html5QrCode.start(
+                { facingMode: 'environment' },
+                config,
+                (decodedText) => {
+                    sendScanData(decodedText);
+                },
+                (errorMessage) => {
+                    // Ignore transient frame errors
+                }
+            );
+        } catch (err) {
+            showFeedback(false, 'Tidak dapat mengakses kamera HP. Pastikan izin kamera telah diberikan di browser.');
+            stopScanner();
         }
-    });
-
-    function henti() {
-        cancelAnimationFrame(raf);
-        stream?.getTracks().forEach(t => t.stop());
-        stream = null;
-        video.srcObject = null;
-        btnStop.classList.add('hidden');
-        btnStart.classList.remove('hidden');
     }
-    btnStop.addEventListener('click', henti);
-    window.addEventListener('beforeunload', henti);
+
+    async function stopScanner() {
+        if (html5QrCode) {
+            try {
+                await html5QrCode.stop();
+                html5QrCode.clear();
+            } catch (e) {}
+            html5QrCode = null;
+        }
+        cameraPlaceholder.classList.remove('hidden');
+        activeControls.classList.add('hidden');
+    }
+
+    btnStart.addEventListener('click', startScanner);
+    btnStop.addEventListener('click', stopScanner);
+    window.addEventListener('beforeunload', stopScanner);
 })();
 </script>
 @endsection

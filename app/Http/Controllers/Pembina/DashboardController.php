@@ -19,17 +19,27 @@ class DashboardController extends Controller
     {
         $me = $request->user();
 
-        $milik = Eskul::where('pembina_id', $me->id)->orWhere(fn ($q) => $q->where('temp_pembina_id', $me->id)->whereDate('temp_pembina_sampai', '>=', today()));
+        // Aturan bisnis: 1 akun pembina = 1 eskul
+        $milik = Eskul::where('pembina_id', $me->id)
+            ->orWhere(fn ($q) => $q->where('temp_pembina_id', $me->id)->whereDate('temp_pembina_sampai', '>=', today()));
 
-        $eskuls = (clone $milik)->withCount('jadwals')->orderBy('name')->get();
-        $milikIds = (clone $milik)->pluck('id');
-        $milikNames = (clone $milik)->pluck('name');
+        $eskul = (clone $milik)->withCount('jadwals')->first();
+        $eskuls = $eskul ? collect([$eskul]) : collect();
+        $milikIds = $eskul ? [$eskul->id] : [];
+        $milikNames = $eskul ? [$eskul->name] : [];
 
         $periodeAktif = Periode::where('status', PeriodeStatus::DIBUKA)->pluck('periode');
+
+        $pendaftarAktif = Registration::query()
+            ->whereIn('periode', $periodeAktif)
+            ->whereIn('eskul_utama', $milikNames)
+            ->where('status', Status::APPROVED)
+            ->count();
 
         $pendaftarPending = Registration::query()
             ->whereIn('periode', $periodeAktif)
             ->whereIn('eskul_utama', $milikNames)
+            ->where('status', Status::PENDING)
             ->count();
 
         $izinPending = Izin::query()
@@ -45,17 +55,19 @@ class DashboardController extends Controller
             ->get();
 
         $stat = [];
-        foreach ((clone $milik)->orderBy('name')->get() as $e) {
+        if ($eskul) {
             $cari = Registration::whereIn('periode', $periodeAktif)
-                ->where('eskul_utama', $e->name);
-            $stat[$e->id] = [
+                ->where('eskul_utama', $eskul->name);
+            $stat[$eskul->id] = [
                 'pending' => (clone $cari)->where('status', Status::PENDING)->count(),
                 'approved' => (clone $cari)->where('status', Status::APPROVED)->count(),
             ];
         }
 
         return view('pembina.dashboard', compact(
+            'eskul',
             'eskuls',
+            'pendaftarAktif',
             'pendaftarPending',
             'izinPending',
             'kegiatanMendatang',

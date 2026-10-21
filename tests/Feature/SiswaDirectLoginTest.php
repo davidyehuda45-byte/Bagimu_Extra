@@ -125,7 +125,7 @@ class SiswaDirectLoginTest extends TestCase
             'token' => $rawToken,
         ]);
 
-        $response->assertRedirect('/siswa/daftar');
+        $response->assertRedirect('/siswa/aturan');
         $this->assertAuthenticatedAs($user);
     }
 }

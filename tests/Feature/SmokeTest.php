@@ -104,15 +104,14 @@ class SmokeTest extends TestCase
         $this->registrasi($siswaTerdaftar, 'APPROVED');
 
         foreach ([
-            '/siswa', '/siswa/daftar', '/siswa/status',
-            '/siswa/kehadiran', '/siswa/profil',
+            '/siswa', '/siswa/aturan', '/siswa/daftar', '/siswa/sukses',
         ] as $url) {
             $this->actingAs($siswa)->get($url)->assertOk();
         }
 
-        foreach (['/siswa/izin', '/siswa/izin/buat'] as $url) {
-            $this->actingAs($siswaTerdaftar)->get($url)->assertOk();
-        }
+        // Rute lama dialihkan otomatis
+        $this->actingAs($siswa)->get('/siswa/status')->assertRedirect('/siswa/sukses');
+        $this->actingAs($siswa)->get('/siswa/profil')->assertRedirect('/siswa/aturan');
     }
 
     public function test_alur_daftar_lalu_disetujui(): void
@@ -133,7 +132,7 @@ class SmokeTest extends TestCase
             'eskul_utama' => 'Futsal',
             'alasan' => 'Ingin sehat.',
         ]);
-        $res->assertRedirect('/siswa/status');
+        $res->assertRedirect('/siswa/sukses');
         $this->assertDatabaseHas('registrations', ['user_id' => $siswa->id, 'status' => 'APPROVED']);
         $this->assertDatabaseHas('status_history', ['new_status' => 'APPROVED']);
 
@@ -148,7 +147,7 @@ class SmokeTest extends TestCase
             'whatsapp' => '081999999999',
             'eskul_utama' => 'Futsal',
             'alasan' => 'Coba lagi.',
-        ])->assertRedirect('/siswa/status');
+        ])->assertRedirect('/siswa/sukses');
         $this->assertDatabaseMissing('registrations', ['user_id' => $siswa->id, 'whatsapp' => '081999999999']);
 
         $reg = Registration::where('user_id', $siswa->id)->first();
@@ -182,11 +181,9 @@ class SmokeTest extends TestCase
             '/admin', '/admin/eskuls', '/admin/eskuls/create', '/admin/periodes',
             '/admin/registrations', '/admin/students',
             '/admin/students/import', '/admin/kehadiran', '/admin/nilai',
-            '/admin/izin', '/admin/certificates', '/admin/inventory',
-            '/admin/inventory/create', '/admin/laporan', '/admin/logs',
+            '/admin/laporan', '/admin/logs',
             '/admin/settings', '/admin/rekap', '/admin/kelas', '/admin/window',
             '/admin/notifikasi', '/admin/cetak', '/admin/kenaikan/arsip-keluar',
-            '/eskul', '/jadwal', '/verify',
         ] as $url) {
             $this->actingAs($admin)->get($url)->assertOk();
         }
@@ -223,23 +220,6 @@ class SmokeTest extends TestCase
         $this->assertNotNull($user->login_token_hash);
 
         $this->assertDatabaseHas('users', ['username' => '20001']);
-    }
-
-    public function test_sertifikat_dan_verifikasi_publik(): void
-    {
-        $this->periodeTerbuka();
-        $this->eskul();
-        $siswa = $this->siswa();
-        $reg = $this->registrasi($siswa, 'APPROVED');
-
-        $this->actingAs($this->admin())->post('/admin/certificates', [
-            'registration_id' => $reg->id,
-        ])->assertRedirect();
-        $this->assertDatabaseHas('certificates', ['registration_id' => $reg->id]);
-
-        $cert = $reg->fresh()->certificate;
-        $this->actingAs($this->admin())->get("/admin/certificates/{$cert->id}/cetak")->assertOk();
-        $this->get('/verify/'.$reg->fresh()->verify_token)->assertOk();
     }
 
     public function test_kehadiran_simpan_dan_kunci(): void
@@ -291,7 +271,7 @@ class SmokeTest extends TestCase
         $token = LoginToken::issue($user);
 
         $this->post('/siswa/login', ['nis' => '10001', 'token' => $token])
-            ->assertRedirect('/siswa/daftar');
+            ->assertRedirect('/siswa/aturan');
         $this->assertAuthenticatedAs($user);
     }
 
@@ -307,10 +287,10 @@ class SmokeTest extends TestCase
         // Halaman scan bisa dibuka pembina pemilik.
         $this->actingAs($pembina)->get("/pembina/eskul/{$eskul->id}/scan")->assertOk();
 
-        // Scan QR (URL verify) tercatat HADIR.
+        // Scan NIS kartu pelajar tercatat HADIR.
         $this->actingAs($pembina)
             ->postJson("/pembina/eskul/{$eskul->id}/scan", [
-                'kode' => route('verify.show', $reg->fresh()->verify_token),
+                'kode' => $siswa->username,
                 'tanggal' => today()->toDateString(),
             ])
             ->assertOk()

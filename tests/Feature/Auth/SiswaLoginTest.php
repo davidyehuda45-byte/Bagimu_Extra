@@ -40,7 +40,7 @@ class SiswaLoginTest extends TestCase
         $response = $this->post('/siswa/login', ['nis' => '10001', 'token' => $token]);
 
         $this->assertAuthenticatedAs($user);
-        $response->assertRedirect('/siswa/daftar');
+        $response->assertRedirect('/siswa/aturan');
         $this->assertSame($user->id, $master->fresh()->user_id);
     }
 
@@ -76,7 +76,7 @@ class SiswaLoginTest extends TestCase
             ->post('/siswa/login', ['nis' => '10001', 'token' => $token]);
 
         $this->assertAuthenticatedAs($user);
-        $response->assertRedirect('/siswa/daftar');
+        $response->assertRedirect('/siswa/aturan');
     }
 
     public function test_nis_nonaktif_ditolak(): void

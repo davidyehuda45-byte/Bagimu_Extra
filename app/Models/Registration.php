@@ -80,11 +80,6 @@ class Registration extends Model
         return $this->hasMany(ClassHistory::class);
     }
 
-    public function certificate(): HasOne
-    {
-        return $this->hasOne(Certificate::class);
-    }
-
     /**
      * Kode pendaftaran ala ESK-XXXXXXXXXX (10 char, stabil dari ID).
      */

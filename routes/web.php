@@ -2,17 +2,13 @@
 
 use App\Http\Controllers\DashboardRedirectController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\InertiaTestController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\PublikController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/eskul', [PublikController::class, 'eskul'])->name('publik.eskul');
-Route::get('/jadwal', [PublikController::class, 'jadwal'])->name('publik.jadwal');
-
-Route::get('/inertia-test', InertiaTestController::class)->name('inertia.test');
+Route::redirect('/eskul', '/')->name('publik.eskul');
+Route::redirect('/jadwal', '/')->name('publik.jadwal');
 
 Route::get('/dashboard', DashboardRedirectController::class)->middleware(['auth'])->name('dashboard');
 
