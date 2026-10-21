@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\RekapController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\WaBlastController;
+use App\Http\Controllers\Admin\WaliKelasAdminController;
 use App\Http\Controllers\Admin\WindowController;
 use Illuminate\Support\Facades\Route;
 
@@ -37,6 +38,12 @@ Route::middleware(['auth', 'role:admin,operator,kepala_sekolah', \App\Http\Middl
     Route::put('users/{user}/role', [UserController::class, 'updateRole'])->name('users.role');
     Route::put('users/{user}/password', [UserController::class, 'resetPassword'])->name('users.password');
     Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+    Route::get('wali-kelas', [WaliKelasAdminController::class, 'index'])->name('wali-kelas.index');
+    Route::post('wali-kelas', [WaliKelasAdminController::class, 'store'])->name('wali-kelas.store');
+    Route::put('wali-kelas/{user}', [WaliKelasAdminController::class, 'update'])->name('wali-kelas.update');
+    Route::put('wali-kelas/{user}/password', [WaliKelasAdminController::class, 'resetPassword'])->name('wali-kelas.password');
+    Route::delete('wali-kelas/{user}', [WaliKelasAdminController::class, 'destroy'])->name('wali-kelas.destroy');
 
     Route::get('rekap', [RekapController::class, 'index'])->name('rekap.index');
     Route::get('rekap/{eskul}', [RekapController::class, 'show'])->name('rekap.show');

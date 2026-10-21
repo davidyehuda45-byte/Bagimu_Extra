@@ -57,6 +57,10 @@
                         <x-icon name="users" class="h-4 w-4 shrink-0" />
                         <span>Kelola Pembina</span>
                     </a>
+                    <a href="{{ route('admin.wali-kelas.index') }}" class="{{ $link(Route::is('admin.wali-kelas.*')) }}">
+                        <x-icon name="user-group" class="h-4 w-4 shrink-0" />
+                        <span>Kelola Wali Kelas</span>
+                    </a>
                     <a href="{{ route('admin.invitations.index') }}" class="{{ $link(Route::is('admin.invitations.*')) }}">
                         <x-icon name="user-plus" class="h-4 w-4 shrink-0" />
                         <span>Undang Pembina</span>
