@@ -8,7 +8,8 @@
     <meta name="theme-color" content="#2563eb">
     <meta name="description" content="Pendaftaran ekstrakurikuler digital SMK Bagimu Negeriku — jelajahi eskul, lihat jadwal mingguan, dan daftar mudah dengan NIS dan token kartu pelajar.">
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet" /></noscript>
     <link rel="stylesheet" href="{{ asset('splash.css') }}">
     <style>
         #app-content { opacity: 0; }
