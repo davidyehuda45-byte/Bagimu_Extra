@@ -1,79 +1,50 @@
-/* ===== Splash Screen – Ide 1: The Micro-Brand Reveal ===== */
+/* ===== Splash Screen – SMK Bagimu Negeriku ===== */
 (function () {
-  'use strict';
+  /* ---- Pengaturan ---- */
+  var CONFIG = {
+    durasi: 3000,              // lama minimum splash (milidetik)
+    teks: 'Ekstrakurikuler'    // teks yang diketik otomatis
+  };
 
   var splash = document.getElementById('splash');
   if (!splash) return;
+  var num = document.getElementById('sp-num');
+  var ekskul = document.getElementById('sp-ekskul');
 
-  // Cek apakah sudah pernah tampil di sesi browser ini (hindari spam saat navigasi internal)
-  try {
-    if (sessionStorage.getItem('bagimu_splash_shown') === '1') {
-      if (splash.parentNode) {
-        splash.parentNode.removeChild(splash);
-      }
-      var appInit = document.getElementById('app-content');
-      if (appInit) {
-        appInit.classList.add('show');
-      }
-      document.dispatchEvent(new CustomEvent('splash:selesai'));
-      return;
-    }
-  } catch (e) {
-    // Abaikan jika storage dinonaktifkan di browser
-  }
-
-  var DURATION = 2000; // Tepat 2 detik sesuai permintaan pengguna
-  var bar = splash.querySelector('.sp-bar');
-  var isFinished = false;
+  var t0 = Date.now(), cur = 1, done = false;
+  var loaded = document.readyState === 'complete';
+  window.addEventListener('load', function () { loaded = true; });
 
   function selesai() {
-    if (isFinished) return;
-    isFinished = true;
-
-    try {
-      sessionStorage.setItem('bagimu_splash_shown', '1');
-    } catch (e) {}
-
-    // Penuhkan progress bar seketika saat keluar
-    if (bar) {
-      bar.style.width = '100%';
-    }
-
-    // Beri sinyal ke konten halaman utama agar mulai transisi fade-in
-    document.dispatchEvent(new CustomEvent('splash:selesai'));
-
-    // Transisi keluar halus (dissolve blur + soft zoom)
-    splash.classList.add('out');
-
+    splash.classList.add('shrink');                    // logo mengecil
     setTimeout(function () {
-      if (splash.parentNode) {
-        splash.parentNode.removeChild(splash);
-      }
-    }, 450);
+      document.dispatchEvent(new CustomEvent('splash:selesai')); // beri tahu halaman utama
+      splash.classList.add('out');
+      setTimeout(function () { splash.remove(); }, 500);
+    }, 650);
   }
 
-  // Animasi progress bar berjalan serasi selama 2 detik
-  requestAnimationFrame(function () {
-    if (bar) {
-      bar.style.transition = 'width ' + DURATION + 'ms cubic-bezier(0.25, 0.8, 0.4, 1)';
-      bar.style.width = '100%';
+  function tick() {
+    var t = Math.min(1, (Date.now() - t0) / CONFIG.durasi);
+    var target = 1 + 99 * t;                           // naik 1 → 100
+    if (!loaded) target = Math.min(target, 92);        // tunggu halaman benar-benar siap
+    cur = Math.max(cur, Math.floor(target));
+    num.textContent = cur;
+    if (cur >= 100 && !done) { done = true; setTimeout(selesai, 350); return; }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  /* teks diketik sendiri */
+  var i = 0;
+  function ketik() {
+    if (i <= CONFIG.teks.length) {
+      ekskul.textContent = CONFIG.teks.slice(0, i++);
+      setTimeout(ketik, 95 + Math.random() * 70);
     }
-  });
+  }
+  setTimeout(ketik, 700);
 
-  // Otomatis langsung masuk ke beranda setelah 2 detik
-  var timer = setTimeout(selesai, DURATION);
-
-  // Akselerasi klik atau sentuhan di mana saja untuk langsung lewati
-  splash.addEventListener('click', function () {
-    clearTimeout(timer);
-    selesai();
-  }, { once: true });
-
-  // Aksesibilitas keyboard (Esc, Space, Enter)
-  splash.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
-      clearTimeout(timer);
-      selesai();
-    }
-  });
+  /* tombol "back" browser → splash tampil lagi */
+  window.addEventListener('pageshow', function (e) { if (e.persisted) location.reload(); });
 })();

@@ -10,21 +10,10 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
     <link rel="stylesheet" href="{{ asset('splash.css') }}">
-    <script>
-        (function() {
-            try {
-                if (sessionStorage.getItem('bagimu_splash_shown') === '1') {
-                    document.documentElement.classList.add('splash-skip');
-                }
-            } catch (e) {}
-        })();
-    </script>
     <style>
         #app-content { opacity: 0; }
         #app-content.show { animation: muncul .7s ease forwards; }
         @keyframes muncul { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-        html.splash-skip #splash { display: none !important; }
-        html.splash-skip #app-content { opacity: 1 !important; transform: none !important; animation: none !important; }
     </style>
     <noscript>
         <style>
@@ -46,31 +35,15 @@
     $sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra'));
 @endphp
 
-<!-- ====== SPLASH SCREEN (Micro-Brand Reveal) ====== -->
-<div id="splash" role="status" aria-label="Selamat Datang di Bagimu Extra" tabindex="0">
-    <div class="sp-ambient" aria-hidden="true"></div>
-    <div class="sp-content">
-        <div class="sp-badge">
-            <img src="{{ asset('splash-logo.png') }}" alt="Logo {{ $sekolah }}" width="150" height="150">
-        </div>
-        <div class="sp-brand">
-            <span class="sp-tag">
-                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                <span>Portal Resmi Ekstrakurikuler</span>
-            </span>
-            <h1 class="sp-name">{{ $sekolah }}</h1>
-            <p class="sp-tagline">"Mewadahi Talenta, Mengukir Prestasi"</p>
-            <p class="sp-motto">4B · Berbudi · Berkualitas · Berdaya · Berhasil</p>
-        </div>
-        <div class="sp-loader" aria-hidden="true">
-            <div class="sp-bar"></div>
-        </div>
-        <div class="sp-status">
-            <span>Menyiapkan beranda...</span>
-        </div>
-    </div>
+<!-- ====== SPLASH SCREEN ====== -->
+<div id="splash" role="status" aria-label="Memuat aplikasi">
+  <div class="sp-badge"><img src="{{ asset('splash-logo.png') }}" alt="Logo {{ $sekolah }}"></div>
+  <div class="sp-ekskul" id="sp-ekskul"></div>
+  <h2 class="sp-name">{{ $sekolah }}</h2>
+  <p class="sp-motto">4B Berbudi · Berkualitas · Berdaya · Berhasil</p>
+  <div class="sp-pct"><b id="sp-num">1</b>%</div>
 </div>
-<!-- ================================================ -->
+<!-- =========================== -->
 
 <div id="app-content" class="w-full max-w-7xl mx-auto space-y-10 px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
     {{-- Top Navbar Mini --}}
