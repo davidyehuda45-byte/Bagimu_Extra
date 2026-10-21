@@ -94,9 +94,9 @@
 @endif
 
 {{-- Filter & Real-Time Live Search --}}
-<form id="filter-siswa-form" method="GET" action="{{ route('admin.students.index') }}" class="rounded-2xl border border-slate-200 bg-white p-4 mb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 text-sm shadow-xs">
+<form id="filter-siswa-form" method="GET" action="{{ route('admin.students.index') }}" class="rounded-2xl border border-slate-200 bg-white p-4 mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3 text-sm shadow-xs items-end">
     {{-- Pencarian --}}
-    <div class="relative sm:col-span-2 lg:col-span-1">
+    <div>
         <label for="q-search-input" class="block font-semibold mb-1 text-slate-700 text-xs">Pencarian (Nama / NIS)</label>
         <div class="relative">
             <input type="text" id="q-search-input" name="q" value="{{ request('q') }}"
@@ -114,7 +114,7 @@
     {{-- Tingkat Kelas (10, 11, 12) --}}
     <div>
         <label for="tingkat-filter" class="block font-semibold mb-1 text-slate-700 text-xs">Tingkat Kelas</label>
-        <select id="tingkat-filter" name="tingkat" class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500 pr-8">
+        <select id="tingkat-filter" name="tingkat" class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
             <option value="">Semua Tingkat</option>
             @foreach ($tingkatList as $t)
                 <option value="{{ $t }}" @selected(request('tingkat') === $t)>Kelas {{ $t }}</option>
@@ -125,7 +125,7 @@
     {{-- Rombel / Kelas Spesifik --}}
     <div>
         <label for="kelas-filter" class="block font-semibold mb-1 text-slate-700 text-xs">Rombel / Kelas</label>
-        <select id="kelas-filter" name="kelas" class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500 pr-8">
+        <select id="kelas-filter" name="kelas" class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
             <option value="">Semua Kelas</option>
             @foreach ($kelasList as $k)
                 <option value="{{ $k }}" @selected(request('kelas') === $k)>{{ $k }}</option>
@@ -136,7 +136,7 @@
     {{-- Jurusan --}}
     <div>
         <label for="jurusan-filter" class="block font-semibold mb-1 text-slate-700 text-xs">Jurusan</label>
-        <select id="jurusan-filter" name="jurusan" class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500 pr-8">
+        <select id="jurusan-filter" name="jurusan" class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
             <option value="">Semua Jurusan</option>
             @foreach ($jurusanList as $j)
                 <option value="{{ $j->value }}" @selected(request('jurusan') === $j->value)>{{ $j->label() }}</option>
@@ -147,27 +147,30 @@
     {{-- Status Pendaftaran Eskul --}}
     <div>
         <label for="eskul-status-filter" class="block font-semibold mb-1 text-slate-700 text-xs">Status Eskul</label>
-        <select id="eskul-status-filter" name="eskul_status" class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500 pr-8">
+        <select id="eskul-status-filter" name="eskul_status" class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
             <option value="">Semua Siswa</option>
             <option value="terdaftar" @selected(request('eskul_status') === 'terdaftar')>Sudah Terdaftar</option>
             <option value="belum" @selected(request('eskul_status') === 'belum')>Belum Mendaftar</option>
         </select>
     </div>
 
-    {{-- Status Siswa + Reset --}}
+    {{-- Status Siswa --}}
     <div>
         <label for="status-filter" class="block font-semibold mb-1 text-slate-700 text-xs">Status Siswa</label>
-        <div class="flex items-center gap-2">
-            <select id="status-filter" name="status" class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500 pr-8">
-                <option value="">Semua Status</option>
-                @foreach ($statusList as $st)
-                    <option value="{{ $st }}" @selected(request('status') === $st)>{{ $st }}</option>
-                @endforeach
-            </select>
-            <a href="{{ route('admin.students.index') }}" class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors shrink-0" title="Reset filter">
-                Reset
-            </a>
-        </div>
+        <select id="status-filter" name="status" class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
+            <option value="">Semua Status</option>
+            @foreach ($statusList as $st)
+                <option value="{{ $st }}" @selected(request('status') === $st)>{{ $st }}</option>
+            @endforeach
+        </select>
+    </div>
+
+    {{-- Tombol Reset --}}
+    <div>
+        <a href="{{ route('admin.students.index') }}" class="inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors shadow-2xs h-[38px]" title="Reset semua filter">
+            <x-icon name="history" class="h-3.5 w-3.5 text-slate-500" />
+            <span>Reset</span>
+        </a>
     </div>
 </form>
 

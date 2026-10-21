@@ -77,7 +77,7 @@
             </x-popover>
         </header>
 
-        <main id="konten-utama" class="w-full p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+        <main id="konten-utama" class="w-full p-4 sm:p-6 lg:p-8">
             @include('layouts.partials.flash-messages')
             @yield('content')
         </main>
