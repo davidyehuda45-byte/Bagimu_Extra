@@ -10,7 +10,7 @@
             <p class="text-xs text-slate-500">Daftar siswa dalam rombel Anda dan status ekstrakurikuler yang diikuti.</p>
         </div>
         <form method="GET" action="{{ route('wali-kelas.siswa') }}" class="flex items-center gap-2">
-            @if ($allClasses->count() > 1)
+            @if (auth()->user()->isAdmin() && $allClasses->count() > 1)
                 <select name="kelas_id" class="border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold focus:border-indigo-500 focus:ring-indigo-500" onchange="this.form.submit()">
                     @foreach ($allClasses as $c)
                         <option value="{{ $c->id }}" @selected($kelas && $kelas->id === $c->id)>{{ $c->nama }}</option>
@@ -24,6 +24,16 @@
             </select>
         </form>
     </div>
+
+    @if (! $kelas)
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs font-semibold text-amber-800 flex items-center gap-3">
+            <x-icon name="alert-circle" class="h-5 w-5 text-amber-600 shrink-0" />
+            <div>
+                <p class="font-bold text-sm text-amber-900">Akun Anda Belum Ditugaskan ke Rombel Kelas</p>
+                <p class="mt-0.5 text-amber-700">Hubungi Administrator sekolah untuk menautkan akun Anda ke rombel binaan di menu <b>Kelola Wali Kelas</b>.</p>
+            </div>
+        </div>
+    @endif
 
     <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
         <div class="overflow-x-auto rounded-xl border border-slate-100">

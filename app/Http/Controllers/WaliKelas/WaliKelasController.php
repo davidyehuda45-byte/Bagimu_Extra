@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\WaliKelas;
 
 use App\Enums\PeriodeStatus;
+use App\Enums\Role;
 use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\AppSetting;
@@ -18,35 +19,35 @@ class WaliKelasController extends Controller
     private function resolveKelas(Request $request): array
     {
         $user = $request->user();
-        $allClasses = SchoolClass::orderBy('nama')->get();
 
-        // 1. Cek relasi managedClass
+        // 1. Admin, Operator, atau Kepala Sekolah: dapat meninjau semua kelas dan berpindah kelas
+        if ($user->isAdmin() || $user->hasRole(Role::OPERATOR, Role::KEPALA_SEKOLAH)) {
+            $allClasses = SchoolClass::orderBy('tingkat')->orderBy('nama')->get();
+            $kelas = null;
+
+            if ($request->filled('kelas_id')) {
+                $kelas = SchoolClass::find($request->query('kelas_id'));
+            } elseif ($request->filled('kelas')) {
+                $kelas = SchoolClass::where('nama', $request->query('kelas'))->first();
+            }
+
+            if (! $kelas) {
+                $kelas = $user->managedClass ?? $allClasses->first();
+            }
+
+            return [$kelas, $allClasses];
+        }
+
+        // 2. Akun Wali Kelas: HANYA terkunci pada rombel kelas binaannya sendiri
         $kelas = $user->managedClass;
-
-        // 2. Cek berdasarkan nama wali kelas sama dengan nama user
         if (! $kelas) {
-            $kelas = SchoolClass::where('wali_kelas_nama', $user->name)->first();
+            $kelas = SchoolClass::where('wali_kelas_id', $user->id)
+                ->orWhere('wali_kelas_nama', $user->name)
+                ->first();
         }
 
-        // 3. Bila ada query param ?kelas_id=... atau ?kelas=... (terutama untuk admin atau wali dengan multi-kelas)
-        if ($request->filled('kelas_id')) {
-            $found = SchoolClass::find($request->query('kelas_id'));
-            if ($found) {
-                $kelas = $found;
-            }
-        } elseif ($request->filled('kelas')) {
-            $found = SchoolClass::where('nama', $request->query('kelas'))->first();
-            if ($found) {
-                $kelas = $found;
-            }
-        }
-
-        // Fallback jika belum diatur di master: ambil kelas pertama yang ada
-        if (! $kelas && $allClasses->isNotEmpty()) {
-            $kelas = $allClasses->first();
-        }
-
-        return [$kelas, $allClasses];
+        // Jangan pernah mengambil kelas acak orang lain jika wali kelas belum ditugaskan
+        return [$kelas, collect($kelas ? [$kelas] : [])];
     }
 
     private function periodeAktif(Request $request): ?Periode

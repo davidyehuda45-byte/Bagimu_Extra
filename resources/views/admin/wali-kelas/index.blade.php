@@ -44,12 +44,12 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Rombel Kelas Binaan (Langsung Tautkan)</label>
-                    <select name="school_class_id" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs font-semibold focus:border-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-600/20">
-                        <option value="">-- Belum Ditugaskan / Pilih Nanti --</option>
+                    <label class="block font-bold text-slate-700 mb-1">Rombel Kelas Binaan <span class="text-rose-500">*</span></label>
+                    <select name="school_class_id" required class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs font-semibold focus:border-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-600/20">
+                        <option value="">-- Pilih Rombel Kelas Binaan --</option>
                         @foreach ($classes as $c)
-                            <option value="{{ $c->id }}">
-                                {{ $c->nama }} (Tingkat {{ $c->tingkat ?? '-' }}) {{ $c->waliKelas ? '— saat ini: ' . $c->waliKelas->name : '— [Kosong]' }}
+                            <option value="{{ $c->id }}" {{ old('school_class_id') == $c->id ? 'selected' : '' }}>
+                                {{ $c->nama }} (Tingkat {{ $c->tingkat ?? '-' }}) {{ $c->waliKelas ? '— [Sudah diampu: ' . $c->waliKelas->name . ']' : '— [Tersedia]' }}
                             </option>
                         @endforeach
                     </select>
@@ -133,9 +133,14 @@
                                     <span class="text-slate-400 font-normal">({{ $wk->managedClass->students->count() }} siswa)</span>
                                 </div>
                             @else
-                                <span class="inline-flex items-center rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 border border-amber-200/80">
-                                    Belum ditautkan kelas
-                                </span>
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex items-center rounded-lg bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-700 border border-amber-200/80">
+                                        Belum ada kelas
+                                    </span>
+                                    <button type="button" @click="showEdit = true" class="text-xs font-bold text-blue-600 hover:text-blue-800 hover:underline">
+                                        Tautkan Kelas &rarr;
+                                    </button>
+                                </div>
                             @endif
                         </td>
                         <td class="px-5 py-3.5 text-right">
@@ -191,12 +196,12 @@
                                             <input type="text" name="username" value="{{ $wk->username }}" class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs font-medium focus:border-blue-600 focus:outline-hidden">
                                         </div>
                                         <div>
-                                            <label class="block font-bold text-slate-700 mb-1">Rombel Kelas Binaan</label>
-                                            <select name="school_class_id" class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs font-semibold focus:border-blue-600 focus:outline-hidden">
-                                                <option value="">-- Lepaskan dari Rombel Kelas --</option>
+                                            <label class="block font-bold text-slate-700 mb-1">Rombel Kelas Binaan <span class="text-rose-500">*</span></label>
+                                            <select name="school_class_id" required class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs font-semibold focus:border-blue-600 focus:outline-hidden">
+                                                <option value="">-- Pilih Rombel Kelas Binaan --</option>
                                                 @foreach ($classes as $c)
                                                     <option value="{{ $c->id }}" {{ $wk->managedClass?->id === $c->id ? 'selected' : '' }}>
-                                                        {{ $c->nama }} (Tingkat {{ $c->tingkat ?? '-' }}) {{ $c->waliKelas && $c->waliKelas->id !== $wk->id ? '— saat ini: ' . $c->waliKelas->name : '' }}
+                                                        {{ $c->nama }} (Tingkat {{ $c->tingkat ?? '-' }}) {{ $c->waliKelas && $c->waliKelas->id !== $wk->id ? '— [Sudah diampu: ' . $c->waliKelas->name . ']' : ($wk->managedClass?->id === $c->id ? '— [Kelas Saat Ini]' : '— [Tersedia]') }}
                                                     </option>
                                                 @endforeach
                                             </select>

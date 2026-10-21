@@ -6,7 +6,9 @@ use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Models\AdminLog;
 use App\Models\SchoolClass;
+use App\Models\Student;
 use App\Models\User;
+use App\Support\Kelas;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -20,13 +22,38 @@ class WaliKelasAdminController extends Controller
      */
     public function index(): View
     {
+        // Otomatis sinkronisasi rombel unik dari data siswa ke master kelas agar dropdown selalu lengkap
+        $distinctClasses = Student::select('kelas', 'jurusan')
+            ->distinct()
+            ->whereNotNull('kelas')
+            ->get();
+
+        foreach ($distinctClasses as $ds) {
+            $clean = Kelas::normalisasi($ds->kelas);
+            if (! $clean) {
+                continue;
+            }
+            $tingkat = Kelas::tingkat($clean);
+            $jurusan = $ds->jurusan?->value ?? (preg_match('/(RPL|DKV|KULINER|TP|TKP)/i', $clean, $m) ? strtoupper($m[1]) : 'UMUM');
+
+            SchoolClass::firstOrCreate(
+                ['nama' => $clean],
+                [
+                    'tingkat' => $tingkat,
+                    'jurusan' => $jurusan,
+                    'wali_kelas_nama' => Student::where('kelas', $ds->kelas)->whereNotNull('wali_nama')->value('wali_nama'),
+                ]
+            );
+        }
+
         $waliKelases = User::where('role', Role::WALI_KELAS)
             ->with(['managedClass.students'])
             ->orderBy('name')
             ->paginate(20);
 
         // Seluruh daftar rombel kelas aktif untuk pilihan dropdown
-        $classes = SchoolClass::orderBy('tingkat')
+        $classes = SchoolClass::with('waliKelas')
+            ->orderBy('tingkat')
             ->orderBy('nama')
             ->get();
 
@@ -43,7 +70,9 @@ class WaliKelasAdminController extends Controller
             'email' => ['required', 'email', 'max:191', 'unique:users,email'],
             'username' => ['nullable', 'string', 'max:30', 'unique:users,username'],
             'password' => ['required', 'string', 'min:8', 'max:100'],
-            'school_class_id' => ['nullable', 'exists:school_classes,id'],
+            'school_class_id' => ['required', 'exists:school_classes,id'],
+        ], [
+            'school_class_id.required' => 'Rombel kelas binaan wajib dipilih agar akun wali kelas langsung terhubung ke kelasnya.',
         ]);
 
         $user = User::create([
@@ -94,7 +123,9 @@ class WaliKelasAdminController extends Controller
             'name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:191', Rule::unique('users', 'email')->ignore($user->id)],
             'username' => ['nullable', 'string', 'max:30', Rule::unique('users', 'username')->ignore($user->id)],
-            'school_class_id' => ['nullable', 'exists:school_classes,id'],
+            'school_class_id' => ['required', 'exists:school_classes,id'],
+        ], [
+            'school_class_id.required' => 'Rombel kelas binaan wajib dipilih.',
         ]);
 
         $user->update([

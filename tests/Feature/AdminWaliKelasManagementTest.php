@@ -120,6 +120,59 @@ class AdminWaliKelasManagementTest extends TestCase
         $this->assertNull($kelas->wali_kelas_nama);
     }
 
+    public function test_tambah_wali_kelas_wajib_memilih_rombel_kelas(): void
+    {
+        $admin = $this->admin();
+
+        $response = $this->actingAs($admin)->post(route('admin.wali-kelas.store'), [
+            'name' => 'Wali Tanpa Kelas',
+            'email' => 'tanpakelas@sekolah.sch.id',
+            'password' => 'password123',
+        ]);
+
+        $response->assertSessionHasErrors(['school_class_id']);
+    }
+
+    public function test_halaman_kelola_wali_kelas_otomatis_sinkron_kelas_dari_siswa(): void
+    {
+        $admin = $this->admin();
+        \App\Models\Student::create([
+            'nis' => '99001',
+            'nama' => 'Siswa Baru',
+            'kelas' => '11 DKV 2',
+            'jurusan' => 'DKV',
+            'status' => 'AKTIF',
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('admin.wali-kelas.index'));
+        $response->assertOk();
+
+        $this->assertDatabaseHas('school_classes', [
+            'nama' => '11 DKV 2',
+        ]);
+    }
+
+    public function test_wali_kelas_terisolasi_hanya_melihat_kelas_sendiri_dan_tidak_bisa_ganti_ke_kelas_lain(): void
+    {
+        $kelasA = SchoolClass::create(['nama' => '10 RPL 1', 'tingkat' => 10, 'jurusan' => 'RPL']);
+        $kelasB = SchoolClass::create(['nama' => '10 RPL 2', 'tingkat' => 10, 'jurusan' => 'RPL']);
+
+        $waliA = User::factory()->create(['role' => Role::WALI_KELAS]);
+        $kelasA->update(['wali_kelas_id' => $waliA->id, 'wali_kelas_nama' => $waliA->name]);
+
+        // Akses dashboard normal
+        $response = $this->actingAs($waliA)->get(route('wali-kelas.dashboard'));
+        $response->assertOk();
+        $response->assertSee('Rombel: 10 RPL 1');
+        $response->assertDontSee('name="kelas_id"', false); // Dropdown tidak boleh ada untuk wali kelas
+
+        // Coba intip kelas B lewat query param ?kelas_id=...
+        $responseIntip = $this->actingAs($waliA)->get(route('wali-kelas.dashboard', ['kelas_id' => $kelasB->id]));
+        $responseIntip->assertOk();
+        $responseIntip->assertSee('Rombel: 10 RPL 1');
+        $responseIntip->assertDontSee('Rombel: 10 RPL 2'); // Tetap terkunci di kelas A!
+    }
+
     public function test_wali_kelas_bisa_login_dan_ke_dashboard_wali_kelas(): void
     {
         $wali = User::factory()->create([
