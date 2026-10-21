@@ -16,21 +16,14 @@
 <body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
 @php($sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra')))
 <main class="flex min-h-screen">
-    {{-- Panel Branding Desktop --}}
-    <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-b from-[#1d62d8] via-[#1e58c8] to-[#154bb0] p-10 xl:p-14 text-white lg:flex">
-        <div class="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-blue-400/25 blur-3xl z-0"></div>
-        <div class="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-blue-700/50 blur-3xl z-0"></div>
+    {{-- Panel Branding Desktop - Biru Cerah Resmi SMK Bagimu Negeriku --}}
+    <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-b from-[#2b6ee8] via-[#2563eb] to-[#1e58d4] p-10 xl:p-14 text-white lg:flex">
+        {{-- Ambient Glow Lembut --}}
+        <div class="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-sky-300/25 blur-3xl z-0"></div>
+        <div class="pointer-events-none absolute top-1/2 -right-20 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl z-0"></div>
 
-        <svg class="pointer-events-none absolute inset-0 h-full w-full opacity-25 z-0" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <pattern id="dot-grid-pembina" width="26" height="26" patternUnits="userSpaceOnUse">
-                    <circle cx="2" cy="2" r="1.25" fill="#ffffff" />
-                </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#dot-grid-pembina)" />
-        </svg>
-
-        <div class="pointer-events-none absolute bottom-0 right-0 h-[68%] xl:h-[75%] max-h-[820px] w-auto select-none z-0">
+        {{-- Foto Gedung SMK Bagimu Negeriku di Sudut Kanan Bawah --}}
+        <div class="pointer-events-none absolute bottom-0 right-0 h-[82%] xl:h-[90%] 2xl:h-[95%] max-h-[960px] w-auto select-none z-0">
             <img src="{{ asset('images/gedung-mockup.png') }}?v={{ filemtime(public_path('images/gedung-mockup.png')) }}"
                  alt="Gedung SMK Bagimu Negeriku"
                  class="h-full w-auto object-contain object-right-bottom drop-shadow-2xl" />
@@ -42,8 +35,9 @@
             <div>
                 <p class="text-xl xl:text-2xl font-black tracking-tight text-white leading-tight">{{ config('app.name', 'Bagimu Extra') }}</p>
                 <p class="text-xs sm:text-sm font-bold text-white tracking-wide mt-0.5">{{ $sekolah }}</p>
-                <p class="text-xs font-medium text-blue-100/95 mt-1 tracking-wide">
-                    4B Berbudi • Berkualitas • Berdaya • Berhasil
+                <p class="text-xs font-medium text-blue-100/95 mt-1 tracking-wide flex items-center gap-1.5">
+                    <x-icon name="user-group" class="h-3.5 w-3.5 text-blue-200 shrink-0" />
+                    <span>4B Berbudi • Berkualitas • Berdaya • Berhasil</span>
                 </p>
             </div>
         </div>
@@ -52,15 +46,15 @@
         <div class="relative z-10 my-auto py-8 space-y-6 max-w-lg">
             <span class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold bg-white/10 text-white border border-white/25 backdrop-blur-md shadow-xs">
                 <x-icon name="user-group" class="h-3.5 w-3.5 text-white/90" />
-                Portal Khusus Pembina
+                Portal Pembina &amp; Wali Kelas
             </span>
             <h1 class="text-3xl sm:text-4xl xl:text-5xl font-black leading-[1.12] tracking-tight text-white drop-shadow-xs">
                 Pengelolaan<br>
                 Ekstrakurikuler<br>
-                Terpadu & Profesional.
+                Terpadu &amp; Profesional.
             </h1>
             <p class="text-sm sm:text-base leading-relaxed text-blue-100/90 max-w-md">
-                Akses resmi pembina eskul untuk pengelolaan pendaftaran siswa, absensi kehadiran latihan, dan penilaian rapor ekstrakurikuler.
+                Akses resmi pembina eskul dan wali kelas untuk pengelolaan pendaftaran siswa, absensi kehadiran latihan, dan penilaian rapor ekstrakurikuler.
             </p>
         </div>
 
@@ -90,7 +84,7 @@
             <div class="card relative rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-xl shadow-slate-200/50">
                 <div class="mb-5">
                     <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10 mb-2.5">
-                        <x-icon name="shield" class="h-3.5 w-3.5 text-blue-600" /> Portal Pembina & Wali Kelas
+                        <x-icon name="shield" class="h-3.5 w-3.5 text-blue-600" /> Portal Pembina &amp; Wali Kelas
                     </span>
                     <h2 class="text-xl font-bold text-slate-900 tracking-tight">Login Pembina / Wali Kelas</h2>
                     <p class="mt-1 text-xs sm:text-sm text-slate-500">Gunakan username atau alamat email resmi akun pembina atau wali kelas Anda.</p>
