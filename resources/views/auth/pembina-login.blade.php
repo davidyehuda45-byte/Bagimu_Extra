@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <x-favicon />
     <meta name="theme-color" content="#2563eb">
-    <title>Login Pembina — {{ config('app.name', 'Bagimu Extra') }}</title>
+    <title>Login Pembina / Wali Kelas — {{ config('app.name', 'Bagimu Extra') }}</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" /></noscript>
@@ -96,16 +96,16 @@
                     </a>
                     <div class="py-2.5 rounded-xl bg-blue-600 text-white shadow-xs flex items-center justify-center gap-2">
                         <x-icon name="user-group" class="h-4 w-4" />
-                        <span>Pembina</span>
+                        <span>Pembina / Wali Kelas</span>
                     </div>
                 </div>
 
                 <div class="mb-5">
                     <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10 mb-2.5">
-                        <x-icon name="shield" class="h-3.5 w-3.5 text-blue-600" /> Portal Pembina
+                        <x-icon name="shield" class="h-3.5 w-3.5 text-blue-600" /> Portal Pembina & Wali Kelas
                     </span>
-                    <h2 class="text-xl font-bold text-slate-900 tracking-tight">Login Staf / Pembina</h2>
-                    <p class="mt-1 text-xs sm:text-sm text-slate-500">Gunakan username atau alamat email resmi akun pembina Anda.</p>
+                    <h2 class="text-xl font-bold text-slate-900 tracking-tight">Login Pembina / Wali Kelas</h2>
+                    <p class="mt-1 text-xs sm:text-sm text-slate-500">Gunakan username atau alamat email resmi akun pembina atau wali kelas Anda.</p>
                 </div>
 
                 <x-auth-session-status class="mb-4" :status="session('status')" />

@@ -64,7 +64,7 @@
             @else
                 <a href="{{ route('pembina.login') }}" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition">
                     <x-icon name="user-group" class="h-3.5 w-3.5 text-slate-500" />
-                    <span>Masuk Pembina</span>
+                    <span>Pembina / Wali Kelas</span>
                 </a>
                 <a href="{{ route('siswa.login') }}" class="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 transition shadow-xs shadow-blue-600/20">
                     <x-icon name="user" class="h-3.5 w-3.5" />
@@ -104,7 +104,7 @@
                     </a>
                     <a href="{{ route('pembina.login') }}" class="group inline-flex h-12 items-center gap-2.5 rounded-2xl border border-white/35 bg-white/15 backdrop-blur-md px-5 sm:px-6 text-sm font-bold text-white shadow-xs hover:bg-white/25 hover:border-white/50 active:scale-[0.98] transition-all duration-150">
                         <x-icon name="user-group" class="h-4 w-4 text-white shrink-0 transition-transform group-hover:scale-110" />
-                        <span>Masuk Pembina</span>
+                        <span>Masuk Pembina / Wali Kelas</span>
                     </a>
                 @endif
                 <a href="#eskul" class="group inline-flex h-12 items-center gap-2.5 rounded-2xl border border-white/25 bg-white/10 backdrop-blur-md px-5 sm:px-6 text-sm font-bold text-white/95 shadow-xs hover:bg-white/20 hover:border-white/40 hover:text-white active:scale-[0.98] transition-all duration-150">

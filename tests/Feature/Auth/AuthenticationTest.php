@@ -110,7 +110,7 @@ class AuthenticationTest extends TestCase
     {
         $response = $this->get('/pembina/login');
         $response->assertOk();
-        $response->assertSee('Login Staf / Pembina');
+        $response->assertSee('Login Pembina / Wali Kelas');
         $response->assertDontSee('Login Guru & Staf');
     }
 
