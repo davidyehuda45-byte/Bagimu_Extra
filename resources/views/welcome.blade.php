@@ -10,10 +10,21 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
     <link rel="stylesheet" href="{{ asset('splash.css') }}">
+    <script>
+        (function() {
+            try {
+                if (sessionStorage.getItem('bagimu_splash_shown') === '1') {
+                    document.documentElement.classList.add('splash-skip');
+                }
+            } catch (e) {}
+        })();
+    </script>
     <style>
         #app-content { opacity: 0; }
         #app-content.show { animation: muncul .7s ease forwards; }
         @keyframes muncul { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+        html.splash-skip #splash { display: none !important; }
+        html.splash-skip #app-content { opacity: 1 !important; transform: none !important; animation: none !important; }
     </style>
     <noscript>
         <style>
@@ -35,15 +46,25 @@
     $sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra'));
 @endphp
 
-<!-- ====== SPLASH SCREEN ====== -->
-<div id="splash" role="status" aria-label="Memuat aplikasi">
-  <div class="sp-badge"><img src="{{ asset('splash-logo.png') }}" alt="Logo {{ $sekolah }}"></div>
-  <div class="sp-ekskul" id="sp-ekskul"></div>
-  <h2 class="sp-name">{{ $sekolah }}</h2>
-  <p class="sp-motto">4B Berbudi · Berkualitas · Berdaya · Berhasil</p>
-  <div class="sp-pct"><b id="sp-num">1</b>%</div>
+<!-- ====== SPLASH SCREEN (Micro-Brand Reveal) ====== -->
+<div id="splash" role="status" aria-label="Selamat Datang di Bagimu Extra" tabindex="0">
+    <div class="sp-ambient" aria-hidden="true"></div>
+    <div class="sp-content">
+        <div class="sp-badge">
+            <img src="{{ asset('splash-logo.png') }}" alt="Logo {{ $sekolah }}" width="124" height="124">
+        </div>
+        <div class="sp-brand">
+            <span class="sp-tag">{{ config('app.name', 'Bagimu Extra') }}</span>
+            <h1 class="sp-name">{{ $sekolah }}</h1>
+            <p class="sp-motto">4B · Berbudi · Berkualitas · Berdaya · Berhasil</p>
+        </div>
+        <div class="sp-loader" aria-hidden="true">
+            <div class="sp-bar"></div>
+        </div>
+        <div class="sp-hint">Ketuk untuk melanjutkan</div>
+    </div>
 </div>
-<!-- =========================== -->
+<!-- ================================================ -->
 
 <div id="app-content" class="w-full max-w-7xl mx-auto space-y-10 px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
     {{-- Top Navbar Mini --}}

@@ -1,45 +1,173 @@
-/* ===== Splash Screen – SMK Bagimu Negeriku ===== */
-:root{
-  --splash-grad:linear-gradient(120deg,#0B4F9E,#1976D2,#0A3D82,#1E88E5,#0B4F9E); /* ganti warna di sini */
+/* ===== Splash Screen – Ide 1: The Micro-Brand Reveal ===== */
+#splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 38%, #1e40af 0%, #0f2352 55%, #081226 100%);
+  color: #ffffff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), filter 0.4s ease, transform 0.4s ease, visibility 0.4s;
 }
-#splash{
-  position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:var(--splash-grad);background-size:300% 300%;animation:splash-warna 8s ease-in-out infinite;
-  color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);
-  transition:opacity .45s ease,visibility .45s;
+
+#splash.out {
+  opacity: 0;
+  filter: blur(10px);
+  transform: scale(1.04);
+  pointer-events: none;
+  visibility: hidden;
 }
-#splash.out{opacity:0;visibility:hidden}
-#splash *{box-sizing:border-box}
 
-/* logo */
-.sp-badge{width:min(68vw,300px);aspect-ratio:1;animation:splash-float 3.2s 1.2s ease-in-out infinite}
-.sp-badge img{display:block;width:100%;height:100%;border-radius:50%;background:#fff;box-shadow:0 16px 40px -8px rgba(0,0,0,0.35);
-  opacity:0;transform:scale(0);animation:splash-pop .8s .15s cubic-bezier(.2,.9,.3,1) forwards}
+#splash * {
+  box-sizing: border-box;
+}
 
-/* teks */
-.sp-ekskul{margin:28px 0 0;min-height:1.5em;font-size:clamp(16px,2.8vw,21px);font-weight:700;letter-spacing:.06em}
-.sp-ekskul::after{content:"";display:inline-block;width:2px;height:1em;margin-left:3px;background:#fff;vertical-align:-2px;animation:splash-caret .8s steps(1) infinite}
-.sp-name{margin:8px 0 0;font-size:clamp(22px,4.5vw,32px);font-weight:800;letter-spacing:.02em;text-align:center;opacity:0;animation:splash-fade .6s .5s ease forwards}
-.sp-motto{margin:8px 16px 0;font-size:clamp(13px,2vw,16px);font-weight:500;color:rgba(255,255,255,.9);text-align:center;letter-spacing:.03em;opacity:0;animation:splash-fade .6s .7s ease forwards}
-.sp-pct{margin-top:32px;font-size:clamp(16px,2vw,19px);font-variant-numeric:tabular-nums;color:rgba(255,255,255,.92);opacity:0;animation:splash-fade .4s .8s ease forwards}
-.sp-pct b{font-size:clamp(34px,5.5vw,44px);font-weight:800;color:#fff}
+/* Ambient glow di belakang logo */
+.sp-ambient {
+  position: absolute;
+  width: min(75vw, 320px);
+  height: min(75vw, 320px);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.35) 0%, rgba(30, 64, 175, 0) 70%);
+  filter: blur(28px);
+  pointer-events: none;
+  animation: sp-pulse 2.8s ease-in-out infinite;
+}
 
-/* saat 100%: logo mengecil, teks menghilang */
-#splash.shrink .sp-badge img{animation:splash-kecil .6s cubic-bezier(.6,0,.9,.5) forwards}
-#splash.shrink .sp-ekskul,#splash.shrink .sp-name,#splash.shrink .sp-motto,#splash.shrink .sp-pct{animation:splash-hilang .3s forwards}
+/* Kontainer konten utama */
+.sp-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px 20px;
+  max-width: 460px;
+  width: 100%;
+}
 
-@keyframes splash-warna{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-@keyframes splash-pop{0%{opacity:0;transform:scale(0)}15%{opacity:1}65%{transform:scale(1.14)}100%{opacity:1;transform:scale(1)}}
-@keyframes splash-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@keyframes splash-fade{to{opacity:1}}
-@keyframes splash-caret{50%{opacity:0}}
-@keyframes splash-kecil{from{transform:scale(1);opacity:1}to{transform:scale(0);opacity:0}}
-@keyframes splash-hilang{from{opacity:1}to{opacity:0}}
+/* Logo sekolah */
+.sp-badge {
+  width: clamp(96px, 22vw, 124px);
+  height: clamp(96px, 22vw, 124px);
+  margin-bottom: 20px;
+  position: relative;
+  animation: sp-scale-in 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 
-@media (prefers-reduced-motion:reduce){
-  #splash,.sp-badge{animation:none}
-  .sp-badge img{animation:splash-pop .01s forwards}
-  .sp-name,.sp-motto,.sp-pct{animation-duration:.01s;animation-delay:0s}
-  .sp-ekskul::after{animation:none}
+.sp-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+  background: #ffffff;
+  padding: 8px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 0 4px rgba(255, 255, 255, 0.15);
+  display: block;
+}
+
+/* Brand tag & nama sekolah */
+.sp-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #93c5fd;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 5px 14px;
+  border-radius: 9999px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  margin-bottom: 12px;
+  animation: sp-fade-up 0.65s 0.12s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.sp-name {
+  font-size: clamp(20px, 4.5vw, 26px);
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+  line-height: 1.25;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  animation: sp-fade-up 0.65s 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.sp-motto {
+  font-size: clamp(12px, 2.5vw, 13.5px);
+  font-weight: 500;
+  color: rgba(224, 231, 255, 0.85);
+  letter-spacing: 0.04em;
+  margin: 0;
+  animation: sp-fade-up 0.65s 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Micro loader bar */
+.sp-loader {
+  margin-top: 26px;
+  width: 130px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+  animation: sp-fade-up 0.5s 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.sp-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #60a5fa, #38bdf8);
+  border-radius: 9999px;
+}
+
+/* Petunjuk lewati */
+.sp-hint {
+  margin-top: 14px;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.02em;
+  animation: sp-fade 0.5s 0.5s ease both;
+}
+
+@keyframes sp-scale-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes sp-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sp-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sp-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.35; }
+  50% { transform: scale(1.15); opacity: 0.6; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #splash, .sp-ambient, .sp-badge, .sp-tag, .sp-name, .sp-motto, .sp-loader, .sp-hint {
+    animation: none !important;
+  }
+  #splash.out {
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
 }
