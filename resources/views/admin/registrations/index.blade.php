@@ -103,7 +103,7 @@
                             <div class="flex items-center gap-1.5">
                                 <a href="{{ route('admin.registrations.show', $r) }}" class="rounded-lg border border-slate-300 px-2.5 py-1 text-xs font-semibold hover:bg-slate-50">Detail</a>
                                 @if (! auth()->user()->hasRole(\App\Enums\Role::KEPALA_SEKOLAH))
-                                    <form method="POST" action="{{ route('admin.registrations.destroy', $r) }}" onsubmit="return confirm('Hapus permanen data pendaftaran ini?')">
+                                    <form method="POST" action="{{ route('admin.registrations.destroy', $r) }}" data-confirm="Hapus permanen data pendaftaran ini?" data-confirm-title="Hapus Pendaftaran" data-confirm-btn="Hapus">
                                         @csrf
                                         @method('DELETE')
                                         <button class="rounded-lg px-2.5 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50">Hapus</button>

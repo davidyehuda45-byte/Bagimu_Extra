@@ -112,9 +112,9 @@
     <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 class="font-bold text-sm text-slate-900 mb-3">Keamanan Kartu Pelajar</h2>
         <div class="flex flex-wrap gap-2 text-sm">
-            <form method="POST" action="{{ route('admin.registrations.cabut', $registration) }}" onsubmit="return confirm('Cabut kartu & terbitkan token baru? Token lama hangus.')">
+            <form method="POST" action="{{ route('admin.registrations.cabut', $registration) }}" data-confirm="Cabut kartu & terbitkan token baru? Token lama akan otomatis hangus." data-confirm-title="Cabut Kartu Pelajar" data-confirm-btn="Cabut & Reset">
                 @csrf
-                <button class="px-4 py-2 rounded-xl border border-slate-300 font-semibold hover:bg-slate-50">Cabut Kartu & Reset Token</button>
+                <button class="px-4 py-2 rounded-xl border border-slate-300 font-semibold hover:bg-slate-50 cursor-pointer">Cabut Kartu & Reset Token</button>
             </form>
         </div>
         <p class="mt-2 text-[11px] text-slate-400">Gunakan bila kartu pelajar fisik siswa hilang atau dicetak ulang.</p>
@@ -131,9 +131,9 @@
             @endif
         </p>
         <div class="mt-2 flex flex-wrap gap-2 text-sm">
-            <form method="POST" action="{{ route('admin.registrations.token', $registration) }}" onsubmit="return confirm('Buat token baru? Token lama hangus.')">
+            <form method="POST" action="{{ route('admin.registrations.token', $registration) }}" data-confirm="Buat token baru? Token lama akan otomatis hangus." data-confirm-title="Reset Token Siswa" data-confirm-btn="Buat Token">
                 @csrf
-                <button class="px-4 py-2 rounded-xl border border-slate-300 font-semibold hover:bg-slate-50">{{ $registration->user?->login_token_hash ? 'Reset Token' : 'Buat Token' }}</button>
+                <button class="px-4 py-2 rounded-xl border border-slate-300 font-semibold hover:bg-slate-50 cursor-pointer">{{ $registration->user?->login_token_hash ? 'Reset Token' : 'Buat Token' }}</button>
             </form>
         </div>
         <form method="POST" action="{{ route('admin.registrations.password', $registration) }}" class="mt-3 flex gap-2 items-end text-sm">

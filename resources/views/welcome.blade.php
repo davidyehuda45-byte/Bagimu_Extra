@@ -9,18 +9,7 @@
     <meta name="description" content="Pendaftaran ekstrakurikuler digital SMK Bagimu Negeriku — jelajahi eskul, lihat jadwal mingguan, dan daftar mudah dengan NIS dan token kartu pelajar.">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="{{ asset('splash.css') }}">
-    <style>
-        #app-content { opacity: 0; }
-        #app-content.show { animation: muncul .7s ease forwards; }
-        @keyframes muncul { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-    </style>
-    <noscript>
-        <style>
-            #splash { display: none !important; }
-            #app-content { opacity: 1 !important; transform: none !important; }
-        </style>
-    </noscript>
+    <noscript><link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" /></noscript>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white" x-data="{
@@ -34,16 +23,6 @@
 @php
     $sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra'));
 @endphp
-
-<!-- ====== SPLASH SCREEN ====== -->
-<div id="splash" role="status" aria-label="Memuat aplikasi">
-  <div class="sp-badge"><img src="{{ asset('splash-logo.png') }}" alt="Logo {{ $sekolah }}"></div>
-  <div class="sp-ekskul" id="sp-ekskul"></div>
-  <h2 class="sp-name">{{ $sekolah }}</h2>
-  <p class="sp-motto">4B Berbudi · Berkualitas · Berdaya · Berhasil</p>
-  <div class="sp-pct"><b id="sp-num">1</b>%</div>
-</div>
-<!-- =========================== -->
 
 <div id="app-content" class="w-full max-w-7xl mx-auto space-y-10 px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
     {{-- Top Navbar Mini --}}
@@ -144,7 +123,7 @@
                             ])->values()->all(),
                         ];
                     @endphp
-                    <div class="flex flex-col justify-between rounded-3xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-xs hover:border-blue-300 hover:shadow-sm transition">
+                    <div class="flex flex-col justify-between h-full rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-xs hover:border-blue-300 hover:shadow-sm transition">
                         <div>
                             <div class="flex items-start justify-between gap-2">
                                 <h3 class="font-bold text-base sm:text-lg text-slate-900">{{ $eskul->name }}</h3>
@@ -380,14 +359,5 @@
     </div>
 </div>
 
-<script src="{{ asset('splash.js') }}"></script>
-<script>
-    document.addEventListener('splash:selesai', function () {
-        var app = document.getElementById('app-content');
-        if (app) {
-            app.classList.add('show');
-        }
-    });
-</script>
 </body>
 </html>

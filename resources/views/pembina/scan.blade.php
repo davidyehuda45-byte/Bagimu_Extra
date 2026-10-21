@@ -50,14 +50,20 @@
                     <span>Mulai Kamera HP</span>
                 </button>
             </div>
-            <div id="camera-active-controls" class="hidden mt-3 w-full flex items-center justify-between bg-slate-800/80 p-2.5 rounded-xl text-xs">
-                <span class="text-emerald-400 font-semibold flex items-center gap-1.5">
+            <div id="camera-active-controls" class="hidden mt-3 w-full flex flex-wrap items-center justify-between bg-slate-800/90 p-3 rounded-xl text-xs gap-2">
+                <span class="text-emerald-400 font-semibold flex items-center gap-1.5 shrink-0">
                     <span class="h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
-                    Kamera Aktif
+                    <span id="camera-mode-label">Kamera Belakang Aktif</span>
                 </span>
-                <button id="btn-stop-camera" type="button" class="rounded-lg bg-rose-600 px-3 py-1 font-bold text-white hover:bg-rose-700 transition cursor-pointer">
-                    Hentikan Kamera
-                </button>
+                <div class="flex items-center gap-2">
+                    <button id="btn-flip-camera" type="button" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-600 bg-slate-700/80 px-3 py-1.5 font-bold text-white hover:bg-slate-700 transition cursor-pointer">
+                        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+                        <span>Ganti Kamera (Flip)</span>
+                    </button>
+                    <button id="btn-stop-camera" type="button" class="rounded-lg bg-rose-600 px-3 py-1.5 font-bold text-white hover:bg-rose-700 transition cursor-pointer">
+                        Hentikan
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -107,6 +113,8 @@
 (function () {
     const btnStart = document.getElementById('btn-start-camera');
     const btnStop = document.getElementById('btn-stop-camera');
+    const btnFlip = document.getElementById('btn-flip-camera');
+    const modeLabel = document.getElementById('camera-mode-label');
     const cameraPlaceholder = document.getElementById('camera-placeholder');
     const activeControls = document.getElementById('camera-active-controls');
     const hasil = document.getElementById('scan-hasil');
@@ -119,6 +127,7 @@
     const url = @json(route('pembina.scan.store', $eskul));
 
     let html5QrCode = null;
+    let currentFacingMode = 'environment';
     let isProcessing = false;
     let lastScannedCode = '';
     let lastScanTime = 0;
@@ -215,6 +224,9 @@
         activeControls.classList.remove('hidden');
 
         try {
+            if (html5QrCode) {
+                try { await html5QrCode.stop(); html5QrCode.clear(); } catch (e) {}
+            }
             html5QrCode = new Html5Qrcode('reader');
             const config = {
                 fps: 10,
@@ -223,7 +235,7 @@
             };
 
             await html5QrCode.start(
-                { facingMode: 'environment' },
+                { facingMode: currentFacingMode },
                 config,
                 (decodedText) => {
                     sendScanData(decodedText);
@@ -232,6 +244,10 @@
                     // Ignore transient frame errors
                 }
             );
+
+            if (modeLabel) {
+                modeLabel.textContent = currentFacingMode === 'environment' ? 'Kamera Belakang Aktif' : 'Kamera Depan Aktif';
+            }
         } catch (err) {
             showFeedback(false, 'Tidak dapat mengakses kamera HP. Pastikan izin kamera telah diberikan di browser.');
             stopScanner();
@@ -250,8 +266,14 @@
         activeControls.classList.add('hidden');
     }
 
+    async function flipCamera() {
+        currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+        await startScanner();
+    }
+
     btnStart.addEventListener('click', startScanner);
     btnStop.addEventListener('click', stopScanner);
+    if (btnFlip) btnFlip.addEventListener('click', flipCamera);
     window.addEventListener('beforeunload', stopScanner);
 })();
 </script>

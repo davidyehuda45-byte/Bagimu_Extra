@@ -73,7 +73,7 @@
             <h3 class="text-sm font-bold text-rose-800">Hapus Ekstrakurikuler</h3>
             <p class="text-xs text-rose-600 mt-0.5">Eskul hanya dapat dihapus bila belum memiliki siswa pendaftar. Bila sudah ada pendaftar, nonaktifkan opsi "Aktif" di formulir atas.</p>
         </div>
-        <form method="POST" action="{{ route('admin.eskuls.destroy', $eskul) }}" onsubmit="return confirm('Hapus permanen ekstrakurikuler {{ $eskul->name }}? Tindakan ini tidak dapat dibatalkan.')">
+        <form method="POST" action="{{ route('admin.eskuls.destroy', $eskul) }}" data-confirm="Hapus permanen ekstrakurikuler {{ $eskul->name }}? Tindakan ini tidak dapat dibatalkan." data-confirm-title="Hapus Ekstrakurikuler" data-confirm-btn="Hapus Eskul">
             @csrf
             @method('DELETE')
             <button type="submit" class="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-700 shadow-sm transition">

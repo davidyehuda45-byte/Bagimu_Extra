@@ -83,8 +83,74 @@
         </main>
     </div>
 </div>
+
+{{-- Global Alpine.js Confirm Modal --}}
+<div x-data="{
+    open: false,
+    title: '',
+    message: '',
+    confirmText: 'Ya, Lanjutkan',
+    targetForm: null,
+    showConfirm(title, message, confirmText, form) {
+        this.title = title || 'Konfirmasi Tindakan';
+        this.message = message || 'Apakah Anda yakin ingin melanjutkan tindakan ini?';
+        this.confirmText = confirmText || 'Ya, Lanjutkan';
+        this.targetForm = form;
+        this.open = true;
+    },
+    doConfirm() {
+        if (this.targetForm) {
+            this.targetForm.removeAttribute('data-confirm');
+            this.targetForm.submit();
+        }
+        this.open = false;
+    }
+}"
+@app-confirm.window="showConfirm($event.detail.title, $event.detail.message, $event.detail.confirmText, $event.detail.form)"
+x-show="open"
+x-cloak
+class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs"
+style="display: none;"
+@keydown.escape.window="open = false">
+    <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl border border-slate-200" @click.outside="open = false">
+        <div class="flex items-start gap-3.5 mb-3">
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </span>
+            <div>
+                <h3 class="font-bold text-slate-900 text-sm" x-text="title">Konfirmasi Tindakan</h3>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed" x-text="message"></p>
+            </div>
+        </div>
+        <div class="mt-5 flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+            <button type="button" @click="open = false" class="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition cursor-pointer">
+                Batal
+            </button>
+            <button type="button" @click="doConfirm()" class="rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-700 shadow-sm transition cursor-pointer">
+                <span x-text="confirmText">Ya, Lanjutkan</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
 (function() {
+    // Intercept form with data-confirm
+    document.addEventListener('submit', function (e) {
+        const form = e.target;
+        if (form.hasAttribute('data-confirm')) {
+            e.preventDefault();
+            window.dispatchEvent(new CustomEvent('app-confirm', {
+                detail: {
+                    title: form.getAttribute('data-confirm-title') || 'Konfirmasi Tindakan',
+                    message: form.getAttribute('data-confirm'),
+                    confirmText: form.getAttribute('data-confirm-btn') || 'Ya, Lanjutkan',
+                    form: form
+                }
+            }));
+        }
+    });
+
     const nav = document.getElementById('staff-sidebar-nav');
     if (!nav) return;
 

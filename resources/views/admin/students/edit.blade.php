@@ -77,7 +77,7 @@
     </div>
 </form>
 
-<form method="POST" action="{{ route('admin.students.destroy', $student) }}" onsubmit="return confirm('Hapus data siswa ini?')" class="mt-4 w-full">
+<form method="POST" action="{{ route('admin.students.destroy', $student) }}" data-confirm="Hapus permanen data siswa {{ $student->nama }}? Data yang dihapus tidak dapat dikembalikan." data-confirm-title="Hapus Data Siswa" data-confirm-btn="Hapus Siswa" class="mt-4 w-full">
     @csrf
     @method('DELETE')
     <button class="px-4 py-2 rounded-xl bg-rose-600 text-white text-sm font-bold hover:bg-rose-700">Hapus Siswa</button>

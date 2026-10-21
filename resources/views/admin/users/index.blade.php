@@ -99,7 +99,7 @@
                                     <x-icon name="key" class="h-3 w-3" /> Reset Sandi
                                 </button>
 
-                                <form method="POST" action="{{ route('admin.users.destroy', $u) }}" onsubmit="return confirm('Hapus akun pembina {{ $u->name }}?')">
+                                <form method="POST" action="{{ route('admin.users.destroy', $u) }}" data-confirm="Hapus akun pembina {{ $u->name }}? Tindakan ini tidak dapat dibatalkan." data-confirm-title="Hapus Akun Pembina" data-confirm-btn="Hapus Akun">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="inline-flex items-center gap-1 rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-100 transition shadow-2xs">
