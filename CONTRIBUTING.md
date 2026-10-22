@@ -9,3 +9,5 @@ Terima kasih telah berkontribusi pada pengembangan aplikasi **Bagimu Extra** (SM
    - docs/nama-dokumen untuk pembaruan dokumentasi
 2. Lakukan pengujian lokal sebelum mengajukan Pull Request.
 3. Buat Pull Request ke branch main.
+
+Tim Pengembang: David Yehuda & Vines Fernando
