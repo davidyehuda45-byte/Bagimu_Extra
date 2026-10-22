@@ -11,24 +11,21 @@
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet" /></noscript>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="{{ asset('css/stempel.css') }}?v={{ filemtime(public_path('css/stempel.css')) }}">
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
 @php
     $sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra'));
 @endphp
 <main class="flex min-h-screen">
-    {{-- Panel Branding Desktop - Biru Cerah Resmi SMK Bagimu Negeriku --}}
-    <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-b from-[#2b6ee8] via-[#2563eb] to-[#1e58d4] p-10 xl:p-14 text-white lg:flex">
+    {{-- Panel Branding Desktop - Biru & Putih Bersih --}}
+    <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-b from-[#2563eb] via-[#1d4ed8] to-[#1e40af] p-10 xl:p-14 text-white lg:flex">
         {{-- Ambient Glow Lembut --}}
-        <div class="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-sky-300/25 blur-3xl z-0"></div>
-        <div class="pointer-events-none absolute top-1/2 -right-20 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl z-0"></div>
+        <div class="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-sky-300/20 blur-3xl z-0"></div>
+        <div class="pointer-events-none absolute top-1/2 -right-20 h-80 w-80 rounded-full bg-blue-400/15 blur-3xl z-0"></div>
 
-        {{-- Foto Gedung SMK Bagimu Negeriku di Sudut Kanan Bawah --}}
-        <div class="pointer-events-none absolute bottom-0 right-0 h-[82%] xl:h-[90%] 2xl:h-[95%] max-h-[960px] w-auto select-none z-0">
-            <img src="{{ asset('images/gedung-mockup.png') }}?v={{ filemtime(public_path('images/gedung-mockup.png')) }}"
-                 alt="Gedung SMK Bagimu Negeriku"
-                 class="h-full w-auto object-contain object-right-bottom drop-shadow-2xl" />
-        </div>
+        {{-- Animasi Bunga Generatif Putih Acak --}}
+        <x-flower-canvas />
 
         {{-- Header Sekolah --}}
         <div class="relative z-10 flex items-center gap-4">
@@ -99,14 +96,15 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('admin.login') }}" id="loginForm" class="space-y-4" x-data="{ loading: false, showPassword: false }">
+                <form method="POST" action="{{ route('admin.login') }}" id="loginForm" class="space-y-4" x-data="{ loading: false, showPassword: false }" @submit="handleAdminLoginSubmit($event, $data)">
                     @csrf
 
                     <div>
                         <x-input-label for="login" value="Username / Alamat Email Admin" />
                         <x-text-input id="login" class="mt-1 block w-full text-sm font-medium" type="text"
                                       name="login" :value="old('login')" autofocus
-                                      autocomplete="username" placeholder="cth: admin atau admin@sekolah.sch.id" required />
+                                      autocomplete="username" placeholder="cth: admin atau admin@sekolah.sch.id" required
+                                      oninput="this.classList.remove('err')" />
                     </div>
 
                     <div>
@@ -125,6 +123,7 @@
                                    required
                                    autocomplete="current-password"
                                    placeholder="••••••••"
+                                   oninput="this.classList.remove('err')"
                                    class="block w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 pr-10 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-600/20" />
                             <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-hidden" tabindex="-1">
                                 <svg x-show="!showPassword" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -135,9 +134,16 @@
                     </div>
 
                     <button type="submit"
-                            class="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-3.5 text-sm font-bold text-white hover:bg-blue-700 transition shadow-md shadow-blue-600/20 cursor-pointer">
-                        <span>Masuk ke Panel Administrator</span>
-                        <x-icon name="arrow-right" class="h-4 w-4" />
+                            :disabled="loading"
+                            class="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-3.5 text-sm font-bold text-white hover:bg-blue-700 transition shadow-md shadow-blue-600/20 cursor-pointer disabled:opacity-75 disabled:cursor-wait">
+                        <span x-show="!loading" class="inline-flex items-center gap-2">
+                            <span>Masuk ke Panel Administrator</span>
+                            <x-icon name="arrow-right" class="h-4 w-4" />
+                        </span>
+                        <span x-show="loading" x-cloak class="inline-flex items-center gap-2">
+                            <svg class="h-4 w-4 animate-spin text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"/></svg>
+                            <span>Memproses Masuk…</span>
+                        </span>
                     </button>
                 </form>
 
@@ -150,5 +156,109 @@
         </div>
     </div>
 </main>
+
+<script src="{{ asset('js/stempel.js') }}?v={{ filemtime(public_path('js/stempel.js')) }}"></script>
+<script>
+    function handleAdminLoginSubmit(e, alpineData) {
+        var form = document.getElementById('loginForm');
+        var loginInput = document.getElementById('login');
+        var passInput = document.getElementById('password');
+        if (!form || !loginInput || !passInput) return;
+
+        e.preventDefault();
+
+        loginInput.classList.remove('err');
+        passInput.classList.remove('err');
+        void loginInput.offsetWidth;
+        void passInput.offsetWidth;
+
+        var loginVal = loginInput.value.trim();
+        var passVal = passInput.value.trim();
+
+        if (!loginVal || !passVal) {
+            if (!loginVal) {
+                loginInput.classList.add('err');
+                loginInput.focus();
+            }
+            if (!passVal) {
+                passInput.classList.add('err');
+                if (loginVal) passInput.focus();
+            }
+            showToast('Wajib diisi', 'error', 2500);
+            return;
+        }
+
+        if (alpineData) alpineData.loading = true;
+
+        var formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            },
+            body: formData
+        })
+        .then(function (res) {
+            if (res.ok) {
+                return res.json().then(function (data) {
+                    showToast('Berhasil', 'success');
+                    var targetUrl = data.redirect || '{{ route("admin.dashboard") }}';
+                    setTimeout(function () {
+                        window.location.href = targetUrl;
+                    }, 1200);
+                });
+            } else if (res.status === 422) {
+                return res.json().then(function (data) {
+                    var stampText = 'Sandi salah';
+                    if (data.errors) {
+                        if (data.errors.login && data.errors.login[0]) {
+                            var msg = data.errors.login[0];
+                            loginInput.classList.add('err');
+                            loginInput.select();
+                            if (msg.indexOf('blokir') !== -1 || msg.indexOf('percobaan') !== -1) stampText = 'Coba nanti';
+                            else if (msg.indexOf('tidak diizinkan') !== -1 || msg.indexOf('hak akses') !== -1) stampText = 'Akses ditolak';
+                            else stampText = 'Akun salah';
+                        } else if (data.errors.password && data.errors.password[0]) {
+                            passInput.classList.add('err');
+                            passInput.select();
+                            stampText = 'Sandi salah';
+                        }
+                    }
+                    showToast(stampText, 'error', 2500);
+                    if (alpineData) alpineData.loading = false;
+                });
+            } else {
+                showToast('Gagal masuk', 'error', 2500);
+                if (alpineData) alpineData.loading = false;
+            }
+        })
+        .catch(function () {
+            form.submit();
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        @if ($errors->any())
+            var loginInput = document.getElementById('login');
+            var passInput = document.getElementById('password');
+            if (loginInput && {{ $errors->has('login') ? 'true' : 'false' }}) {
+                loginInput.classList.add('err');
+            }
+            if (passInput && {{ $errors->has('password') ? 'true' : 'false' }}) {
+                passInput.classList.add('err');
+            }
+            setTimeout(function () {
+                showToast('{{ $errors->has("login") ? "Akun salah" : "Sandi salah" }}', 'error', 2500);
+            }, 100);
+        @elseif (session('status'))
+            setTimeout(function () {
+                showToast('Berhasil', 'success');
+            }, 100);
+        @endif
+    });
+</script>
 </body>
 </html>

@@ -17,18 +17,14 @@
     $sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra'));
 @endphp
 <main class="flex min-h-screen">
-    {{-- Panel Branding Desktop - Sesuai Mockup (Biru Cerah & Bersih dengan Gedung SMK Bagimu Negeriku) --}}
-    <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-b from-[#2b6ee8] via-[#2563eb] to-[#1e58d4] p-10 xl:p-14 text-white lg:flex">
+    {{-- Panel Branding Desktop - Biru & Putih Bersih --}}
+    <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-b from-[#2563eb] via-[#1d4ed8] to-[#1e40af] p-10 xl:p-14 text-white lg:flex">
         {{-- Ambient Glow Lembut di Belakang --}}
-        <div class="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-sky-300/25 blur-3xl z-0"></div>
-        <div class="pointer-events-none absolute top-1/2 -right-20 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl z-0"></div>
+        <div class="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-sky-300/20 blur-3xl z-0"></div>
+        <div class="pointer-events-none absolute top-1/2 -right-20 h-80 w-80 rounded-full bg-blue-400/15 blur-3xl z-0"></div>
 
-        {{-- Foto Gedung SMK Bagimu Negeriku di Sudut Kanan Bawah --}}
-        <div class="pointer-events-none absolute bottom-0 right-0 h-[82%] xl:h-[90%] 2xl:h-[95%] max-h-[960px] w-auto select-none z-0">
-            <img src="{{ asset('images/gedung-mockup.png') }}?v={{ filemtime(public_path('images/gedung-mockup.png')) }}"
-                 alt="Gedung SMK Bagimu Negeriku"
-                 class="h-full w-auto object-contain object-right-bottom drop-shadow-2xl" />
-        </div>
+        {{-- Animasi Bunga Generatif Putih Acak --}}
+        <x-flower-canvas />
 
         {{-- Header Sekolah --}}
         <div class="relative z-10 flex items-center gap-4">
