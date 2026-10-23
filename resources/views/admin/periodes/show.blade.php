@@ -6,7 +6,7 @@
 <div class="flex items-center justify-between mb-4">
     <h1 class="text-xl font-bold">Periode {{ $periode->periode }}</h1>
     <div class="flex gap-2">
-        <a href="{{ route('admin.periodes.edit', $periode->periode) }}" class="px-4 py-2 rounded bg-yellow-500 text-white text-sm">Ubah</a>
+        <a href="{{ route('admin.periodes.edit', $periode->periode) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition shadow-xs"><x-icon name="pencil" class="h-4 w-4" /> Ubah</a>
         <a href="{{ route('admin.periodes.index') }}" class="px-4 py-2 rounded border text-sm">Kembali</a>
     </div>
 </div>
@@ -27,6 +27,6 @@
 <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
     <h2 class="font-bold text-slate-900 text-sm mb-1">Jendela Pendaftaran</h2>
     <p class="text-sm text-slate-500 mb-3">Status saat ini: {{ $periode->window && $periode->window->buka ? 'Dibuka' : 'Ditutup' }}</p>
-    <a href="{{ route('admin.windows.index') }}" class="inline-block px-4 py-2 rounded-xl bg-blue-700 text-white text-sm font-bold hover:bg-blue-800">Kelola Jendela →</a>
+    <a href="{{ route('admin.periodes.index') }}" class="inline-block px-4 py-2 rounded-xl bg-blue-700 text-white text-sm font-bold hover:bg-blue-800">Kelola di Periode & Jendela →</a>
 </div>
 @endsection

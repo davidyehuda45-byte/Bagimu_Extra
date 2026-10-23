@@ -55,14 +55,14 @@
                             <template x-if="!editing">
                                 <td class="px-3 py-2">
                                     <div class="flex items-center gap-1.5">
-                                        <button type="button" @click="editing = true" class="inline-flex items-center gap-1 rounded border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800 hover:bg-amber-100 transition shadow-sm">
-                                            <x-icon name="pencil" class="h-3 w-3" /> Ubah
+                                        <button type="button" @click="editing = true" class="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 transition shadow-2xs" title="Ubah Jadwal">
+                                            <x-icon name="pencil" class="h-3.5 w-3.5" />
                                         </button>
                                         <form method="POST" action="{{ route('pembina.jadwals.destroy', $jadwal) }}" onsubmit="return confirm('Hapus jadwal ini?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="inline-flex items-center gap-1 rounded border border-rose-300 bg-rose-50 px-2 py-0.5 text-xs font-semibold text-rose-700 hover:bg-rose-100 transition shadow-sm">
-                                                <x-icon name="trash" class="h-3 w-3" /> Hapus
+                                            <button type="submit" class="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 transition shadow-2xs cursor-pointer" title="Hapus Jadwal">
+                                                <x-icon name="trash" class="h-3.5 w-3.5" />
                                             </button>
                                         </form>
                                     </div>
@@ -226,7 +226,9 @@
                                 <form method="POST" action="{{ route('pembina.pertemuan.destroy', $p) }}" onsubmit="return confirm('Hapus Pertemuan {{ $p->nomor }}?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="w-full rounded-lg px-2.5 py-1 text-[11px] font-semibold text-rose-600 hover:bg-rose-50">Hapus</button>
+                                    <button class="w-full inline-flex items-center justify-center gap-1 rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1 text-[11px] font-semibold text-rose-600 hover:bg-rose-100 transition shadow-2xs cursor-pointer" title="Hapus Pertemuan">
+                                        <x-icon name="trash" class="h-3 w-3" /> Hapus
+                                    </button>
                                 </form>
                             @endif
                         </div>

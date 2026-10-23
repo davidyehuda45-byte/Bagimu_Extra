@@ -6,7 +6,7 @@
 <div class="flex items-center justify-between mb-4">
     <h1 class="text-xl font-bold">{{ $eskul->name }}</h1>
     <div class="flex gap-2">
-        <a href="{{ route('admin.eskuls.edit', $eskul) }}" class="px-4 py-2 rounded bg-yellow-500 text-white text-sm">Ubah</a>
+        <a href="{{ route('admin.eskuls.edit', $eskul) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition shadow-xs"><x-icon name="pencil" class="h-4 w-4" /> Ubah</a>
         <a href="{{ route('admin.eskuls.index') }}" class="px-4 py-2 rounded border text-sm">Kembali</a>
     </div>
 </div>
@@ -84,16 +84,14 @@
                         <template x-if="!editing">
                             <td class="py-2.5 px-3 text-right">
                                 <div class="inline-flex items-center gap-1.5">
-                                    <button type="button" @click="editing = true" class="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 hover:bg-amber-100 transition shadow-sm" title="Ubah jadwal ini">
-                                        <x-icon name="pencil" class="h-3 w-3" />
-                                        Ubah
+                                    <button type="button" @click="editing = true" class="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 transition shadow-2xs" title="Ubah jadwal ini">
+                                        <x-icon name="pencil" class="h-3.5 w-3.5" />
                                     </button>
                                     <form method="POST" action="{{ route('admin.jadwals.destroy', $j) }}" onsubmit="return confirm('Hapus jadwal hari {{ $j->hari }} jam {{ $j->jam_mulai }}–{{ $j->jam_selesai }}?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center gap-1 rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-100 transition shadow-sm" title="Hapus jadwal">
-                                            <x-icon name="trash" class="h-3 w-3" />
-                                            Hapus
+                                        <button type="submit" class="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 transition shadow-2xs cursor-pointer" title="Hapus jadwal">
+                                            <x-icon name="trash" class="h-3.5 w-3.5" />
                                         </button>
                                     </form>
                                 </div>

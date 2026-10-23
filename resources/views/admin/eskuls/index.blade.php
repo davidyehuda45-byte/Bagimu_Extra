@@ -41,18 +41,18 @@
                             @endif
                         </td>
                         <td class="py-2 px-3">
-                            <div class="flex items-center gap-2">
-                                <a href="{{ route('admin.eskuls.show', $eskul) }}" class="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm">
-                                    <x-icon name="eye" class="h-3 w-3" /> Detail
+                            <div class="flex items-center gap-1.5">
+                                <a href="{{ route('admin.eskuls.show', $eskul) }}" class="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition shadow-2xs" title="Lihat Detail">
+                                    <x-icon name="eye" class="h-4 w-4" />
                                 </a>
-                                <a href="{{ route('admin.eskuls.edit', $eskul) }}" class="inline-flex items-center gap-1 rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 hover:bg-amber-100 transition shadow-sm">
-                                    <x-icon name="pencil" class="h-3 w-3" /> Ubah
+                                <a href="{{ route('admin.eskuls.edit', $eskul) }}" class="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-amber-600 hover:bg-amber-50 hover:border-amber-200 transition shadow-2xs" title="Ubah Eskul">
+                                    <x-icon name="pencil" class="h-4 w-4" />
                                 </a>
                                 <form method="POST" action="{{ route('admin.eskuls.destroy', $eskul) }}" data-confirm="Hapus permanen ekstrakurikuler {{ $eskul->name }}? Tindakan ini tidak dapat dibatalkan." data-confirm-title="Hapus Ekstrakurikuler" data-confirm-btn="Hapus Eskul" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="inline-flex items-center gap-1 rounded-lg border border-rose-300 bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-100 transition shadow-sm cursor-pointer" title="Hapus eskul">
-                                        <x-icon name="trash" class="h-3 w-3" /> Hapus
+                                    <button type="submit" class="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 hover:border-rose-300 transition shadow-2xs cursor-pointer" title="Hapus eskul">
+                                        <x-icon name="trash" class="h-4 w-4" />
                                     </button>
                                 </form>
                             </div>

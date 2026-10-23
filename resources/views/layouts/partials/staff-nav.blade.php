@@ -170,13 +170,9 @@
             </div>
             <div class="space-y-0.5">
                 @if ($isAdmin || $isKepsek)
-                    <a href="{{ route('admin.periodes.index') }}" class="{{ $link(Route::is('admin.periodes.*')) }}">
+                    <a href="{{ route('admin.periodes.index') }}" class="{{ $link(Route::is('admin.periodes.*') || Route::is('admin.windows.*')) }}">
                         <x-icon name="calendar" class="h-4 w-4 shrink-0" />
-                        <span>Periode & Arsip</span>
-                    </a>
-                    <a href="{{ route('admin.windows.index') }}" class="{{ $link(Route::is('admin.windows.*')) }}">
-                        <x-icon name="clock" class="h-4 w-4 shrink-0" />
-                        <span>Jendela</span>
+                        <span>Periode & Jendela</span>
                     </a>
                 @endif
                 @if ($isAdminOnly || $isKepsek)

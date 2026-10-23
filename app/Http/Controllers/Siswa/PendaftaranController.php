@@ -267,10 +267,24 @@ class PendaftaranController extends Controller
             ? Registration::where('user_id', $user->id)->where('periode', $periode->periode)->latest()->first()
             : null;
 
+        $schoolName = \App\Models\AppSetting::get('school.name', 'SMK Bagimu Negeriku');
+        $tahunAjaran = $periode?->tahun_ajaran ?? ($periode?->periode ?? '2026/2027');
+
+        $berlakuSampai = null;
+        if ($periode && $periode->tgl_selesai) {
+            $berlakuSampai = \Illuminate\Support\Carbon::parse($periode->tgl_selesai)->translatedFormat('d F Y');
+        } else {
+            $tahunParts = explode('/', $tahunAjaran);
+            $berlakuSampai = isset($tahunParts[1]) ? '30 Juni ' . trim($tahunParts[1]) : 'Akhir Tahun Ajaran';
+        }
+
         return view('siswa.sukses', [
             'user' => $user,
             'registration' => $registration,
             'periode' => $periode,
+            'schoolName' => $schoolName,
+            'tahunAjaran' => $tahunAjaran,
+            'berlakuSampai' => $berlakuSampai,
         ]);
     }
 

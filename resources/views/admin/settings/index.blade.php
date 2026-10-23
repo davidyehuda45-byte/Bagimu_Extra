@@ -40,12 +40,16 @@
                                             <option value="{{ $val }}" @selected($u->role->value === $val)>{{ $label }}</option>
                                         @endforeach
                                     </select>
-                                    <button class="rounded-lg border border-slate-300 px-2 py-1 text-xs font-semibold hover:bg-slate-50">Ubah</button>
+                                    <button type="submit" class="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition shadow-2xs" title="Simpan Perubahan Role">
+                                        <x-icon name="check" class="h-3.5 w-3.5" />
+                                    </button>
                                 </form>
                                 <form method="POST" action="{{ route('admin.users.destroy', $u) }}" onsubmit="return confirm('Hapus akun {{ $u->email }}?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="rounded-lg px-2 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50">Hapus</button>
+                                    <button type="submit" class="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 hover:border-rose-300 transition shadow-2xs cursor-pointer" title="Hapus Akun">
+                                        <x-icon name="trash" class="h-3.5 w-3.5" />
+                                    </button>
                                 </form>
                             </div>
                         </td>

@@ -43,7 +43,8 @@
     </div>
 </header>
 
-<main id="konten-utama" class="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+<main id="konten-utama" class="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-5xl mx-auto">
+    @include('layouts.partials.flash-messages')
     @yield('content')
 </main>
 

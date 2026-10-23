@@ -32,7 +32,7 @@ class EskulController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:100', 'unique:eskuls,name'],
             'description' => ['nullable', 'string'],
-            'kuota' => ['required', 'integer', 'min:0',],
+            'kuota' => ['nullable', 'integer', 'min:0'],
             'kuota_aktif' => ['nullable', 'boolean'],
             'aktif' => ['nullable', 'boolean'],
             'pembina_id' => ['nullable', 'exists:users,id', function ($attr, $val, $fail) {

@@ -157,9 +157,13 @@
                             <td class="px-3 py-2">{{ $kegiatan->agenda }}</td>
                             <td class="px-3 py-2">{{ $kegiatan->lokasi ?? '-' }}</td>
                             <td class="px-3 py-2">
-                                <div class="flex gap-2">
-                                    <a href="{{ route('pembina.kegiatan.show', $kegiatan) }}" class="text-blue-600 hover:underline">Detail</a>
-                                    <a href="{{ route('pembina.kegiatan.edit', $kegiatan) }}" class="text-amber-600 hover:underline">Ubah</a>
+                                <div class="flex items-center gap-1.5">
+                                    <a href="{{ route('pembina.kegiatan.show', $kegiatan) }}" class="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition shadow-2xs" title="Lihat Detail">
+                                        <x-icon name="eye" class="h-4 w-4" />
+                                    </a>
+                                    <a href="{{ route('pembina.kegiatan.edit', $kegiatan) }}" class="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-amber-600 hover:bg-amber-50 hover:border-amber-200 transition shadow-2xs" title="Ubah Kegiatan">
+                                        <x-icon name="pencil" class="h-4 w-4" />
+                                    </a>
                                 </div>
                             </td>
                         </tr>

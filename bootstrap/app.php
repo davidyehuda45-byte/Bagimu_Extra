@@ -39,5 +39,10 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Illuminate\Database\QueryException $e, \Illuminate\Http\Request $request) {
+            if (! $request->expectsJson()) {
+                \Illuminate\Support\Facades\Log::error('Form Database Query Error: ' . $e->getMessage());
+                return back()->withInput()->with('error', 'Terjadi kendala saat menyimpan data. Pastikan semua isian wajib telah lengkap dan data tidak duplikat.');
+            }
+        });
     })->create();

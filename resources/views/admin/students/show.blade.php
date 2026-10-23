@@ -6,7 +6,7 @@
 <div class="flex items-center justify-between mb-4">
     <h1 class="text-xl font-bold text-slate-900">Siswa — {{ $student->nama }}</h1>
     <div class="flex gap-2">
-        <a href="{{ route('admin.students.edit', $student) }}" class="px-4 py-2 rounded-xl bg-yellow-500 text-white text-sm font-semibold">Ubah</a>
+        <a href="{{ route('admin.students.edit', $student) }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition shadow-xs"><x-icon name="pencil" class="h-4 w-4" /> Ubah</a>
         <a href="{{ route('admin.students.index') }}" class="px-4 py-2 rounded-xl border border-slate-300 text-sm bg-white">Kembali</a>
     </div>
 </div>

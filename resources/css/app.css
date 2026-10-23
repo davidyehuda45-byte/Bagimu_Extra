@@ -52,6 +52,19 @@
   border-radius: 8px;
 }
 
+/* ---------- Input Error Shake & Highlight ---------- */
+.input-invalid-shake {
+  animation: inputShake 0.38s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  border-color: #f43f5e !important;
+}
+
+@keyframes inputShake {
+  10%, 90% { transform: translate3d(-1.5px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+  40%, 60% { transform: translate3d(3px, 0, 0); }
+}
+
 /* ---------- Animasi bar / progress (non-blocking, hormati reduced-motion) ---------- */
 .bar-animate {
   transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);

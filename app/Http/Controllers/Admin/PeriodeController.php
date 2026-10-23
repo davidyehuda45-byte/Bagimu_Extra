@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\PeriodeStatus;
 use App\Http\Controllers\Controller;
 use App\Models\AdminLog;
+use App\Models\PendaftaranWindow;
 use App\Models\Periode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,8 +16,11 @@ class PeriodeController extends Controller
     public function index()
     {
         $periodes = Periode::with(['window'])->withCount('registrations')->orderByDesc('periode')->paginate(15);
+        $activePeriode = Periode::where('status', PeriodeStatus::DIBUKA)->orderByDesc('periode')->first()
+            ?? Periode::orderByDesc('periode')->first();
+        $window = $activePeriode ? PendaftaranWindow::firstOrNew(['periode' => $activePeriode->periode]) : null;
 
-        return view('admin.periodes.index', compact('periodes'));
+        return view('admin.periodes.index', compact('periodes', 'activePeriode', 'window'));
     }
 
     public function create()

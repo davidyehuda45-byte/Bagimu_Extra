@@ -13,12 +13,12 @@ class WindowController extends Controller
 {
     public function index()
     {
-        $periode = Periode::where('status', PeriodeStatus::DIBUKA)->orderByDesc('periode')->first()
+        $periodes = Periode::with(['window'])->withCount('registrations')->orderByDesc('periode')->paginate(15);
+        $activePeriode = Periode::where('status', PeriodeStatus::DIBUKA)->orderByDesc('periode')->first()
             ?? Periode::orderByDesc('periode')->first();
+        $window = $activePeriode ? PendaftaranWindow::firstOrNew(['periode' => $activePeriode->periode]) : null;
 
-        $window = $periode ? PendaftaranWindow::firstOrNew(['periode' => $periode->periode]) : null;
-
-        return view('admin.windows.index', compact('periode', 'window'));
+        return view('admin.periodes.index', compact('periodes', 'activePeriode', 'window'));
     }
 
     public function update(Request $request, string $periode)

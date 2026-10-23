@@ -94,16 +94,16 @@
                             @endif
                         </td>
                         <td class="px-5 py-3.5">
-                            <div class="flex items-center gap-2" x-data="{ showReset: false }">
-                                <button type="button" @click="showReset = !showReset" class="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 shadow-2xs">
-                                    <x-icon name="key" class="h-3 w-3" /> Reset Sandi
+                            <div class="flex items-center gap-1.5" x-data="{ showReset: false }">
+                                <button type="button" @click="showReset = !showReset" class="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition shadow-2xs" title="Reset Sandi">
+                                    <x-icon name="key" class="h-4 w-4" />
                                 </button>
 
                                 <form method="POST" action="{{ route('admin.users.destroy', $u) }}" data-confirm="Hapus akun pembina {{ $u->name }}? Tindakan ini tidak dapat dibatalkan." data-confirm-title="Hapus Akun Pembina" data-confirm-btn="Hapus Akun">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="inline-flex items-center gap-1 rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-100 transition shadow-2xs">
-                                        <x-icon name="trash" class="h-3 w-3" /> Hapus
+                                    <button type="submit" class="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 hover:border-rose-300 transition shadow-2xs cursor-pointer" title="Hapus Akun">
+                                        <x-icon name="trash" class="h-4 w-4" />
                                     </button>
                                 </form>
 

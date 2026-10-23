@@ -146,17 +146,15 @@
                         <td class="px-5 py-3.5 text-right">
                             <div class="inline-flex items-center gap-1.5 justify-end">
                                 {{-- Tombol Edit --}}
-                                <button type="button" @click="showEdit = true"
-                                        class="inline-flex items-center gap-1 rounded-xl border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition shadow-2xs">
-                                    <x-icon name="edit" class="h-3 w-3" />
-                                    <span>Edit</span>
+                                <button type="button" @click="showEdit = true" title="Edit Data Wali Kelas"
+                                        class="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-amber-600 hover:bg-amber-50 hover:border-amber-200 transition shadow-2xs">
+                                    <x-icon name="pencil" class="h-4 w-4" />
                                 </button>
 
                                 {{-- Tombol Reset Password --}}
-                                <button type="button" @click="showReset = true"
-                                        class="inline-flex items-center gap-1 rounded-xl border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition shadow-2xs">
-                                    <x-icon name="key" class="h-3 w-3" />
-                                    <span>Sandi</span>
+                                <button type="button" @click="showReset = true" title="Reset Kata Sandi"
+                                        class="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition shadow-2xs">
+                                    <x-icon name="key" class="h-4 w-4" />
                                 </button>
 
                                 {{-- Tombol Hapus --}}
@@ -166,9 +164,8 @@
                                       data-confirm-btn="Ya, Hapus Akun">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="inline-flex items-center gap-1 rounded-xl border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-100 hover:border-rose-300 transition shadow-2xs cursor-pointer">
-                                        <x-icon name="trash" class="h-3 w-3" />
-                                        <span>Hapus</span>
+                                    <button type="submit" title="Hapus Akun" class="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 hover:border-rose-300 transition shadow-2xs cursor-pointer">
+                                        <x-icon name="trash" class="h-4 w-4" />
                                     </button>
                                 </form>
                             </div>

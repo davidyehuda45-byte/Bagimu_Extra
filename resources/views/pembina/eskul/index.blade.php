@@ -37,7 +37,9 @@
                                 @endif
                             </td>
                             <td class="px-3 py-2">
-                                <a href="{{ route('pembina.eskul.show', $eskul) }}" class="text-blue-600 hover:underline">Detail</a>
+                                <a href="{{ route('pembina.eskul.show', $eskul) }}" class="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition shadow-2xs" title="Lihat Detail">
+                                    <x-icon name="eye" class="h-4 w-4" />
+                                </a>
                             </td>
                         </tr>
                     @empty
