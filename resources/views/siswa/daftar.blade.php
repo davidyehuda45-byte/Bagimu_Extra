@@ -78,7 +78,7 @@
                     </span>
                     <div class="min-w-0">
                         <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold bg-emerald-100 text-emerald-800">
-                            Pendaftaran Berhasil & Diterima
+                            Pendaftaran Berhasil / Diterima
                         </span>
                         <h2 class="mt-1.5 text-2xl font-black text-slate-900">{{ $existing->eskul_utama }}</h2>
                         <p class="text-xs text-slate-500">Tahun Ajaran {{ $periode->periode }} • {{ \App\Models\AppSetting::get('school.name', 'Sekolah') }}</p>
@@ -104,7 +104,7 @@
                     </div>
 
                     <div class="rounded-xl bg-slate-50 p-3.5 border border-slate-100 text-xs">
-                        <span class="font-semibold text-slate-400 uppercase text-[10px]">Jadwal & Tempat Pertemuan:</span>
+                        <span class="font-semibold text-slate-400 uppercase text-[10px]">Jadwal / Tempat Pertemuan:</span>
                         @if ($existingEskul && $existingEskul->jadwals->isNotEmpty())
                             <ul class="mt-2 space-y-2">
                                 @foreach ($existingEskul->jadwals as $j)
@@ -273,7 +273,7 @@
                             </div>
 
                             <div class="mt-3.5 pt-3 border-t border-blue-100">
-                                <span class="font-bold text-slate-400 uppercase tracking-wider text-[10px] block mb-1.5">Jadwal & Lokasi Latihan:</span>
+                                <span class="font-bold text-slate-400 uppercase tracking-wider text-[10px] block mb-1.5">Jadwal / Lokasi Latihan:</span>
                                 <div id="detail-eskul-jadwal-list" class="space-y-1.5"></div>
                             </div>
                         </div>

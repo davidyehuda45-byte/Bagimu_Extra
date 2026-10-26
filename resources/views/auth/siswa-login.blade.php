@@ -49,9 +49,9 @@
                 Portal Ekstrakurikuler Siswa
             </span>
             <h1 class="text-3xl sm:text-4xl xl:text-5xl font-black leading-[1.12] tracking-tight text-white drop-shadow-xs">
-                Pendaftaran & Presensi<br>
+                Pendaftaran / Presensi<br>
                 Ekstrakurikuler<br>
-                Digital, Praktis & Cepat.
+                Digital, Praktis / Cepat.
             </h1>
             <p class="text-sm sm:text-base leading-relaxed text-blue-100/90 max-w-md">
                 Pilih eskul favoritmu secara mudah dan cepat, langsung terdaftar resmi ke sistem sekolah.
@@ -164,7 +164,7 @@
                             :disabled="loading"
                             class="relative flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/25 transition hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed">
                         <span x-show="!loading" class="inline-flex items-center gap-2">
-                            <span>Masuk & Pilih Eskul</span>
+                            <span>Masuk / Pilih Eskul</span>
                             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                         </span>
                         <span x-show="loading" x-cloak class="inline-flex items-center gap-2">
@@ -186,7 +186,7 @@
             </div>
 
             <p class="mt-4 text-center text-[11px] text-slate-400">
-                &copy; {{ date('Y') }} David Yehuda Surbakti &amp; Vines Fernando Siritoitet • {{ config('app.name', 'Bagimu Extra') }}
+                &copy; {{ date('Y') }} David Yehuda Surbakti / Vines Fernando Siritoitet • {{ config('app.name', 'Bagimu Extra') }}
             </p>
         </div>
     </div>

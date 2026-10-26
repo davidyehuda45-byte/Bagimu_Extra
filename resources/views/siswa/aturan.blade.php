@@ -1,6 +1,6 @@
 @extends('layouts.siswa')
 
-@section('title', 'Ketentuan & Aturan Pendaftaran')
+@section('title', 'Ketentuan / Aturan Pendaftaran')
 
 @section('content')
 <div class="space-y-6 w-full max-w-3xl mx-auto">
@@ -12,7 +12,7 @@
             </span>
             <div>
                 <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold bg-blue-50 text-blue-700 mb-1">
-                    Langkah 1 dari 2: Ketentuan & Aturan
+                    Langkah 1 dari 2: Ketentuan / Aturan
                 </span>
                 <h1 class="text-lg sm:text-xl font-bold text-slate-900 leading-tight">Halo, {{ $user->name }}!</h1>
                 <p class="text-xs text-slate-500 mt-0.5 font-mono">NIS: {{ $user->student?->nis ?? $user->username }} • Kelas: {{ $user->student?->kelas ?? '—' }}</p>
@@ -27,7 +27,7 @@
                 <x-icon name="clipboard" class="h-5 w-5" />
             </span>
             <div>
-                <h2 class="text-base sm:text-lg font-bold text-slate-900">Ketentuan & Aturan Pendaftaran</h2>
+                <h2 class="text-base sm:text-lg font-bold text-slate-900">Ketentuan / Aturan Pendaftaran</h2>
                 <p class="text-xs text-slate-500">Harap baca dengan cermat sebelum menentukan pilihan ekstrakurikuler.</p>
             </div>
         </div>
@@ -40,13 +40,10 @@
                 <strong class="font-bold text-slate-900">Token Sekali Pakai (One-Time Token):</strong> Token 8 digit yang Anda gunakan untuk masuk bersifat sekali pakai. Setelah data terkirim, token akan <strong>otomatis hangus</strong>.
             </li>
             <li class="pl-1">
-                <strong class="font-bold text-slate-900">Data Pendaftaran Terkunci:</strong> Setelah Anda menekan tombol "Kirim Pendaftaran", pilihan eskul resmi tersimpan dan <strong>tidak dapat diubah atau dibatalkan</strong> kembali secara mandiri.
+                <strong class="font-bold text-slate-900">Data Pendaftaran Terkunci:</strong> Setelah Anda menekan tombol "Kirim Pendaftaran", pilihan eskul resmi tersimpan dan <strong>tidak dapat diubah atau dibatalkan</strong> kembali.
             </li>
             <li class="pl-1">
-                <strong class="font-bold text-slate-900">Kuota Terbatas:</strong> Setiap eskul memiliki kapasitas kuota tertentu. Apabila kuota eskul yang Anda inginkan telah penuh, Anda dipersilakan memilih eskul alternatif lain yang masih tersedia.
-            </li>
-            <li class="pl-1">
-                <strong class="font-bold text-slate-900">Logout Otomatis:</strong> Setelah pendaftaran berhasil terkirim, sistem akan menampilkan bukti penerimaan dan otomatis keluar (logout) dalam 5 detik untuk menjaga keamanan akun Anda.
+                <strong class="font-bold text-slate-900">Simpan Bukti / Screenshot (15 Detik):</strong> Segera simpan atau ambil tangkapan layar (screenshot) kartu bukti pendaftaran Anda dalam waktu 15 detik sebagai tanda bukti resmi sebelum sistem otomatis keluar (logout) demi keamanan akun.
             </li>
         </ol>
 
