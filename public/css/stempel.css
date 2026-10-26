@@ -1,6 +1,11 @@
 /* ==========================================================
-   STEMPEL NOTIFIKASI
-   Posisi: Pojok Kanan Atas Kartu Login (.card)
+   STEMPEL NOTIFIKASI (Sandi salah / Wajib diisi / Berhasil)
+   File animasi resmi dari animasi-stempel.zip. Pasang bersama js/stempel.js
+
+   Syarat:
+   1. Elemen kotak login (.card) harus punya position:relative
+   2. Beri ruang di atas kotak supaya stempel yang menonjol
+      keluar tidak terpotong.
    ========================================================== */
 
 .card {
@@ -11,7 +16,7 @@
 input.err {
   border-color: #ef4444 !important;
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
-  animation: shake .35s !important;
+  animation: shake 0.35s !important;
 }
 @keyframes shake {
   25% { transform: translateX(-6px); }
@@ -21,26 +26,26 @@ input.err {
 /* --- Stempel di Pojok Kanan Atas Kartu Login --- */
 .toast-container {
   position: absolute;
-  top: -42px;
-  right: -20px;
+  top: -65px;
+  right: -24px;
   z-index: 50;
   pointer-events: none;
 }
 .toast {
   position: relative;
-  width: 145px;
-  height: 145px;
+  width: 170px;
+  height: 170px;
   color: #1d4ed8;
-  font-size: 16px;
+  font-size: 19px;
   font-weight: 800;
-  letter-spacing: .05em;
+  letter-spacing: 0.05em;
   line-height: 1.1;
   text-align: center;
   text-transform: uppercase;
-  filter: drop-shadow(0 8px 12px rgba(0,0,0,.22));
+  filter: drop-shadow(0 5px 6px rgba(0, 0, 0, 0.35));
   transform: rotate(-10deg);
   opacity: 0;
-  animation: stampIn .85s cubic-bezier(.4,0,.6,1) forwards;
+  animation: stampIn 0.85s cubic-bezier(0.4, 0, 0.6, 1) forwards;
 }
 .toast svg {
   display: block;
@@ -60,6 +65,11 @@ input.err {
 }
 .toast .ink {
   display: none !important;
+  fill: #2563eb;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ink 0.45s cubic-bezier(0.2, 0.8, 0.3, 1) 0.52s forwards;
 }
 .toast .shock {
   fill: none;
@@ -68,18 +78,18 @@ input.err {
   opacity: 0;
   transform-box: fill-box;
   transform-origin: center;
-  animation: shock .6s ease-out .52s forwards;
+  animation: shock 0.6s ease-out 0.52s forwards;
 }
 .toast .shock.s2 {
   stroke-width: 1.5;
-  animation-delay: .64s;
+  animation-delay: 0.64s;
 }
 .toast span {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 110px;
-  transform: translate(-50%,-50%);
+  width: 118px;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -89,52 +99,44 @@ input.err {
   display: block;
   font-weight: 800;
   opacity: 0;
-  animation: wd .4s cubic-bezier(.2,1.5,.4,1) forwards;
-  animation-delay: calc(.58s + var(--i) * .16s);
+  animation: wd 0.4s cubic-bezier(0.2, 1.5, 0.4, 1) forwards;
+  animation-delay: calc(0.58s + var(--i) * 0.16s);
 }
 .toast.hide {
-  animation: stampOut .45s ease forwards;
+  animation: stampOut 0.45s ease forwards;
 }
 @keyframes stampIn {
-  0% { opacity: 0; transform: perspective(500px) rotate(-34deg) rotateX(55deg) scale(3); filter: blur(7px) drop-shadow(0 5px 6px rgba(0,0,0,.35)); }
-  45% { opacity: 1; transform: perspective(500px) rotate(-14deg) rotateX(20deg) scale(1.5); filter: blur(2px) drop-shadow(0 5px 6px rgba(0,0,0,.35)); }
-  62% { opacity: 1; transform: perspective(500px) rotate(-10deg) rotateX(0) scale(.9); filter: blur(0) drop-shadow(0 1px 2px rgba(0,0,0,.45)); }
+  0% { opacity: 0; transform: perspective(500px) rotate(-34deg) rotateX(55deg) scale(3); filter: blur(7px) drop-shadow(0 5px 6px rgba(0, 0, 0, 0.35)); }
+  45% { opacity: 1; transform: perspective(500px) rotate(-14deg) rotateX(20deg) scale(1.5); filter: blur(2px) drop-shadow(0 5px 6px rgba(0, 0, 0, 0.35)); }
+  62% { opacity: 1; transform: perspective(500px) rotate(-10deg) rotateX(0) scale(0.9); filter: blur(0) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45)); }
   76% { transform: perspective(500px) rotate(-10deg) rotateX(0) scale(1.05); }
-  88% { transform: perspective(500px) rotate(-10deg) rotateX(0) scale(.99); }
-  100% { opacity: 1; transform: perspective(500px) rotate(-10deg) rotateX(0) scale(1); filter: blur(0) drop-shadow(0 8px 12px rgba(0,0,0,.22)); }
+  88% { transform: perspective(500px) rotate(-10deg) rotateX(0) scale(0.99); }
+  100% { opacity: 1; transform: perspective(500px) rotate(-10deg) rotateX(0) scale(1); filter: blur(0) drop-shadow(0 5px 6px rgba(0, 0, 0, 0.35)); }
 }
 @keyframes wd {
   from { opacity: 0; transform: scale(2.2); filter: blur(4px); }
   to { opacity: 1; transform: scale(1); filter: blur(0); }
 }
 @keyframes ink {
-  from { opacity: 1; transform: translate(0,0) scale(.3); }
-  to { opacity: .9; transform: translate(var(--dx),var(--dy)) scale(1); }
+  from { opacity: 1; transform: translate(0, 0) scale(0.3); }
+  to { opacity: 0.9; transform: translate(var(--dx), var(--dy)) scale(1); }
 }
 @keyframes shock {
-  from { opacity: .9; transform: scale(.8); }
+  from { opacity: 0.9; transform: scale(0.8); }
   to { opacity: 0; transform: scale(1.7); }
 }
 @keyframes stampOut {
   from { opacity: 1; transform: rotate(-10deg) scale(1); }
-  to { opacity: 0; transform: translate(26px,-30px) rotate(-26deg) scale(.7); }
+  to { opacity: 0; transform: translate(26px, -30px) rotate(-26deg) scale(0.7); }
 }
 @keyframes hit {
-  20% { transform: translate(-5px,2px); }
-  40% { transform: translate(4px,-2px); }
-  60% { transform: translate(-3px,1px); }
-  80% { transform: translate(2px,0); }
+  20% { transform: translate(-5px, 2px); }
+  40% { transform: translate(4px, -2px); }
+  60% { transform: translate(-3px, 1px); }
+  80% { transform: translate(2px, 0); }
 }
 .card.hit {
-  animation: hit .35s .5s;
-}
-
-/* Stempel Error / Peringatan (Warna Merah Crimson) */
-.toast.error {
-  color: #b91c1c;
-}
-.toast.error .ring, .toast.error .shock {
-  stroke: #dc2626;
+  animation: hit 0.35s 0.5s;
 }
 
 /* Stempel Berhasil (Warna Hijau Emerald) */
@@ -143,9 +145,10 @@ input.err {
 }
 .toast.success span {
   font-size: 16px;
-  letter-spacing: .08em;
+  letter-spacing: 0.08em;
 }
-.toast.success .ring, .toast.success .shock {
+.toast.success .ring,
+.toast.success .shock {
   stroke: #22c55e;
 }
 .toast.success .ink {
@@ -154,16 +157,15 @@ input.err {
 
 @media (max-width: 640px) {
   .toast-container {
-    top: -42px;
+    top: -50px;
     right: -12px;
   }
   .toast {
-    width: 125px;
-    height: 125px;
-    font-size: 14px;
+    width: 135px;
+    height: 135px;
+    font-size: 15px;
   }
   .toast span {
     width: 95px;
   }
 }
-

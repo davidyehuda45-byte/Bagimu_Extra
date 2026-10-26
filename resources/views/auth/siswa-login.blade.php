@@ -121,7 +121,7 @@
     </div>
 
     {{-- Panel Form Kanan Sesuai Mockup Foto 2 (42% Lebar Layar, Latar Lembut dengan Kartu Melayang) --}}
-    <div class="flex w-full lg:w-[42%] min-h-screen flex-col justify-center items-center px-4 sm:px-6 py-10 bg-slate-50/80">
+    <div class="flex w-full lg:w-[42%] min-h-screen flex-col justify-center items-center px-4 sm:px-6 pt-24 pb-12 sm:pt-28 bg-slate-50/80">
         <div class="w-full max-w-[420px]">
             {{-- Kartu Form Melayang Sesuai Foto Referensi 2 --}}
             <div class="card relative animate-card-in rounded-3xl sm:rounded-[32px] border border-slate-200/90 bg-white p-7 sm:p-9 shadow-xl shadow-slate-200/60">
