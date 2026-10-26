@@ -22,81 +22,84 @@
     <div class="relative hidden w-full lg:w-[58%] min-h-screen flex-col justify-between overflow-hidden p-8 xl:p-12 text-white lg:flex"
          style="background-color: #1a62d8;">
         
-        {{-- Foto Asli Gedung & Langit SMK Bagimu Negeriku (Full Panel) --}}
+        {{-- Foto Asli Gedung & Langit SMK Bagimu Negeriku (Bersih Tanpa Teks Bawaan) --}}
         <img src="{{ asset('images/gedung-backdrop-clean.jpg') }}?v={{ filemtime(public_path('images/gedung-backdrop-clean.jpg')) }}"
              alt="Gedung SMK Bagimu Negeriku"
              class="pointer-events-none absolute inset-0 h-full w-full object-cover object-right select-none z-0" />
 
-        {{-- Header Sekolah --}}
-        <div class="relative z-10 flex items-center gap-3.5">
-            <x-school-logo :size="52" class="rounded-full bg-white p-0.5 shadow-md ring-2 ring-white/30" />
-            <div>
-                <p class="text-lg xl:text-xl font-black tracking-tight text-white leading-tight">{{ config('app.name', 'Bagimu Extra') }}</p>
-                <p class="text-xs font-semibold text-white/90 tracking-wide mt-0.5">{{ $sekolah }}</p>
+        {{-- Header Sekolah Modern & Elegan --}}
+        <div class="relative z-10 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+                <x-school-logo :size="54" class="rounded-full bg-white p-1 shadow-lg ring-2 ring-white/40 shrink-0" />
+                <div>
+                    <p class="text-lg xl:text-xl font-black tracking-tight text-white leading-tight drop-shadow-sm">{{ config('app.name', 'Bagimu Extra') }}</p>
+                    <p class="text-xs font-semibold text-white/90 tracking-wide mt-0.5">{{ $sekolah }}</p>
+                </div>
             </div>
-            <div class="h-8 w-px bg-white/25 mx-2 hidden sm:block"></div>
-            <div class="hidden sm:flex items-center gap-1.5 text-xs text-white/90 font-medium">
-                <svg class="h-3.5 w-3.5 text-blue-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
-                <span>Panel Kontrol Administrasi &amp; Sistem</span>
+
+            {{-- Badge Status Panel Kontrol --}}
+            <div class="hidden sm:flex items-center">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 border border-white/30 backdrop-blur-md text-xs font-semibold text-white shadow-sm">
+                    <x-icon name="shield" class="h-3.5 w-3.5 text-sky-200 shrink-0" />
+                    <span>Panel Kontrol Administrasi &amp; Sistem</span>
+                </div>
             </div>
         </div>
 
         {{-- Konten Utama Sesuai Mockup --}}
         <div class="relative z-10 my-auto py-6 space-y-5 max-w-lg">
-            <div class="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-semibold bg-white/20 text-white border border-white/30 backdrop-blur-md shadow-xs">
+            <div class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold bg-white/20 text-white border border-white/30 backdrop-blur-md shadow-sm">
                 <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
                 <span>Portal Khusus Administrator</span>
             </div>
 
-            <h1 class="text-3xl sm:text-4xl xl:text-5xl font-black leading-[1.12] tracking-tight text-white drop-shadow-xs">
+            <h1 class="text-3xl sm:text-4xl xl:text-5xl font-black leading-[1.12] tracking-tight text-white drop-shadow-md">
                 Pusat Kendali<br>
                 Sistem Informasi<br>
                 Ekstrakurikuler.
             </h1>
 
-            <p class="text-sm xl:text-base leading-relaxed text-blue-50/95 max-w-md">
+            <p class="text-sm xl:text-base leading-relaxed text-blue-50/95 max-w-md drop-shadow-xs">
                 Akses terproteksi khusus administrator untuk konfigurasi master data eskul, manajemen akun pembina &amp; wali kelas, pengaturan periode, dan audit sistem.
             </p>
 
             <ul class="space-y-4 pt-2 text-sm xl:text-base text-white max-w-md">
                 <li class="flex items-center gap-3.5">
-                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1b5fd6] text-white border border-white/30 shadow-md">
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1b5fd6] text-white border border-white/35 shadow-md ring-2 ring-white/10">
                         <svg class="h-4.5 w-4.5 stroke-[2.75]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5" />
                         </svg>
                     </span>
-                    <span class="font-medium text-white/95 leading-snug">Kontrol penuh konfigurasi tahun ajaran dan kuota eskul</span>
+                    <span class="font-semibold text-white/95 leading-snug drop-shadow-xs">Kontrol penuh konfigurasi tahun ajaran dan kuota eskul</span>
                 </li>
                 <li class="flex items-center gap-3.5">
-                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1b5fd6] text-white border border-white/30 shadow-md">
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1b5fd6] text-white border border-white/35 shadow-md ring-2 ring-white/10">
                         <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <ellipse cx="12" cy="5" rx="9" ry="3" />
                             <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
                             <path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3" />
                         </svg>
                     </span>
-                    <span class="font-medium text-white/95 leading-snug">Sinkronisasi data siswa, pembina, dan rekapitulasi nilai</span>
+                    <span class="font-semibold text-white/95 leading-snug drop-shadow-xs">Sinkronisasi data siswa, pembina, dan rekapitulasi nilai</span>
                 </li>
                 <li class="flex items-center gap-3.5">
-                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1b5fd6] text-white border border-white/30 shadow-md">
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1b5fd6] text-white border border-white/35 shadow-md ring-2 ring-white/10">
                         <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                             <path d="m9 12 2 2 4-4" />
                         </svg>
                     </span>
-                    <span class="font-medium text-white/95 leading-snug">Proteksi otentikasi ganda dan riwayat audit aktivitas sistem</span>
+                    <span class="font-semibold text-white/95 leading-snug drop-shadow-xs">Proteksi otentikasi ganda dan riwayat audit aktivitas sistem</span>
                 </li>
             </ul>
         </div>
 
         {{-- Footer Sisi Kiri --}}
-        <div class="relative z-10 pt-4">
-            <div class="w-10 h-0.5 bg-white/40 mb-3"></div>
-            <p class="text-xs text-white/80">&copy; {{ date('Y') }} {{ config('app.name', 'Bagimu Extra') }} &mdash; {{ $sekolah }}</p>
+        <div class="relative z-10 pt-4 border-t border-white/20 flex items-center justify-between text-xs text-blue-100">
+            <p>&copy; {{ date('Y') }} {{ config('app.name', 'Bagimu Extra') }} &mdash; {{ $sekolah }}</p>
+            <span class="text-white/80 font-medium">Panel Kendali Tingkat Administrator</span>
         </div>
     </div>
 
