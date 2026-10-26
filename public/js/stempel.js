@@ -29,6 +29,8 @@ function showToast(message, type, duration) {
     box.id = "toastContainer";
     box.className = "toast-container";
     (card || document.body).appendChild(box);
+  } else if (card && box.parentElement !== card) {
+    card.appendChild(box);
   }
   box.innerHTML = "";
 

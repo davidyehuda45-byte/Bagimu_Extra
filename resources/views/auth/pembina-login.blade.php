@@ -148,7 +148,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('pembina.login') }}" id="loginForm" novalidate class="space-y-4" x-data="{ loading: false, showPassword: false }" @submit="handlePembinaLoginSubmit($event, $data)">
+                <form method="POST" action="{{ route('pembina.login') }}" id="loginForm" novalidate data-no-validate data-stempel class="space-y-4" x-data="{ loading: false, showPassword: false }" @submit="handlePembinaLoginSubmit($event, $data)">
                     @csrf
 
                     {{-- Input Username / Email --}}
@@ -161,7 +161,6 @@
                                autofocus
                                autocomplete="username"
                                placeholder="cth: pembina.futsal atau nama@sekolah.sch.id"
-                               required
                                oninput="this.classList.remove('err')"
                                class="w-full rounded-xl border border-slate-200 bg-white py-2.5 sm:py-3 px-3.5 text-sm font-semibold text-slate-900 placeholder:font-normal placeholder:text-slate-400 focus:border-blue-600 focus:outline-hidden focus:ring-4 focus:ring-blue-100 transition shadow-xs" />
                     </div>
@@ -175,7 +174,6 @@
                             <input id="password"
                                    :type="showPassword ? 'text' : 'password'"
                                    name="password"
-                                   required
                                    autocomplete="current-password"
                                    placeholder="••••••••"
                                    oninput="this.classList.remove('err')"

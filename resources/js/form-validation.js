@@ -145,8 +145,17 @@
         const form = e.target;
         if (!form || form.tagName !== 'FORM') return;
 
-        // Skip forms opting out
-        if (form.hasAttribute('data-no-validate') || form.hasAttribute('data-confirm')) {
+        // Skip forms opting out or using custom/stempel validation (e.g. login pages)
+        if (
+            form.noValidate ||
+            form.hasAttribute('novalidate') ||
+            form.hasAttribute('data-no-validate') ||
+            form.hasAttribute('data-confirm') ||
+            form.id === 'loginForm' ||
+            form.hasAttribute('data-stempel') ||
+            form.classList.contains('card') ||
+            Boolean(form.closest('.card'))
+        ) {
             return;
         }
 
