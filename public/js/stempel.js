@@ -1,6 +1,9 @@
 /* ==========================================================
    STEMPEL NOTIFIKASI - Bagimu Extra
-   Berdasarkan animasi-stempel resmi. Pasang bersama css/stempel.css
+   Aturan:
+   - Jika error: tampilkan getar + stempel sejenak, lalu
+     kembalikan lagi seperti semula (hilangkan stempel & status err).
+   - Jika berhasil: stempel hijau permanen, jangan dikembalikan.
    ========================================================== */
 
 var _stempelTimer = null;
@@ -8,7 +11,7 @@ var _stempelRemoveTimer = null;
 
 function showToast(message, type, duration) {
   type = type || "error";
-  duration = duration || 3800;
+  duration = duration || 2500;
 
   if (_stempelTimer) {
     clearTimeout(_stempelTimer);
@@ -19,26 +22,13 @@ function showToast(message, type, duration) {
     _stempelRemoveTimer = null;
   }
 
-  // Cari elemen kartu login (.card atau container pembungkus form)
-  var card = document.querySelector(".card") || 
-             document.getElementById("loginForm")?.closest(".rounded-3xl") || 
-             document.getElementById("loginForm")?.closest(".rounded-[32px]") || 
-             document.getElementById("loginForm")?.parentElement;
-
-  if (card && !card.classList.contains("card")) {
-    card.classList.add("card");
-  }
-
-  var targetContainer = card || document.body;
-
+  var card = document.querySelector(".card");
   var box = document.getElementById("toastContainer");
   if (!box) {
     box = document.createElement("div");
     box.id = "toastContainer";
     box.className = "toast-container";
-    targetContainer.appendChild(box);
-  } else if (targetContainer && box.parentElement !== targetContainer) {
-    targetContainer.appendChild(box);
+    (card || document.body).appendChild(box);
   }
   box.innerHTML = "";
 
@@ -69,10 +59,13 @@ function showToast(message, type, duration) {
       t.classList.add("hide");
       _stempelRemoveTimer = setTimeout(function() {
         t.remove();
+        // Kembalikan form seperti semula: bersihkan indikator err
         document.querySelectorAll("input.err").forEach(function(el) {
           el.classList.remove("err");
         });
-      }, 400);
+      }, 450);
     }, duration);
   }
+  // Jika berhasil: stempel tetap terpasang, jangan dikembalikan
 }
+

@@ -12,15 +12,6 @@
     <noscript><link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800,900&display=swap" rel="stylesheet" /></noscript>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('css/stempel.css') }}?v={{ filemtime(public_path('css/stempel.css')) }}">
-    <style>
-        @keyframes cardAppear {
-            0% { opacity: 0; transform: translateY(14px) scale(0.985); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .animate-card-in {
-            animation: cardAppear 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
-    </style>
 </head>
 <body class="bg-white font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
 @php
@@ -120,10 +111,10 @@
     </div>
 
     {{-- Panel Form Kanan Sesuai Mockup Foto 2 (42% Lebar Layar, Latar Lembut dengan Kartu Melayang) --}}
-    <div class="flex w-full lg:w-[42%] min-h-screen flex-col justify-center items-center px-4 sm:px-6 pt-24 pb-12 sm:pt-28 bg-slate-50/80">
+    <div class="flex w-full lg:w-[42%] min-h-screen flex-col justify-center items-center px-4 sm:px-6 py-10 bg-slate-50/80">
         <div class="w-full max-w-[420px]">
             {{-- Kartu Form Melayang --}}
-            <div class="card relative animate-card-in rounded-3xl sm:rounded-[32px] border border-slate-200/90 bg-white p-7 sm:p-9 shadow-xl shadow-slate-200/60">
+            <div class="card relative rounded-3xl sm:rounded-[32px] border border-slate-200/90 bg-white p-7 sm:p-9 shadow-xl shadow-slate-200/60">
                 {{-- Mobile Logo --}}
                 <div class="mb-5 flex items-center gap-3 lg:hidden">
                     <x-school-logo :size="48" class="shadow-sm shrink-0" />
@@ -189,7 +180,7 @@
                                    placeholder="••••••••"
                                    oninput="this.classList.remove('err')"
                                    class="w-full rounded-xl border border-slate-200 bg-white py-2.5 sm:py-3 pl-3.5 pr-10 text-sm font-semibold text-slate-900 placeholder:font-normal placeholder:text-slate-400 focus:border-blue-600 focus:outline-hidden focus:ring-4 focus:ring-blue-100 transition shadow-xs" />
-                            <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-hidden cursor-pointer hover:scale-110 active:scale-95 transition-transform duration-150" tabindex="-1">
+                            <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-hidden cursor-pointer" tabindex="-1">
                                 <svg x-show="!showPassword" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                                 <svg x-show="showPassword" x-cloak class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9.88 9.88 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
                             </button>
@@ -197,7 +188,7 @@
                     </div>
 
                     {{-- Kotak Catatan Sesuai Desain --}}
-                    <div class="my-4 flex items-start gap-2.5 rounded-xl border border-blue-100 bg-blue-50/80 p-3 text-xs leading-relaxed text-blue-900 transition-colors hover:border-blue-200">
+                    <div class="my-4 flex items-start gap-2.5 rounded-xl border border-blue-100 bg-blue-50/80 p-3 text-xs leading-relaxed text-blue-900">
                         <svg class="h-4 w-4 shrink-0 text-blue-600 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10" />
                             <path d="M12 16v-4" />
@@ -206,22 +197,19 @@
                         <p><strong class="font-bold text-blue-950">Catatan:</strong> <span class="text-blue-800">Pastikan Anda menggunakan akun resmi pembina eskul atau wali kelas terdaftar.</span></p>
                     </div>
 
-                    {{-- Tombol Masuk dengan Ukuran Proporsional & Animasi Interaktif --}}
+                    {{-- Tombol Masuk --}}
                     <button type="submit"
                             :disabled="loading"
-                            class="group relative overflow-hidden w-full h-11 sm:h-12 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-sm sm:text-[15px] font-bold text-white shadow-md shadow-blue-600/30 hover:shadow-lg hover:shadow-blue-600/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition-all duration-200 cursor-pointer disabled:opacity-75 disabled:cursor-wait">
-                        {{-- Efek Kilau Cahaya (Shimmer) saat kursor diarahkan --}}
-                        <span class="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out bg-gradient-to-r from-transparent via-white/20 to-transparent"></span>
-
-                        <span x-show="!loading" class="inline-flex items-center justify-center gap-2 whitespace-nowrap">
+                            class="w-full h-11 sm:h-12 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-sm sm:text-[15px] font-bold text-white shadow-md shadow-blue-600/30 transition cursor-pointer disabled:opacity-75 disabled:cursor-wait">
+                        <span x-show="!loading" class="inline-flex items-center justify-center gap-2">
                             <span>Masuk ke Panel Pembina / Wali Kelas</span>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-[18px] h-[18px] shrink-0 transition-transform duration-200 group-hover:scale-110 group-hover:rotate-6">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-[18px] h-[18px] shrink-0">
                                 <circle cx="12" cy="12" r="10" />
                                 <path d="M12 16v-4" />
                                 <path d="M12 8h.01" />
                             </svg>
                         </span>
-                        <span x-show="loading" x-cloak class="inline-flex items-center justify-center gap-2 whitespace-nowrap">
+                        <span x-show="loading" x-cloak class="inline-flex items-center justify-center gap-2">
                             <svg class="h-4 w-4 animate-spin text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"/></svg>
                             <span>Memproses Masuk…</span>
                         </span>
@@ -229,11 +217,10 @@
 
                     {{-- Link Bantuan & Navigasi --}}
                     <div class="mt-5 text-center space-y-2">
-                        <p class="text-xs text-slate-600">Bukan staf / wali kelas? <a href="{{ route('siswa.login') }}" class="group/link inline-flex items-center gap-0.5 font-semibold text-blue-600 hover:text-blue-700 hover:underline transition-colors"><span>Masuk sebagai Siswa</span> <span class="inline-block transition-transform duration-200 group-hover/link:translate-x-1">&rarr;</span></a></p>
+                        <p class="text-xs text-slate-600">Bukan staf / wali kelas? <a href="{{ route('siswa.login') }}" class="font-semibold text-blue-600 hover:text-blue-700 hover:underline">Masuk sebagai Siswa &rarr;</a></p>
                         <div class="pt-2">
-                            <a href="{{ route('home') }}" class="group/back inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-blue-600 hover:underline transition-colors">
-                                <span class="inline-block transition-transform duration-200 group-hover/back:-translate-x-1">&larr;</span>
-                                <span>Kembali ke Beranda</span>
+                            <a href="{{ route('home') }}" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-blue-600 hover:underline transition">
+                                &larr; Kembali ke Beranda
                             </a>
                         </div>
                     </div>
