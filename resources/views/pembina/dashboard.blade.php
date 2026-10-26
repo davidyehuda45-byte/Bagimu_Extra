@@ -44,14 +44,12 @@
             </div>
         </div>
 
-        {{-- Statistik Ringkas Eskul Ini --}}
+        {{-- Statistik Ringkas Eskul Ini (Tanpa Kontainer Icon) --}}
         <div class="grid gap-4 sm:grid-cols-3">
-            <div class="group relative overflow-hidden rounded-3xl border border-slate-200/90 bg-white p-5 shadow-xs hover:border-emerald-300 hover:shadow-md transition-all duration-200">
+            <div class="rounded-3xl border border-slate-200/90 bg-white p-5 shadow-xs hover:border-slate-300 transition-all duration-200">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-slate-500">Anggota Aktif</span>
-                    <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-500/25 group-hover:scale-110 transition-transform duration-200">
-                        <x-icon name="users" class="h-5 w-5" />
-                    </span>
+                    <x-icon name="users" class="h-5 w-5 text-emerald-600" />
                 </div>
                 <div class="mt-3 text-3xl font-black text-slate-900 tracking-tight">{{ $pendaftarAktif }}</div>
                 <p class="mt-1 text-xs text-slate-400 font-medium">Siswa terdaftar resmi periode berjalan.</p>
@@ -63,12 +61,10 @@
                 </div>
             </div>
 
-            <div class="group relative overflow-hidden rounded-3xl border border-slate-200/90 bg-white p-5 shadow-xs hover:border-amber-300 hover:shadow-md transition-all duration-200">
+            <div class="rounded-3xl border border-slate-200/90 bg-white p-5 shadow-xs hover:border-slate-300 transition-all duration-200">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-slate-500">Permohonan Izin</span>
-                    <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/25 group-hover:scale-110 transition-transform duration-200">
-                        <x-icon name="clock" class="h-5 w-5" />
-                    </span>
+                    <x-icon name="clock" class="h-5 w-5 text-amber-500" />
                 </div>
                 <div class="mt-3 text-3xl font-black text-slate-900 tracking-tight">{{ $izinPending }}</div>
                 <p class="mt-1 text-xs text-slate-400 font-medium">
@@ -82,12 +78,10 @@
                 </div>
             </div>
 
-            <div class="group relative overflow-hidden rounded-3xl border border-slate-200/90 bg-white p-5 shadow-xs hover:border-blue-300 hover:shadow-md transition-all duration-200">
+            <div class="rounded-3xl border border-slate-200/90 bg-white p-5 shadow-xs hover:border-slate-300 transition-all duration-200">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-slate-500">Jadwal Sesi Latihan</span>
-                    <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25 group-hover:scale-110 transition-transform duration-200">
-                        <x-icon name="calendar-check" class="h-5 w-5" />
-                    </span>
+                    <x-icon name="calendar-check" class="h-5 w-5 text-blue-600" />
                 </div>
                 <div class="mt-3 text-3xl font-black text-slate-900 tracking-tight">{{ $eskul->jadwals_count }}</div>
                 <p class="mt-1 text-xs text-slate-400 font-medium">Sesi latihan rutin setiap minggunya.</p>
