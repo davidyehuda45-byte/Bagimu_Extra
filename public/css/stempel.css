@@ -21,8 +21,8 @@ input.err {
 /* --- Stempel di Pojok Kanan Atas Kartu Login --- */
 .toast-container {
   position: absolute;
-  top: -52px;
-  right: -24px;
+  top: -42px;
+  right: -20px;
   z-index: 50;
   pointer-events: none;
 }
@@ -127,6 +127,14 @@ input.err {
 }
 .card.hit {
   animation: hit .35s .5s;
+}
+
+/* Stempel Error / Peringatan (Warna Merah Crimson) */
+.toast.error {
+  color: #b91c1c;
+}
+.toast.error .ring, .toast.error .shock {
+  stroke: #dc2626;
 }
 
 /* Stempel Berhasil (Warna Hijau Emerald) */

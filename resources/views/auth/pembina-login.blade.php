@@ -123,7 +123,7 @@
     <div class="flex w-full lg:w-[42%] min-h-screen flex-col justify-center items-center px-4 sm:px-6 py-10 bg-slate-50/80">
         <div class="w-full max-w-[420px]">
             {{-- Kartu Form Melayang --}}
-            <div class="animate-card-in rounded-3xl sm:rounded-[32px] border border-slate-200/90 bg-white p-7 sm:p-9 shadow-xl shadow-slate-200/60">
+            <div class="card relative animate-card-in rounded-3xl sm:rounded-[32px] border border-slate-200/90 bg-white p-7 sm:p-9 shadow-xl shadow-slate-200/60">
                 {{-- Mobile Logo --}}
                 <div class="mb-5 flex items-center gap-3 lg:hidden">
                     <x-school-logo :size="48" class="shadow-sm shrink-0" />
@@ -157,7 +157,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('pembina.login') }}" id="loginForm" class="space-y-4" x-data="{ loading: false, showPassword: false }" @submit="handlePembinaLoginSubmit($event, $data)">
+                <form method="POST" action="{{ route('pembina.login') }}" id="loginForm" novalidate class="space-y-4" x-data="{ loading: false, showPassword: false }" @submit="handlePembinaLoginSubmit($event, $data)">
                     @csrf
 
                     {{-- Input Username / Email --}}

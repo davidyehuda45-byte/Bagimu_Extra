@@ -22,18 +22,31 @@ function showToast(message, type, duration) {
     _stempelRemoveTimer = null;
   }
 
-  var card = document.querySelector(".card");
+  // Cari wadah kartu login (.card atau wadah form terdekat)
+  var card = document.querySelector(".card") || 
+             document.getElementById("loginForm")?.closest(".rounded-3xl") || 
+             document.getElementById("loginForm")?.closest(".rounded-[32px]") || 
+             document.getElementById("loginForm")?.parentElement;
+
+  if (card && !card.classList.contains("card")) {
+    card.classList.add("card");
+  }
+
+  var targetContainer = card || document.body;
+
   var box = document.getElementById("toastContainer");
   if (!box) {
     box = document.createElement("div");
     box.id = "toastContainer";
     box.className = "toast-container";
-    (card || document.body).appendChild(box);
+    targetContainer.appendChild(box);
+  } else if (targetContainer && box.parentElement !== targetContainer) {
+    targetContainer.appendChild(box);
   }
   box.innerHTML = "";
 
   var t = document.createElement("div");
-  t.className = "toast" + (type === "success" ? " success" : "");
+  t.className = "toast" + (type === "success" ? " success" : (type === "error" ? " error" : ""));
   t.innerHTML = '<svg viewBox="0 0 140 140" aria-hidden="true"><defs><filter id="rough" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="10" xChannelSelector="R" yChannelSelector="G"/></filter></defs><circle class="shock" cx="70" cy="70" r="60"/><circle class="shock s2" cx="70" cy="70" r="60"/><g filter="url(#rough)"><circle class="disc" cx="70" cy="70" r="60"/><circle class="ring" cx="70" cy="70" r="58" stroke-width="6" stroke-dasharray="90 5 60 8 110 4 45 6 30 6"/><circle class="ring" cx="70" cy="70" r="48" stroke-width="2.5" stroke-dasharray="70 4 50 7 90 5 40 6 20 9"/></g></svg><span></span>';
 
   var sp = t.querySelector("span");
