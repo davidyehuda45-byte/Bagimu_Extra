@@ -49,7 +49,7 @@
             {{-- Judul Besar Dua Baris & Subtitle --}}
             <div class="space-y-1.5 pt-1">
                 <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white leading-tight drop-shadow-xs">
-                    Dashboard Admin &amp;<br class="hidden sm:inline"> Kesiswaan
+                    Dashboard Admin /<br class="hidden sm:inline"> Kesiswaan
                 </h1>
                 <p class="text-xs sm:text-sm text-blue-100/95 leading-relaxed max-w-xl">
                     Ringkasan statistik pendaftaran eskul, verifikasi berkas siswa, pemantauan kehadiran, dan rekap aktivitas.
@@ -161,7 +161,7 @@
             <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2">
                     <x-icon name="alert" class="h-4 w-4 text-amber-600" />
-                    <h2 class="font-bold text-slate-900 text-sm">Pusat Tindakan &amp; Tugas</h2>
+                    <h2 class="font-bold text-slate-900 text-sm">Pusat Tindakan / Tugas</h2>
                 </div>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
                     {{ count($tugas) }} Butuh Perhatian

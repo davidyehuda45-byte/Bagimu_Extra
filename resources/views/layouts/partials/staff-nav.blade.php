@@ -39,7 +39,7 @@
     @if ($isAdmin || $isKepsek || $isPembina)
         <div class="pt-3 border-t border-slate-100">
             <div class="px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 select-none">
-                Eskul & Kegiatan
+                Eskul / Kegiatan
             </div>
             <div class="space-y-0.5">
                 @if ($isAdmin || $isKepsek)
@@ -133,7 +133,7 @@
     @if ($isAdmin || $isKepsek)
         <div class="pt-3 border-t border-slate-100">
             <div class="px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 select-none">
-                Informasi & Laporan
+                Informasi / Laporan
             </div>
             <div class="space-y-0.5">
                 @if ($isAdmin || $isKepsek)
@@ -166,13 +166,13 @@
     @if ($isAdmin || $isKepsek)
         <div class="pt-3 border-t border-slate-100">
             <div class="px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 select-none">
-                Sistem & Admin
+                Sistem / Admin
             </div>
             <div class="space-y-0.5">
                 @if ($isAdmin || $isKepsek)
                     <a href="{{ route('admin.periodes.index') }}" class="{{ $link(Route::is('admin.periodes.*') || Route::is('admin.windows.*')) }}">
                         <x-icon name="calendar" class="h-4 w-4 shrink-0" />
-                        <span>Periode & Jendela</span>
+                        <span>Periode / Jendela</span>
                     </a>
                 @endif
                 @if ($isAdminOnly || $isKepsek)

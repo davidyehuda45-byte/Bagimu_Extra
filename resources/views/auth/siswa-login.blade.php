@@ -21,7 +21,7 @@
     {{-- Panel Branding Desktop - Sesuai Mockup Desain Resmi (58% Lebar Layar) --}}
     <div class="relative hidden w-full lg:w-[58%] min-h-screen flex-col justify-between overflow-hidden p-8 xl:p-12 text-white lg:flex"
          style="background-color: #1a62d8;">
-        
+
         {{-- Foto Asli Gedung & Langit SMK Bagimu Negeriku (Bersih Tanpa Teks Bawaan) --}}
         <img src="{{ asset('images/gedung-backdrop-clean.jpg') }}?v={{ filemtime(public_path('images/gedung-backdrop-clean.jpg')) }}"
              alt="Gedung SMK Bagimu Negeriku"
@@ -62,10 +62,10 @@
             </div>
 
             <h1 class="text-3xl sm:text-4xl xl:text-5xl font-black leading-[1.12] tracking-tight text-white drop-shadow-md">
-                Pendaftaran &amp;<br>
+                Pendaftaran /<br>
                 Presensi<br>
                 Ekstrakurikuler<br>
-                Digital, Praktis &amp;<br>
+                Digital, Praktis /<br>
                 Cepat.
             </h1>
 
@@ -207,7 +207,7 @@
                             :disabled="loading"
                             class="w-full h-11 sm:h-12 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-sm sm:text-[15px] font-bold text-white shadow-md shadow-blue-600/30 transition cursor-pointer disabled:opacity-75 disabled:cursor-wait">
                         <span x-show="!loading" class="inline-flex items-center justify-center gap-2">
-                            <span>Masuk &amp; Pilih Eskul</span>
+                            <span>Masuk / Pilih Eskul</span>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-[18px] h-[18px] shrink-0">
                                 <circle cx="12" cy="12" r="10" />
                                 <path d="M12 16v-4" />
@@ -235,7 +235,7 @@
 
             {{-- Footer Bawah Kartu Sesuai Foto Referensi 2 --}}
             <p class="mt-5 text-center text-xs text-slate-400">
-                &copy; {{ date('Y') }} David Yehuda Surbakti &amp; Vines Fernando Siritoitet &bull; {{ config('app.name', 'Bagimu Extra') }}
+                &copy; {{ date('Y') }} David Yehuda Surbakti / Vines Fernando Siritoitet &bull; {{ config('app.name', 'Bagimu Extra') }}
             </p>
         </div>
     </div>

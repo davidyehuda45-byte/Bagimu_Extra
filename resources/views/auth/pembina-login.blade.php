@@ -58,13 +58,13 @@
                     <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
                     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                 </svg>
-                <span>Portal Pembina &amp; Wali Kelas</span>
+                <span>Portal Pembina / Wali Kelas</span>
             </div>
 
             <h1 class="text-3xl sm:text-4xl xl:text-5xl font-black leading-[1.12] tracking-tight text-white drop-shadow-md">
                 Pengelolaan<br>
                 Ekstrakurikuler<br>
-                Terpadu &amp;<br>
+                Terpadu /<br>
                 Profesional.
             </h1>
 
@@ -227,7 +227,7 @@
 
             {{-- Footer Bawah Kartu Sesuai Foto Referensi 2 --}}
             <p class="mt-5 text-center text-xs text-slate-400">
-                &copy; {{ date('Y') }} David Yehuda Surbakti &amp; Vines Fernando Siritoitet &bull; {{ config('app.name', 'Bagimu Extra') }}
+                &copy; {{ date('Y') }} David Yehuda Surbakti / Vines Fernando Siritoitet &bull; {{ config('app.name', 'Bagimu Extra') }}
             </p>
         </div>
     </div>

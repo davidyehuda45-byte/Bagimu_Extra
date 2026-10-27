@@ -32,7 +32,7 @@
             <x-school-logo :size="38" />
             <div class="leading-tight min-w-0">
                 <p class="text-sm font-extrabold text-slate-900 tracking-tight truncate">{{ config('app.name', 'Bagimu Extra') }}</p>
-                <p class="text-[11px] text-slate-400 font-medium truncate">{{ \App\Models\AppSetting::get('school.name', 'Panel Guru & Staf') }}</p>
+                <p class="text-[11px] text-slate-400 font-medium truncate">{{ \App\Models\AppSetting::get('school.name', 'Panel Guru / Staf') }}</p>
             </div>
         </div>
 

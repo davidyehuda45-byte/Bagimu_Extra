@@ -4,11 +4,227 @@
 
 @section('content')
 <style>
-    .card-pelajar-container {
-        width: 8.5cm;
-        height: 5.5cm;
-        min-width: 8.5cm;
-        min-height: 5.5cm;
+    /* Standar fisik kartu: 85.6mm x 54mm (ID-1 / CR80) */
+    .id-card-wrapper {
+        display: flex;
+        justify-content: center;
+        padding: 4px 0;
+    }
+    .id-card {
+        width: 85.6mm;
+        height: 54mm;
+        min-width: 85.6mm;
+        min-height: 54mm;
+        max-width: 85.6mm;
+        max-height: 54mm;
+        box-sizing: border-box;
+        background: #ffffff;
+        border: 1.5px solid #1e3a8a;
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 4px 6px -4px rgba(15, 23, 42, 0.08);
+        text-align: left;
+        user-select: none;
+    }
+    .id-card-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+        color: #ffffff;
+        padding: 5px 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #172554;
+        flex-shrink: 0;
+    }
+    .id-card-header-left {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 0;
+    }
+    .id-card-logo-circle {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #ffffff;
+        padding: 1.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+    .id-card-header-text {
+        min-width: 0;
+        line-height: 1.1;
+    }
+    .id-card-header-title {
+        font-size: 8px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.2px;
+        color: #ffffff;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 175px;
+    }
+    .id-card-header-sub {
+        font-size: 6px;
+        font-weight: 700;
+        color: #93c5fd;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 1px;
+    }
+    .id-card-badge {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 3px;
+        padding: 1.5px 5px;
+        font-size: 6.5px;
+        font-weight: 700;
+        color: #f8fafc;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .id-card-body {
+        padding: 5px 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(180deg, #f8fafc 0%, #ffffff 60%, #f1f5f9 100%);
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+    }
+    .id-card-watermark {
+        position: absolute;
+        right: 4px;
+        bottom: 2px;
+        width: 60px;
+        height: 60px;
+        opacity: 0.05;
+        pointer-events: none;
+        z-index: 1;
+        object-fit: contain;
+    }
+    .id-card-photo {
+        width: 44px;
+        height: 58px;
+        flex-shrink: 0;
+        border-radius: 4px;
+        border: 1px solid #93c5fd;
+        background: linear-gradient(180deg, #dbeafe 0%, #eff6ff 50%, #bfdbfe 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+        z-index: 2;
+    }
+    .id-card-photo-initial {
+        font-size: 18px;
+        font-weight: 900;
+        color: #1e3a8a;
+        line-height: 1;
+    }
+    .id-card-photo-tag {
+        font-size: 5.5px;
+        font-weight: 700;
+        color: #2563eb;
+        letter-spacing: 0.5px;
+        margin-top: 1px;
+    }
+    .id-card-photo-banner {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #1e3a8a;
+        color: #ffffff;
+        font-size: 5px;
+        font-weight: 800;
+        text-align: center;
+        padding: 1px 0;
+        letter-spacing: 0.5px;
+    }
+    .id-card-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        z-index: 2;
+    }
+    .id-card-row {
+        display: flex;
+        align-items: baseline;
+        font-size: 7px;
+        line-height: 1.2;
+    }
+    .id-card-label {
+        width: 52px;
+        flex-shrink: 0;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        font-size: 6.2px;
+        letter-spacing: 0.2px;
+    }
+    .id-card-sep {
+        width: 6px;
+        flex-shrink: 0;
+        color: #94a3b8;
+        font-weight: 700;
+    }
+    .id-card-value {
+        flex: 1;
+        min-width: 0;
+        font-weight: 700;
+        color: #0f172a;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .id-card-value-primary {
+        font-weight: 800;
+        color: #1d4ed8;
+        font-size: 7.5px;
+    }
+    .id-card-footer {
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        padding: 3px 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 6px;
+        flex-shrink: 0;
+        z-index: 2;
+    }
+    .id-card-status {
+        color: #047857;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        letter-spacing: 0.3px;
+    }
+    .id-card-token {
+        color: #64748b;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 6px;
+        font-weight: 600;
     }
     @media print {
         @page {
@@ -16,9 +232,10 @@
             margin: 10mm;
         }
         body {
-            background: white !important;
+            background: #ffffff !important;
+            color: #000000 !important;
         }
-        .no-print, header, nav, footer {
+        .no-print, header, nav, footer, .skip-link {
             display: none !important;
         }
         .print-area {
@@ -28,10 +245,15 @@
             margin: 0 !important;
             width: 100% !important;
             background: transparent !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
         }
-        .card-pelajar-container {
-            width: 8.5cm !important;
-            height: 5.5cm !important;
+        .id-card-wrapper {
+            padding: 0 !important;
+            margin: 20mm auto !important;
+        }
+        .id-card {
             border: 1.5px solid #1e3a8a !important;
             box-shadow: none !important;
             page-break-inside: avoid !important;
@@ -42,23 +264,17 @@
 </style>
 
 <div class="space-y-6 w-full max-w-xl mx-auto py-4 sm:py-6" x-data="{
-    countdown: 30,
-    paused: false,
+    countdown: 15,
     timer: null,
     init() {
         this.timer = setInterval(() => {
-            if (!this.paused) {
-                if (this.countdown > 1) {
-                    this.countdown--;
-                } else {
-                    clearInterval(this.timer);
-                    document.getElementById('logout-form').submit();
-                }
+            if (this.countdown > 1) {
+                this.countdown--;
+            } else {
+                clearInterval(this.timer);
+                document.getElementById('logout-form').submit();
             }
         }, 1000);
-    },
-    togglePause() {
-        this.paused = !this.paused;
     }
 }">
     <div class="print-area rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-xl text-center space-y-6">
@@ -66,79 +282,90 @@
         <div class="no-print space-y-2">
             <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
                 <x-icon name="check" class="h-3.5 w-3.5" />
-                Pendaftaran Berhasil & Terverifikasi
+                Pendaftaran Berhasil / Terverifikasi
             </span>
             <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Kartu Tanda Peserta Ekstrakurikuler</h1>
-            <p class="text-xs text-slate-500">Simpan atau cetak kartu ini sebagai bukti resmi keikutsertaan kegiatan eskul.</p>
+            <p class="text-xs text-slate-500">Simpan atau tangkap layar (screenshot) kartu ini dalam 15 detik sebagai bukti resmi keikutsertaan kegiatan eskul.</p>
         </div>
 
-        {{-- KARTU PELAJAR / KARTU PESERTA (UKURAN FISIK PRESISI 8.5 cm x 5.5 cm) --}}
-        <div class="flex justify-center overflow-x-auto py-1">
-            <div class="card-pelajar-container relative rounded-2xl border-2 border-blue-900/30 bg-white shadow-xl overflow-hidden flex flex-col justify-between text-left select-none">
-                {{-- Header Kartu (Biru Dongker / Design System) --}}
-                <div class="bg-gradient-to-r from-blue-950 via-blue-900 to-indigo-950 text-white px-3 py-1.5 flex items-center justify-between border-b border-blue-800 shrink-0">
-                    <div class="flex items-center gap-2 min-w-0">
-                        <x-school-logo :size="22" class="h-5 w-5 shrink-0 rounded-full bg-white p-0.5 shadow-2xs" />
-                        <div class="leading-none min-w-0">
-                            <h3 class="font-black text-[9px] uppercase tracking-wide truncate text-white">{{ $schoolName }}</h3>
-                            <p class="text-[6.5px] font-semibold text-blue-200 uppercase tracking-widest mt-0.5">KARTU PESERTA EKSTRAKURIKULER</p>
+        {{-- KARTU PELAJAR / KARTU PESERTA (UKURAN FISIK PRESISI 8.5 cm x 5.4 cm) --}}
+        <div class="id-card-wrapper">
+            <div class="id-card">
+                {{-- Header Kartu --}}
+                <div class="id-card-header">
+                    <div class="id-card-header-left">
+                        <span class="id-card-logo-circle">
+                            <img src="/logo.png" alt="Logo" style="width: 100%; height: 100%; object-fit: contain; display: none;" onload="this.style.display='block'; if(this.nextElementSibling) this.nextElementSibling.style.display='none';" onerror="this.style.display='none';">
+                            <svg style="width: 14px; height: 14px; color: #1e3a8a;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>
+                        </span>
+                        <div class="id-card-header-text">
+                            <h3 class="id-card-header-title">{{ $schoolName }}</h3>
+                            <p class="id-card-header-sub">KARTU PESERTA EKSTRAKURIKULER</p>
                         </div>
                     </div>
-                    <span class="rounded bg-blue-800/90 border border-blue-400/30 px-1.5 py-0.5 text-[7px] font-bold text-blue-100 tracking-wider shrink-0">
+                    <span class="id-card-badge">
                         TA {{ $tahunAjaran }}
                     </span>
                 </div>
 
                 {{-- Badan Kartu --}}
-                <div class="px-3 py-2 flex items-center gap-3 bg-gradient-to-b from-blue-50/30 via-white to-slate-50/50 flex-1 relative min-h-0">
-                    {{-- Watermark Logo Sekolah --}}
-                    <div class="absolute inset-0 flex items-center justify-center opacity-[0.035] pointer-events-none">
-                        <x-school-logo :size="90" />
+                <div class="id-card-body">
+                    {{-- Watermark Logo Sekolah (Transparan, tidak menghalangi teks) --}}
+                    <img src="/logo.png" alt="" class="id-card-watermark" onerror="this.style.display='none';">
+
+                    {{-- Foto Siswa / Avatar --}}
+                    <div class="id-card-photo">
+                        <span class="id-card-photo-initial">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                        <span class="id-card-photo-tag">FOTO</span>
+                        <div class="id-card-photo-banner">SISWA</div>
                     </div>
 
-                    {{-- Foto / Avatar Siswa --}}
-                    <div class="flex flex-col items-center justify-center shrink-0 z-10">
-                        <div class="h-[2.1cm] w-[1.55cm] rounded-lg border border-blue-300 bg-gradient-to-b from-blue-100 via-blue-50 to-blue-200 flex flex-col items-center justify-center shadow-inner overflow-hidden relative">
-                            <span class="text-lg font-black text-blue-800">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
-                            <span class="text-[6.5px] font-bold text-blue-600 uppercase tracking-tighter mt-0.5">FOTO</span>
-                            <div class="absolute bottom-0 inset-x-0 bg-blue-900/90 text-[5.5px] text-white text-center py-0.5 font-bold uppercase tracking-wider">
-                                SISWA
+                    {{-- Data Isian Kartu --}}
+                    <div class="id-card-info">
+                        <div class="id-card-row">
+                            <span class="id-card-label">Nama</span>
+                            <span class="id-card-sep">:</span>
+                            <span class="id-card-value" style="font-weight: 800;">{{ $user->name }}</span>
+                        </div>
+                        <div class="id-card-row">
+                            <span class="id-card-label">NIS</span>
+                            <span class="id-card-sep">:</span>
+                            <span class="id-card-value">{{ $user->student?->nis ?? ($registration?->nis ?? $user->username) }}</span>
+                        </div>
+                        @if ($registration?->kelas ?? $user->student?->kelas)
+                            <div class="id-card-row">
+                                <span class="id-card-label">Kelas</span>
+                                <span class="id-card-sep">:</span>
+                                <span class="id-card-value">{{ $registration?->kelas ?? $user->student?->kelas }}</span>
                             </div>
+                        @endif
+                        <div class="id-card-row">
+                            <span class="id-card-label">Eskul</span>
+                            <span class="id-card-sep">:</span>
+                            <span class="id-card-value id-card-value-primary">{{ $registration?->eskul_utama ?? session('eskul', 'Terdaftar') }}</span>
                         </div>
-                    </div>
-
-                    {{-- Data Isian Kartu Pelajar --}}
-                    <div class="flex-1 min-w-0 space-y-1 text-[8px] leading-tight z-10">
-                        <div class="grid grid-cols-[56px_1fr] items-baseline">
-                            <span class="font-semibold text-slate-500 uppercase tracking-wider text-[7px]">Nama</span>
-                            <span class="font-black text-slate-900 text-[8.5px] truncate">: {{ $user->name }}</span>
+                        <div class="id-card-row">
+                            <span class="id-card-label">Thn Ajaran</span>
+                            <span class="id-card-sep">:</span>
+                            <span class="id-card-value">
+                                {{ $tahunAjaran }} <span style="font-style: italic; font-weight: normal; color: #64748b; font-size: 6px;">(Kode: {{ $periode?->periode ?? ($registration?->periode ?? $tahunAjaran) }})</span>
+                            </span>
                         </div>
-                        <div class="grid grid-cols-[56px_1fr] items-baseline">
-                            <span class="font-semibold text-slate-500 uppercase tracking-wider text-[7px]">NIS</span>
-                            <span class="font-bold text-slate-800">: {{ $user->student?->nis ?? ($registration?->nis ?? $user->username) }}</span>
-                        </div>
-                        <div class="grid grid-cols-[56px_1fr] items-baseline">
-                            <span class="font-semibold text-slate-500 uppercase tracking-wider text-[7px]">Jenis Eskul</span>
-                            <span class="font-black text-blue-700 text-[9px] truncate">: {{ $registration?->eskul_utama ?? session('eskul', 'Terdaftar') }}</span>
-                        </div>
-                        <div class="grid grid-cols-[56px_1fr] items-baseline">
-                            <span class="font-semibold text-slate-500 uppercase tracking-wider text-[7px]">Tahun Ajaran</span>
-                            <span class="font-bold text-slate-800">: {{ $tahunAjaran }}</span>
-                        </div>
-                        <div class="grid grid-cols-[56px_1fr] items-baseline">
-                            <span class="font-semibold text-slate-500 uppercase tracking-wider text-[7px]">Berlaku s/d</span>
-                            <span class="font-extrabold text-emerald-700">: {{ $berlakuSampai }}</span>
+                        <div class="id-card-row">
+                            <span class="id-card-label">Berlaku s/d</span>
+                            <span class="id-card-sep">:</span>
+                            <span class="id-card-value" style="color: #047857; font-weight: 800;">{{ $berlakuSampai }}</span>
                         </div>
                     </div>
                 </div>
 
                 {{-- Footer Kartu --}}
-                <div class="bg-slate-50 border-t border-blue-100 px-3 py-1 flex items-center justify-between text-[6.5px] text-slate-500 shrink-0">
-                    <span class="inline-flex items-center gap-1 font-bold text-emerald-700">
-                        <x-icon name="check" class="h-2.5 w-2.5" />
+                <div class="id-card-footer">
+                    <span class="id-card-status">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle;"><polyline points="20 6 9 17 4 12"/></svg>
                         TERDAFTAR RESMI
                     </span>
-                    <span class="font-mono text-slate-400">
+                    <span class="id-card-token">
                         ID: {{ substr($registration?->verify_token ?? md5($user->id . $tahunAjaran), 0, 10) }}
                     </span>
                 </div>
@@ -151,41 +378,25 @@
                 Token login telah dihanguskan demi keamanan. Sistem akan otomatis keluar dalam:
             </p>
             <div class="flex items-center justify-center gap-1.5 font-black text-blue-700 text-2xl font-mono">
-                <span x-text="countdown">30</span>
+                <span x-text="countdown">15</span>
                 <span class="text-xs uppercase font-sans font-bold text-blue-600">detik</span>
-                <template x-if="paused">
-                    <span class="ms-2 rounded-md bg-amber-200 px-2 py-0.5 text-[11px] font-bold text-amber-800 uppercase font-sans">Dijeda</span>
-                </template>
             </div>
+            <p class="text-[11px] font-semibold text-blue-800">
+                Segera simpan atau screenshot kartu bukti di atas sebelum waktu habis.
+            </p>
         </div>
 
         {{-- Action Buttons (No-Print) --}}
         <div class="no-print space-y-2 pt-1">
-            <div class="grid grid-cols-2 gap-2">
-                <button type="button" @click="togglePause()" class="w-full inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-2xs">
-                    <template x-if="!paused">
-                        <span class="inline-flex items-center gap-1.5">
-                            <x-icon name="clock" class="h-3.5 w-3.5 text-slate-500" />
-                            Jeda Hitung Mundur
-                        </span>
-                    </template>
-                    <template x-if="paused">
-                        <span class="inline-flex items-center gap-1.5 text-blue-700 font-bold">
-                            <x-icon name="clock" class="h-3.5 w-3.5 text-blue-600" />
-                            Lanjutkan Hitung Mundur
-                        </span>
-                    </template>
-                </button>
-                <button type="button" onclick="window.print()" class="w-full inline-flex items-center justify-center gap-1.5 rounded-xl border border-blue-600 bg-blue-600 px-3.5 py-2.5 text-xs font-bold text-white hover:bg-blue-700 transition shadow-xs cursor-pointer">
-                    <x-icon name="printer" class="h-3.5 w-3.5 text-white" />
-                    Cetak Kartu (8,5 x 5,5 cm)
-                </button>
-            </div>
+            <button type="button" onclick="window.print()" class="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-blue-600 bg-blue-600 px-4 py-2.5 text-xs sm:text-sm font-bold text-white hover:bg-blue-700 transition shadow-xs cursor-pointer">
+                <x-icon name="printer" class="h-4 w-4 text-white" />
+                <span>Cetak / Simpan Kartu (8,5 x 5,4 cm)</span>
+            </button>
 
             <form id="logout-form" method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="w-full rounded-xl bg-slate-900 px-5 py-2.5 text-xs sm:text-sm font-bold text-white hover:bg-slate-800 transition shadow-xs cursor-pointer">
-                    Keluar Sesi Sekarang
+                    Keluar Sekarang
                 </button>
             </form>
         </div>

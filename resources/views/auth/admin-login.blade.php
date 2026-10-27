@@ -41,7 +41,7 @@
             <div class="hidden sm:flex items-center">
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 border border-white/30 backdrop-blur-md text-xs font-semibold text-white shadow-sm">
                     <x-icon name="shield" class="h-3.5 w-3.5 text-sky-200 shrink-0" />
-                    <span>Panel Kontrol Administrasi &amp; Sistem</span>
+                    <span>Panel Kontrol Administrasi / Sistem</span>
                 </div>
             </div>
         </div>
@@ -62,7 +62,7 @@
             </h1>
 
             <p class="text-sm xl:text-base leading-relaxed text-blue-50/95 max-w-md drop-shadow-xs">
-                Akses terproteksi khusus administrator untuk konfigurasi master data eskul, manajemen akun pembina &amp; wali kelas, pengaturan periode, dan audit sistem.
+                Akses terproteksi khusus administrator untuk konfigurasi master data eskul, manajemen akun pembina / wali kelas, pengaturan periode, dan audit sistem.
             </p>
 
             <ul class="space-y-4 pt-2 text-sm xl:text-base text-white max-w-md">
@@ -222,7 +222,7 @@
 
             {{-- Footer Bawah Kartu Sesuai Foto Referensi 2 --}}
             <p class="mt-5 text-center text-xs text-slate-400">
-                &copy; {{ date('Y') }} David Yehuda Surbakti &amp; Vines Fernando Siritoitet &bull; {{ config('app.name', 'Bagimu Extra') }}
+                &copy; {{ date('Y') }} David Yehuda Surbakti / Vines Fernando Siritoitet &bull; {{ config('app.name', 'Bagimu Extra') }}
             </p>
         </div>
     </div>
