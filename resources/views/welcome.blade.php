@@ -75,23 +75,59 @@
         </div>
     </header>
 
-    {{-- Hero Section - Bersih, Cerah, Profesional --}}
-    <section class="rounded-3xl bg-blue-600 px-6 py-10 sm:px-12 sm:py-14 text-white shadow-sm">
-        <div class="max-w-3xl">
-            <div class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold bg-white/15 text-white border border-white/20 mb-4">
-                <span class="flex h-2 w-2 rounded-full bg-white"></span>
-                <span>{{ $sekolah }}</span>
+    {{-- Hero Section - Sesuai Foto Desain Resmi (Latar Kampus SMK Bagimu Negeriku) --}}
+    <section class="relative overflow-hidden rounded-3xl bg-[#0e5cda] text-white shadow-xl shadow-blue-900/10 min-h-[360px] sm:min-h-[400px] px-6 py-10 sm:px-10 sm:py-12 lg:px-12 lg:py-14 flex flex-col justify-between">
+        {{-- Foto Asli Kampus SMK Bagimu Negeriku (Bersih Tanpa Teks Bawaan) --}}
+        <img src="{{ asset('images/dashboard-banner-clean.jpg') }}?v={{ filemtime(public_path('images/dashboard-banner-clean.jpg')) }}"
+             alt="Kampus SMK Bagimu Negeriku"
+             class="pointer-events-none absolute inset-0 h-full w-full object-cover object-right select-none z-0" />
+
+        {{-- Gradient Overlay Halus untuk Kontras & Keterbacaan Sempurna --}}
+        <div class="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0a4fc0]/95 via-[#0e5cda]/80 to-transparent sm:via-[#0e5cda]/65 z-0"></div>
+
+        <div class="relative z-10 max-w-3xl space-y-6">
+            {{-- Branding Sekolah: Logo + Nama + Slogan 4B --}}
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="flex items-center gap-3">
+                    <x-school-logo :size="46" class="rounded-full bg-white p-1 shadow-md ring-2 ring-white/50 shrink-0" />
+                    <div class="leading-tight">
+                        <p class="text-base sm:text-lg font-black tracking-tight text-white leading-tight drop-shadow-xs">{{ config('app.name', 'Bagimu Extra') }}</p>
+                        <p class="text-xs font-semibold text-white/90">{{ $sekolah }}</p>
+                    </div>
+                </div>
+                <div class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/20 backdrop-blur-md text-white border border-white/30 shadow-xs">
+                    <svg class="h-3 w-3 text-sky-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+                        <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    <span>4B Berbudi • Berkualitas • Berdaya • Berhasil</span>
+                </div>
             </div>
 
-            <h1 class="text-3xl font-black leading-tight sm:text-5xl tracking-tight text-white">
-                Pendaftaran Ekstrakurikuler Digital & Terorganisir
-            </h1>
+            {{-- Badges Glassmorphic --}}
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-bold bg-white/20 text-white border border-white/30 backdrop-blur-md shadow-xs">
+                    <span class="flex h-2 w-2 rounded-full bg-emerald-400"></span>
+                    <span>Portal Ekstrakurikuler Resmi</span>
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/15 text-blue-100 border border-white/20 backdrop-blur-md">
+                    <span>{{ $sekolah }}</span>
+                </span>
+            </div>
 
-            <p class="mt-4 text-sm sm:text-base leading-relaxed text-blue-100 max-w-2xl">
-                Jelajahi beragam kegiatan ekstrakurikuler unggulan, periksa jadwal latihan mingguan, dan lakukan pendaftaran langsung menggunakan NIS dan token kartu pelajar dari ponsel Anda.
-            </p>
+            {{-- Judul Besar & Subtitle --}}
+            <div class="space-y-3">
+                <h1 class="text-3xl font-black leading-tight sm:text-4xl lg:text-5xl tracking-tight text-white drop-shadow-xs">
+                    Pendaftaran Ekstrakurikuler<br class="hidden sm:inline"> Digital &amp; Terorganisir
+                </h1>
 
-            <div class="mt-8 flex flex-wrap items-center gap-3.5">
+                <p class="text-sm sm:text-base leading-relaxed text-blue-100/95 max-w-2xl">
+                    Jelajahi beragam kegiatan ekstrakurikuler unggulan, periksa jadwal latihan mingguan, dan lakukan pendaftaran langsung menggunakan NIS dan token kartu pelajar dari ponsel Anda.
+                </p>
+            </div>
+
+            {{-- Tombol Aksi Cepat --}}
+            <div class="pt-2 flex flex-wrap items-center gap-3 sm:gap-3.5">
                 @if (auth()->check())
                     <a href="{{ url('/dashboard') }}" class="group inline-flex h-12 items-center gap-2.5 rounded-2xl border border-transparent bg-white px-6 text-sm font-bold text-blue-700 shadow-md shadow-blue-950/20 hover:bg-blue-50/95 hover:shadow-lg active:scale-[0.98] transition-all duration-150">
                         <x-icon name="home" class="h-4 w-4 text-blue-600 shrink-0 transition-transform group-hover:scale-110" />
@@ -103,7 +139,7 @@
                         <x-icon name="user" class="h-4 w-4 text-blue-600 shrink-0 transition-transform group-hover:scale-110" />
                         <span>Masuk Siswa (NIS + Token)</span>
                     </a>
-                    <a href="{{ route('pembina.login') }}" class="group inline-flex h-12 items-center gap-2.5 rounded-2xl border border-white/35 bg-white/15 backdrop-blur-md px-5 sm:px-6 text-sm font-bold text-white shadow-xs hover:bg-white/25 hover:border-white/50 active:scale-[0.98] transition-all duration-150">
+                    <a href="{{ route('pembina.login') }}" class="group inline-flex h-12 items-center gap-2.5 rounded-2xl border border-white/30 bg-white/20 backdrop-blur-md px-5 sm:px-6 text-sm font-bold text-white shadow-xs hover:bg-white/30 hover:border-white/40 active:scale-[0.98] transition-all duration-150">
                         <x-icon name="user-group" class="h-4 w-4 text-white shrink-0 transition-transform group-hover:scale-110" />
                         <span>Masuk Pembina / Wali Kelas</span>
                     </a>
