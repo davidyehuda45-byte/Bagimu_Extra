@@ -172,7 +172,7 @@
         li.className = 'py-2.5 flex items-center justify-between';
         li.innerHTML = `
             <div class="flex items-center gap-2">
-                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">✓</span>
+                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                 <span class="font-bold text-slate-800">${nama}</span>
             </div>
             <span class="text-xs font-semibold text-slate-500">${kelas || 'Siswa'}</span>
@@ -203,7 +203,7 @@
             const data = await res.json().catch(() => ({}));
             if (res.ok && data.ok) {
                 playBeep();
-                showFeedback(true, `✓ HADIR: ${data.nama} (${data.kelas || '-'})`);
+                showFeedback(true, `HADIR: ${data.nama} (${data.kelas || '-'})`);
                 const uniqueKey = scannedText + '|' + inputTanggal.value;
                 if (!recordedSet.has(uniqueKey)) {
                     recordedSet.add(uniqueKey);

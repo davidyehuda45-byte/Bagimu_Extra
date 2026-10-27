@@ -10,9 +10,12 @@
 
 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 w-full space-y-4 text-sm">
     @if (!$zipAktif)
-        <div class="rounded-xl bg-amber-50 border border-amber-200 p-4 text-xs text-amber-900 leading-relaxed">
-            <p class="font-bold">Perhatian: ekstensi ZIP PHP belum aktif.</p>
-            <p class="mt-1">File <b>.xlsx</b> tidak bisa dibaca sampai <code class="bg-white px-1 rounded border border-amber-300">extension=zip</code> diaktifkan di php.ini lalu web server di-restart. Sementara itu gunakan format <b>CSV</b> atau <b>.xls</b>.</p>
+        <div class="rounded-xl bg-blue-50/70 border border-blue-200/80 p-4 text-xs text-slate-700 leading-relaxed shadow-2xs flex items-start gap-2.5">
+            <x-icon name="info" class="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+            <div>
+                <p class="font-bold text-blue-950">Perhatian: ekstensi ZIP PHP belum aktif.</p>
+                <p class="mt-1 text-slate-600">File <b>.xlsx</b> tidak bisa dibaca sampai <code class="bg-white px-1 rounded border border-blue-200 font-mono">extension=zip</code> diaktifkan di php.ini lalu web server di-restart. Sementara itu gunakan format <b>CSV</b> atau <b>.xls</b>.</p>
+            </div>
         </div>
     @endif
 

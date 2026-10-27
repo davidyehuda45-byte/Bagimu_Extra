@@ -63,11 +63,13 @@
                         <td class="px-4 py-2.5 whitespace-nowrap">
                             @if ($log->status === 'FAILED')
                                 <span class="inline-flex items-center rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-bold text-rose-700">
-                                    ✕ Gagal
+                                    <x-icon name="x" class="h-3 w-3 mr-1" />
+                                    <span>Gagal</span>
                                 </span>
                             @else
                                 <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700">
-                                    ✓ Berhasil
+                                    <x-icon name="check" class="h-3 w-3 mr-1" />
+                                    <span>Berhasil</span>
                                 </span>
                             @endif
                         </td>

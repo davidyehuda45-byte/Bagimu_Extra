@@ -68,19 +68,19 @@
 @if (session('status'))
     <div class="mb-4 flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50/90 px-4 py-3 text-xs font-medium text-emerald-800 shadow-xs">
         <div class="flex items-center gap-2">
-            <span class="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-200 text-emerald-800 font-bold">✓</span>
+            <span class="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-200 text-emerald-800 font-bold"><x-icon name="check" class="h-3 w-3" /></span>
             <span>{{ session('status') }}</span>
         </div>
         <button type="button" onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-900 font-bold">&times;</button>
     </div>
 @endif
 @if (session('warning'))
-    <div class="mb-4 flex items-center justify-between rounded-2xl border border-amber-200 bg-amber-50/90 px-4 py-3 text-xs font-medium text-amber-800 shadow-xs">
+    <div class="mb-4 flex items-center justify-between rounded-2xl border border-blue-200 bg-blue-50/90 px-4 py-3 text-xs font-medium text-slate-800 shadow-xs">
         <div class="flex items-center gap-2">
-            <span class="flex h-5 w-5 items-center justify-center rounded-full bg-amber-200 text-amber-800 font-bold">!</span>
+            <span class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-200 text-blue-800 font-bold"><x-icon name="info" class="h-3 w-3" /></span>
             <span>{{ session('warning') }}</span>
         </div>
-        <button type="button" onclick="this.parentElement.remove()" class="text-amber-600 hover:text-amber-900 font-bold">&times;</button>
+        <button type="button" onclick="this.parentElement.remove()" class="text-blue-600 hover:text-blue-900 font-bold">&times;</button>
     </div>
 @endif
 @if (session('error'))
@@ -178,7 +178,7 @@
 <div id="bulk-selection-bar" class="hidden mb-3 items-center justify-between gap-3 rounded-2xl border border-blue-200 bg-blue-50/90 px-4 py-3 text-xs text-blue-900 shadow-sm transition-all">
     <div class="flex items-center gap-2.5">
         <span class="flex h-6 w-6 items-center justify-center rounded-lg bg-blue-600 text-white font-bold text-xs">
-            ✓
+            <x-icon name="check" class="h-3.5 w-3.5" />
         </span>
         <span class="font-medium">
             <strong id="selected-count-text" class="font-bold">0</strong> siswa dipilih
@@ -317,7 +317,7 @@
     <div class="relative w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl text-left">
         <div class="flex items-center gap-3 mb-3">
             <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200">
-                <span class="text-xl">💬</span>
+                <x-icon name="message-square" class="h-5 w-5" />
             </div>
             <div>
                 <h3 class="text-base font-bold text-slate-900">Kirim Token via WhatsApp</h3>
@@ -373,11 +373,11 @@
         </div>
 
         @if (!($fonnte['connected'] ?? false))
-            <div class="mt-4 rounded-xl bg-amber-50 p-3.5 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
-                <x-icon name="alert" class="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+            <div class="mt-4 rounded-xl bg-blue-50/70 p-3.5 border border-blue-200/80 text-slate-700 text-xs flex items-start gap-2.5 shadow-2xs">
+                <x-icon name="info" class="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
                 <div>
-                    <p class="font-bold">WhatsApp Gateway Belum Terhubung!</p>
-                    <p class="mt-0.5 text-amber-800 leading-relaxed">
+                    <p class="font-bold text-blue-950">WhatsApp Gateway Belum Terhubung!</p>
+                    <p class="mt-0.5 text-slate-600 leading-relaxed">
                         Anda belum menghubungkan Fonnte API Key. Silakan masukkan dan verifikasi token terlebih dahulu di menu Pengaturan.
                     </p>
                     <a href="{{ route('admin.settings.index') }}" class="mt-2 inline-flex items-center gap-1 font-bold text-blue-700 hover:underline">
@@ -442,14 +442,17 @@
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Template Pesan</label>
                 <div class="flex flex-wrap gap-1.5 mb-2">
-                    <button type="button" onclick="setWaTemplate('token')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition cursor-pointer">
-                        🔑 Kredensial Token Login
+                    <button type="button" onclick="setWaTemplate('token')" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition cursor-pointer">
+                        <x-icon name="key" class="h-3.5 w-3.5" />
+                        <span>Kredensial Token Login</span>
                     </button>
-                    <button type="button" onclick="setWaTemplate('pengumuman')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition cursor-pointer">
-                        📢 Pembukaan Pendaftaran
+                    <button type="button" onclick="setWaTemplate('pengumuman')" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition cursor-pointer">
+                        <x-icon name="megaphone" class="h-3.5 w-3.5" />
+                        <span>Pembukaan Pendaftaran</span>
                     </button>
-                    <button type="button" onclick="setWaTemplate('custom')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition cursor-pointer">
-                        ✏️ Pesan Kustom
+                    <button type="button" onclick="setWaTemplate('custom')" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition cursor-pointer">
+                        <x-icon name="pencil" class="h-3.5 w-3.5" />
+                        <span>Pesan Kustom</span>
                     </button>
                 </div>
 

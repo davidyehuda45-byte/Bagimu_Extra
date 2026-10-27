@@ -40,10 +40,7 @@
             {{-- Badge Slogan 4B Glassmorphic --}}
             <div class="hidden sm:flex items-center">
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 border border-white/30 backdrop-blur-md text-xs font-semibold text-white shadow-sm">
-                    <svg class="h-3.5 w-3.5 text-sky-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
-                        <circle cx="12" cy="10" r="3" />
-                    </svg>
+                    <x-icon name="sparkles" class="h-3.5 w-3.5 text-sky-200 shrink-0" />
                     <span>4B Berbudi • Berkualitas • Berdaya • Berhasil</span>
                 </div>
             </div>

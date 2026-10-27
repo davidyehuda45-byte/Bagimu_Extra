@@ -10,7 +10,7 @@
     </div>
     <div x-data="{ openForm: false }">
         <button type="button" @click="openForm = !openForm" class="rounded-xl bg-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-blue-800 transition shadow-sm inline-flex items-center gap-1.5 cursor-pointer">
-            <span x-text="openForm ? '✕ Tutup Form' : '+ Tambah Pembina Baru'"></span>
+            <span x-text="openForm ? 'Tutup Form' : '+ Tambah Pembina Baru'"></span>
         </button>
 
         {{-- Form Tambah Pembina --}}

@@ -39,7 +39,7 @@ export default function Dashboard({
                                 <span>Tahun Ajaran {periode?.periode || '2026/2027'}</span>
                             </span>
                             <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-                                Selamat Datang, {user?.name || 'Siswa'}! 👋
+                                Selamat Datang, {user?.name || 'Siswa'}!
                             </h1>
                             <p className="text-xs sm:text-sm text-blue-100 max-w-xl">
                                 Kelola pendaftaran kegiatan ekstrakurikuler, pantau kartu anggota digital, dan periksa rekap presensi latihan mingguanmu.

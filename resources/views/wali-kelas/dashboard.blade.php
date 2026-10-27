@@ -47,11 +47,11 @@
     </div>
 
     @if (! $kelas)
-        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs font-semibold text-amber-800 flex items-center gap-3">
-            <x-icon name="alert-circle" class="h-5 w-5 text-amber-600 shrink-0" />
+        <div class="rounded-2xl border border-blue-200/80 bg-blue-50/70 p-4 text-xs font-semibold text-slate-700 flex items-center gap-3 shadow-2xs">
+            <x-icon name="info" class="h-5 w-5 text-blue-600 shrink-0" />
             <div>
-                <p class="font-bold text-sm text-amber-900">Akun Anda Belum Ditugaskan ke Rombel Kelas</p>
-                <p class="mt-0.5 text-amber-700">Hubungi Administrator sekolah untuk menautkan akun Anda ke rombel binaan di menu <b>Kelola Wali Kelas</b>.</p>
+                <p class="font-bold text-sm text-blue-950">Akun Anda Belum Ditugaskan ke Rombel Kelas</p>
+                <p class="mt-0.5 text-slate-600">Hubungi Administrator sekolah untuk menautkan akun Anda ke rombel binaan di menu <b>Kelola Wali Kelas</b>.</p>
             </div>
         </div>
     @endif

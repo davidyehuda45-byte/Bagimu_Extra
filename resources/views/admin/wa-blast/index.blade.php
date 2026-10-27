@@ -210,8 +210,8 @@
         </div>
 
         @if (!$fonnteStatus['connected'])
-            <div class="rounded-xl bg-amber-50 px-3.5 py-2.5 border border-amber-200 text-amber-800 text-xs mb-4 flex items-center gap-2">
-                <x-icon name="alert" class="h-4 w-4 text-amber-600 shrink-0" />
+            <div class="rounded-xl bg-blue-50/70 px-3.5 py-2.5 border border-blue-200/80 text-slate-700 text-xs mb-4 flex items-center gap-2 shadow-2xs">
+                <x-icon name="info" class="h-4 w-4 text-blue-600 shrink-0" />
                 <span>Hubungkan Fonnte API Key pada kartu di atas terlebih dahulu.</span>
             </div>
         @endif
@@ -258,14 +258,17 @@
                 <div class="flex items-center justify-between gap-2 mb-1.5">
                     <label class="text-xs font-bold text-slate-700">Isi Pesan</label>
                     <div class="flex items-center gap-1.5">
-                        <button type="button" onclick="setPageTemplate('token')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition cursor-pointer">
-                            🔑 Token Login
+                        <button type="button" onclick="setPageTemplate('token')" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition cursor-pointer">
+                            <x-icon name="key" class="h-3.5 w-3.5" />
+                            <span>Token Login</span>
                         </button>
-                        <button type="button" onclick="setPageTemplate('pengumuman')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition cursor-pointer">
-                            📢 Pengumuman
+                        <button type="button" onclick="setPageTemplate('pengumuman')" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition cursor-pointer">
+                            <x-icon name="megaphone" class="h-3.5 w-3.5" />
+                            <span>Pengumuman</span>
                         </button>
-                        <button type="button" onclick="setPageTemplate('custom')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition cursor-pointer">
-                            ✏️ Kustom
+                        <button type="button" onclick="setPageTemplate('custom')" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition cursor-pointer">
+                            <x-icon name="pencil" class="h-3.5 w-3.5" />
+                            <span>Kustom</span>
                         </button>
                     </div>
                 </div>

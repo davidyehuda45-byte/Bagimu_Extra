@@ -28,9 +28,9 @@ Route::middleware(['auth', 'role:admin,operator,kepala_sekolah', \App\Http\Middl
     Route::put('jadwals/{jadwal}', [EskulJadwalController::class, 'update'])->name('jadwals.update');
     Route::delete('jadwals/{jadwal}', [EskulJadwalController::class, 'destroy'])->name('jadwals.destroy');
 
-    Route::resource('periodes', PeriodeController::class)->parameters(['periodes' => 'periode'])->where(['periode' => '.*']);
+    Route::resource('periodes', PeriodeController::class)->parameters(['periodes' => 'periode'])->where(['periode' => '[0-9]{4}[/-][0-9]{4}']);
 
-    Route::put('periodes/{periode}/window', [WindowController::class, 'update'])->name('windows.update')->where(['periode' => '.*']);
+    Route::put('periodes/{periode}/window', [WindowController::class, 'update'])->name('windows.update')->where(['periode' => '[0-9]{4}[/-][0-9]{4}']);
     Route::get('window', [WindowController::class, 'index'])->name('windows.index');
 
     Route::get('users', [UserController::class, 'index'])->name('users.index');

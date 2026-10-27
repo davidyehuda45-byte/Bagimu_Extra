@@ -100,8 +100,8 @@
         </div>
 
         @if ($locked)
-            <div class="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-900 flex items-center gap-2">
-                <x-icon name="lock" class="h-4 w-4 text-amber-700 shrink-0" />
+            <div class="rounded-xl border border-blue-200/80 bg-blue-50/70 px-4 py-3 text-xs text-slate-700 flex items-center gap-2 shadow-2xs">
+                <x-icon name="lock" class="h-4 w-4 text-blue-600 shrink-0" />
                 <span>Presensi tanggal <b>{{ $tanggal }}</b> sudah <strong>dikunci</strong> dan tidak dapat diubah tanpa izin buka kunci admin.</span>
             </div>
         @endif
@@ -172,8 +172,9 @@
                                             <span class="text-slate-500 font-normal">({{ $anggotaKelas->count() }} Siswa)</span>
                                         </div>
                                         @if (! $locked)
-                                            <button type="button" onclick="setSemuaHadir('{{ addslashes($namaKelas) }}')" class="text-[11px] font-bold text-blue-700 hover:underline cursor-pointer">
-                                                ✓ Set Semua Hadir di Kelas Ini
+                                            <button type="button" onclick="setSemuaHadir('{{ addslashes($namaKelas) }}')" class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-700 hover:underline cursor-pointer">
+                                                <x-icon name="check" class="h-3 w-3" />
+                                                <span>Set Semua Hadir di Kelas Ini</span>
                                             </button>
                                         @endif
                                     </div>
@@ -275,7 +276,7 @@ function setSemuaHadir(kelas) {
                 setTimeout(() => targetRow.classList.remove('bg-emerald-100'), 2500);
 
                 if (feedback) {
-                    feedback.textContent = `✓ Siswa NIS ${val} berhasil ditandai HADIR`;
+                    feedback.textContent = `Siswa NIS ${val} berhasil ditandai HADIR`;
                     feedback.classList.remove('hidden');
                     setTimeout(() => feedback.classList.add('hidden'), 3500);
                 }

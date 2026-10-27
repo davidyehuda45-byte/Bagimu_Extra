@@ -109,6 +109,9 @@
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
         .btn-close {
             background-color: #64748b;
@@ -147,7 +150,10 @@
 </head>
 <body>
     <div class="print-bar">
-        <button class="btn-print" onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
+        <button class="btn-print" onclick="window.print()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>
+            <span>Cetak / Simpan PDF</span>
+        </button>
         <button class="btn-close" onclick="window.close()">Tutup</button>
     </div>
 

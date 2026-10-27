@@ -11,7 +11,7 @@
     <div>
         <button type="button" @click="openForm = !openForm" class="rounded-xl bg-blue-700 px-4 py-2.5 text-xs sm:text-sm font-bold text-white hover:bg-blue-800 transition shadow-xs inline-flex items-center gap-2 cursor-pointer">
             <x-icon name="user-plus" class="h-4 w-4" />
-            <span x-text="openForm ? '✕ Tutup Formulir' : '+ Tambah Wali Kelas Baru'"></span>
+            <span x-text="openForm ? 'Tutup Formulir' : '+ Tambah Wali Kelas Baru'"></span>
         </button>
 
         {{-- Form Tambah Wali Kelas Baru --}}
@@ -175,7 +175,9 @@
                                 <div class="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl border border-slate-200" @click.outside="showEdit = false">
                                     <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
                                         <h3 class="font-bold text-slate-900 text-sm">Edit Data Wali Kelas</h3>
-                                        <button type="button" @click="showEdit = false" class="text-slate-400 hover:text-slate-600 text-sm font-bold">✕</button>
+                                        <button type="button" @click="showEdit = false" class="text-slate-400 hover:text-slate-600 cursor-pointer" aria-label="Tutup">
+                                            <x-icon name="x" class="h-4 w-4" />
+                                        </button>
                                     </div>
                                     <form method="POST" action="{{ route('admin.wali-kelas.update', $wk) }}" class="space-y-3.5 text-xs">
                                         @csrf

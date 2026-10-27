@@ -40,10 +40,7 @@
             {{-- Badge Slogan 4B Glassmorphic --}}
             <div class="hidden sm:flex items-center">
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 border border-white/30 backdrop-blur-md text-xs font-semibold text-white shadow-sm">
-                    <svg class="h-3.5 w-3.5 text-sky-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
-                        <circle cx="12" cy="10" r="3" />
-                    </svg>
+                    <x-icon name="sparkles" class="h-3.5 w-3.5 text-sky-200 shrink-0" />
                     <span>4B Berbudi • Berkualitas • Berdaya • Berhasil</span>
                 </div>
             </div>
@@ -196,10 +193,10 @@
                         <x-input-error :messages="$errors->get('token')" class="mt-1.5" />
                     </div>
 
-                    {{-- Kotak Catatan Amber Sesuai Foto Referensi 2 --}}
-                    <div class="my-4 flex items-start gap-2.5 rounded-xl border border-amber-200/90 bg-amber-50/80 p-3 text-xs leading-relaxed text-amber-900">
-                        <span class="text-amber-600 text-sm leading-none shrink-0 mt-0.5 select-none font-bold">⚠️</span>
-                        <p><strong class="font-bold text-amber-950">Catatan:</strong> <span class="text-amber-800">Token bersifat sekali pakai dan hangus setelah pendaftaran selesai.</span></p>
+                    {{-- Kotak Catatan Soft Blue --}}
+                    <div class="my-4 flex items-start gap-2.5 rounded-xl border border-blue-200/80 bg-blue-50/70 p-3 text-xs leading-relaxed text-slate-700 shadow-2xs">
+                        <x-icon name="info" class="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                        <p><strong class="font-bold text-blue-950">Catatan:</strong> <span class="text-slate-600">Token bersifat sekali pakai dan hangus setelah pendaftaran selesai.</span></p>
                     </div>
 
                     {{-- Tombol Masuk Sesuai Foto Referensi 2 --}}

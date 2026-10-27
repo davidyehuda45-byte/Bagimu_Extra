@@ -61,12 +61,12 @@
         </div>
     @elseif (!$windowOpen && !$existing)
         {{-- Jadwal Pendaftaran Tertutup --}}
-        <div class="rounded-3xl border border-amber-200 bg-amber-50/70 p-10 text-center shadow-xs">
-            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 text-amber-700 mb-3">
+        <div class="rounded-3xl border border-blue-200/80 bg-blue-50/50 p-10 text-center shadow-xs">
+            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100 text-blue-700 mb-3">
                 <x-icon name="clock" class="h-7 w-7" />
             </div>
-            <h2 class="font-bold text-lg text-amber-950">Pendaftaran Sedang Ditutup</h2>
-            <p class="mt-1 text-xs text-amber-800 max-w-md mx-auto">{{ $windowLabel }}</p>
+            <h2 class="font-bold text-lg text-slate-900">Pendaftaran Sedang Ditutup</h2>
+            <p class="mt-1 text-xs text-slate-600 max-w-md mx-auto">{{ $windowLabel }}</p>
         </div>
     @else
         @if ($existing)
@@ -147,13 +147,13 @@
             </div>
         @elseif ($windowOpen)
             {{-- Pemberitahuan Pendaftaran --}}
-            <div class="flex items-start gap-3.5 rounded-2xl border border-amber-200 bg-amber-50/80 p-4 text-xs text-amber-900 shadow-2xs">
-                <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-amber-200 text-amber-900 mt-0.5">
-                    <x-icon name="alert" class="h-4 w-4" />
+            <div class="flex items-start gap-3.5 rounded-2xl border border-blue-200/80 bg-blue-50/70 p-4 text-xs text-slate-700 shadow-2xs">
+                <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-blue-200/80 text-blue-800 mt-0.5">
+                    <x-icon name="info" class="h-4 w-4" />
                 </div>
                 <div class="leading-relaxed">
-                    <strong class="font-bold text-amber-950">Pemberitahuan Penting:</strong>
-                    <p class="mt-0.5">Pendaftaran ekstrakurikuler hanya dapat dilakukan <b>1 (satu) kali</b> dan langsung resmi diterima. Pastikan data dan pilihan eskul Anda sudah benar sebelum dikirim, karena data yang telah terkirim <b>tidak dapat diubah kembali</b>.</p>
+                    <strong class="font-bold text-blue-950">Pemberitahuan Penting:</strong>
+                    <p class="mt-0.5 text-slate-600">Pendaftaran ekstrakurikuler hanya dapat dilakukan <b>1 (satu) kali</b> dan langsung resmi diterima. Pastikan data dan pilihan eskul Anda sudah benar sebelum dikirim, karena data yang telah terkirim <b>tidak dapat diubah kembali</b>.</p>
                 </div>
             </div>
 
@@ -320,9 +320,9 @@
                         </div>
                     </div>
 
-                    <div class="rounded-xl bg-amber-50 p-3 text-[11px] text-amber-900 border border-amber-200/80 mb-5 leading-relaxed flex items-start gap-2">
-                        <x-icon name="alert" class="h-4 w-4 shrink-0 mt-px text-amber-700" />
-                        <span><strong>Konfirmasi:</strong> Pastikan pilihanmu sudah benar. Setelah dikirim, data akan terkunci permanen dan akun akan otomatis keluar.</span>
+                    <div class="rounded-xl bg-blue-50/70 p-3 text-[11px] text-slate-700 border border-blue-200/80 mb-5 leading-relaxed flex items-start gap-2">
+                        <x-icon name="info" class="h-4 w-4 shrink-0 mt-px text-blue-600" />
+                        <span><strong class="font-bold text-blue-950">Konfirmasi:</strong> Pastikan pilihanmu sudah benar. Setelah dikirim, data akan terkunci permanen dan akun akan otomatis keluar.</span>
                     </div>
 
                     <div class="flex gap-2">

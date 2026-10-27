@@ -23,10 +23,7 @@
                     <p class="text-base sm:text-lg font-black tracking-tight text-white leading-tight drop-shadow-xs">Bagimu Extra</p>
                     <p class="text-xs font-semibold text-white/90">SMK Bagimu Negeriku</p>
                     <p class="text-[11px] font-medium text-blue-100 mt-0.5 flex items-center gap-1">
-                        <svg class="h-3 w-3 text-sky-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
-                            <circle cx="12" cy="10" r="3" />
-                        </svg>
+                        <x-icon name="sparkles" class="h-3 w-3 text-sky-200 shrink-0" />
                         <span>4B Berbudi • Berkualitas • Berdaya • Berhasil</span>
                     </p>
                 </div>
@@ -157,25 +154,25 @@
 
     {{-- Pusat Tugas Interaktif --}}
     @if (count($tugas) > 0)
-        <div class="rounded-3xl border border-amber-200/80 bg-gradient-to-br from-amber-50/80 via-white to-amber-50/40 p-5 shadow-xs">
+        <div class="rounded-3xl border border-blue-200/80 bg-gradient-to-br from-blue-50/70 via-white to-blue-50/30 p-5 shadow-xs">
             <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2">
-                    <x-icon name="alert" class="h-4 w-4 text-amber-600" />
+                    <x-icon name="info" class="h-4 w-4 text-blue-600" />
                     <h2 class="font-bold text-slate-900 text-sm">Pusat Tindakan / Tugas</h2>
                 </div>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
                     {{ count($tugas) }} Butuh Perhatian
                 </span>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
                 @foreach ($tugas as $t)
                     @if ($t['url'])
-                        <a href="{{ $t['url'] }}" class="flex items-center justify-between p-3 rounded-2xl bg-white border border-amber-200/70 hover:border-amber-300 hover:shadow-2xs text-xs font-semibold text-slate-800 transition-all group">
+                        <a href="{{ $t['url'] }}" class="flex items-center justify-between p-3 rounded-2xl bg-white border border-blue-100 hover:border-blue-300 hover:shadow-2xs text-xs font-semibold text-slate-800 transition-all group">
                             <span class="truncate mr-2">{{ $t['label'] }}</span>
-                            <x-icon name="arrow-right" class="h-3.5 w-3.5 text-amber-600 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                            <x-icon name="arrow-right" class="h-3.5 w-3.5 text-blue-600 group-hover:translate-x-0.5 transition-transform shrink-0" />
                         </a>
                     @else
-                        <div class="flex items-center p-3 rounded-2xl bg-white border border-amber-200/50 text-xs font-medium text-slate-600">
+                        <div class="flex items-center p-3 rounded-2xl bg-white border border-blue-100/60 text-xs font-medium text-slate-600">
                             <span class="truncate">{{ $t['label'] }}</span>
                         </div>
                     @endif
