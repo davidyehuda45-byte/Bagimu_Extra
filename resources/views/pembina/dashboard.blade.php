@@ -7,7 +7,7 @@
     {{-- Header Sambutan --}}
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-            <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Dashboard Pembina &amp; Pelatih</h1>
+            <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Dashboard Pembina / Pelatih</h1>
             <p class="text-xs text-slate-500 mt-0.5">Kelola kegiatan ekstrakurikuler, presensi digital, perizinan siswa, dan rekap penilaian.</p>
         </div>
         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 border border-blue-200/70 text-xs font-bold text-blue-700 shadow-2xs self-start sm:self-auto">
@@ -115,7 +115,7 @@
                     <x-icon name="calendar" class="h-4 w-4" />
                 </span>
                 <div>
-                    <h2 class="text-sm font-extrabold text-slate-900">5 Kegiatan &amp; Latihan Mendatang</h2>
+                    <h2 class="text-sm font-extrabold text-slate-900">5 Kegiatan / Latihan Mendatang</h2>
                     <p class="text-[11px] text-slate-400">Jadwal kegiatan yang akan segera dilaksanakan</p>
                 </div>
             </div>

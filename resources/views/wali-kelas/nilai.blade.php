@@ -51,7 +51,7 @@
                     <x-icon name="document-check" class="h-4 w-4" />
                 </div>
                 <div>
-                    <h2 class="text-sm font-bold text-slate-900">Daftar Nilai & Predikat Rapor</h2>
+                    <h2 class="text-sm font-bold text-slate-900">Daftar Nilai / Predikat Rapor</h2>
                     <p class="text-[11px] text-slate-400">Data nilai telah divalidasi oleh pembina ekstrakurikuler masing-masing</p>
                 </div>
             </div>

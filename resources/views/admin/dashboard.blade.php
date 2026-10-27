@@ -19,7 +19,7 @@
             </span>
         </div>
         <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-white">
-            Dashboard Admin &amp; Kesiswaan
+            Dashboard Admin / Kesiswaan
         </h1>
         <p class="text-xs sm:text-sm text-blue-100 max-w-2xl mt-1 leading-relaxed">
             Ringkasan statistik pendaftaran eskul, verifikasi berkas siswa, pemantauan kehadiran, dan rekap aktivitas.
@@ -129,7 +129,7 @@
             <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2">
                     <x-icon name="alert" class="h-4 w-4 text-amber-600" />
-                    <h2 class="font-bold text-slate-900 text-sm">Pusat Tindakan &amp; Tugas</h2>
+                    <h2 class="font-bold text-slate-900 text-sm">Pusat Tindakan / Tugas</h2>
                 </div>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
                     {{ count($tugas) }} Butuh Perhatian

@@ -101,7 +101,7 @@
                             @if (!empty($verifyUrl))
                                 <div style="text-align: center; margin: 28px 0 20px;">
                                     <a href="{{ $verifyUrl }}" target="_blank" style="display: inline-block; background-color: #1d4ed8; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 10px; font-weight: 700; font-size: 14px; box-shadow: 0 2px 4px rgba(29, 78, 216, 0.2);">
-                                        Lihat Status & Verifikasi Online &rarr;
+                                        Lihat Status / Verifikasi Online &rarr;
                                     </a>
                                     <div style="font-size: 11px; color: #94a3b8; margin-top: 8px;">
                                         Atau buka langsung tautan: <br>
