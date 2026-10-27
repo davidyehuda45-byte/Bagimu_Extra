@@ -4,26 +4,58 @@
 
 @section('content')
 <div class="space-y-6">
-    {{-- Header Banner --}}
-    <div class="rounded-3xl bg-blue-600 p-6 sm:p-7 text-white shadow-sm">
-        <div class="flex flex-wrap items-center gap-2 mb-2">
-            @if ($periode)
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/15 text-white border border-white/20">
-                    <x-icon name="calendar" class="h-3.5 w-3.5" />
-                    <span>Tahun Ajaran {{ $periode }}</span>
+    {{-- Header Banner Sesuai Foto Desain Resmi (Latar Gedung Sekolah SMK Bagimu Negeriku) --}}
+    <div class="relative overflow-hidden rounded-3xl bg-[#0e5cda] text-white shadow-lg shadow-blue-900/10 min-h-[240px] sm:min-h-[280px] p-6 sm:p-8 xl:p-9 flex flex-col justify-between">
+        {{-- Foto Asli Kampus SMK Bagimu Negeriku (Bersih Tanpa Teks Bawaan) --}}
+        <img src="{{ asset('images/dashboard-banner-clean.jpg') }}?v={{ filemtime(public_path('images/dashboard-banner-clean.jpg')) }}"
+             alt="Kampus SMK Bagimu Negeriku"
+             class="pointer-events-none absolute inset-0 h-full w-full object-cover object-right select-none z-0" />
+
+        {{-- Gradient Overlay untuk Menjamin Keterbacaan Teks di Semua Resolusi Layar --}}
+        <div class="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0a4fc0]/90 via-[#0e5cda]/75 to-transparent sm:from-transparent sm:via-transparent z-0"></div>
+
+        {{-- Konten Utama Banner --}}
+        <div class="relative z-10 space-y-4 max-w-2xl">
+            {{-- Branding Sekolah: Logo + Nama + Slogan 4B --}}
+            <div class="flex items-center gap-3.5">
+                <x-school-logo :size="48" class="rounded-full bg-white p-1 shadow-md ring-2 ring-white/50 shrink-0" />
+                <div class="leading-tight">
+                    <p class="text-base sm:text-lg font-black tracking-tight text-white leading-tight drop-shadow-xs">Bagimu Extra</p>
+                    <p class="text-xs font-semibold text-white/90">SMK Bagimu Negeriku</p>
+                    <p class="text-[11px] font-medium text-blue-100 mt-0.5 flex items-center gap-1">
+                        <svg class="h-3 w-3 text-sky-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+                            <circle cx="12" cy="10" r="3" />
+                        </svg>
+                        <span>4B Berbudi • Berkualitas • Berdaya • Berhasil</span>
+                    </p>
+                </div>
+            </div>
+
+            {{-- Badges Glassmorphic --}}
+            <div class="flex flex-wrap items-center gap-2 pt-1">
+                @if ($periode)
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/20 backdrop-blur-md text-white border border-white/30 shadow-xs">
+                        <x-icon name="calendar" class="h-3.5 w-3.5 text-sky-200" />
+                        <span>Tahun Ajaran {{ $periode }}</span>
+                    </span>
+                @endif
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/20 backdrop-blur-md text-white border border-white/30 shadow-xs">
+                    <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+                    <span>Sistem Ekstrakurikuler Aktif</span>
                 </span>
-            @endif
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-blue-100">
-                <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
-                <span>Sistem Ekstrakurikuler Aktif</span>
-            </span>
+            </div>
+
+            {{-- Judul Besar Dua Baris & Subtitle --}}
+            <div class="space-y-1.5 pt-1">
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white leading-tight drop-shadow-xs">
+                    Dashboard Admin &amp;<br class="hidden sm:inline"> Kesiswaan
+                </h1>
+                <p class="text-xs sm:text-sm text-blue-100/95 leading-relaxed max-w-xl">
+                    Ringkasan statistik pendaftaran eskul, verifikasi berkas siswa, pemantauan kehadiran, dan rekap aktivitas.
+                </p>
+            </div>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-white">
-            Dashboard Admin &amp; Kesiswaan
-        </h1>
-        <p class="text-xs sm:text-sm text-blue-100 max-w-2xl mt-1 leading-relaxed">
-            Ringkasan statistik pendaftaran eskul, verifikasi berkas siswa, pemantauan kehadiran, dan rekap aktivitas.
-        </p>
     </div>
 
     {{-- Tombol Aksi Cepat (Ditaruh di Bawah Banner Sesuai Foto Permintaan User) --}}
