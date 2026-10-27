@@ -22,8 +22,8 @@
     $isPembina = $user && $user->hasRole(\App\Enums\Role::PEMBINA);
     $isKepsek = $user && $user->hasRole(\App\Enums\Role::KEPALA_SEKOLAH);
     $isWaliKelas = $user && $user->hasRole(\App\Enums\Role::WALI_KELAS);
-    $link = fn ($active) => 'flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold transition-all duration-150 '
-        .($active ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/25' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 active:scale-[0.99]');
+    $link = fn ($active) => 'flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-bold transition-all duration-150 '
+        .($active ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/25' : 'text-slate-600 hover:bg-slate-100/90 hover:text-slate-900 active:scale-[0.99]');
 @endphp
 <div class="min-h-screen lg:flex bg-slate-50">
     {{-- Sidebar desktop --}}
