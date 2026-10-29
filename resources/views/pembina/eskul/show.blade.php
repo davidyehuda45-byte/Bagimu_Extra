@@ -4,6 +4,7 @@
 
 @section('content')
 <div class="space-y-6" x-data="{
+    activeTab: 'anggota',
     bukaModal: false,
     search: '',
     filterTingkat: 'all',
@@ -99,8 +100,30 @@
         </div>
     </div>
 
-    <div class="rounded-lg border bg-white p-4 shadow-sm">
-        <h2 class="mb-3 font-semibold">Jadwal Latihan</h2>
+    {{-- Tab Navigasi Pembina Eskul (Mobile-First) --}}
+    <div class="flex border-b border-slate-200 gap-1 overflow-x-auto text-xs font-bold no-scrollbar">
+        <button type="button" @click="activeTab = 'anggota'" :class="activeTab === 'anggota' ? 'border-b-2 border-blue-600 text-blue-700 bg-blue-50/60' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'" class="px-4 py-3 rounded-t-xl transition cursor-pointer shrink-0 inline-flex items-center gap-2">
+            <x-icon name="users" class="h-4 w-4" />
+            <span>Anggota Eskul ({{ $disetujui->count() }})</span>
+        </button>
+        <button type="button" @click="activeTab = 'presensi'" :class="activeTab === 'presensi' ? 'border-b-2 border-blue-600 text-blue-700 bg-blue-50/60' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'" class="px-4 py-3 rounded-t-xl transition cursor-pointer shrink-0 inline-flex items-center gap-2">
+            <x-icon name="calendar-check" class="h-4 w-4" />
+            <span>Presensi & Pertemuan</span>
+        </button>
+        <button type="button" @click="activeTab = 'nilai'" :class="activeTab === 'nilai' ? 'border-b-2 border-blue-600 text-blue-700 bg-blue-50/60' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'" class="px-4 py-3 rounded-t-xl transition cursor-pointer shrink-0 inline-flex items-center gap-2">
+            <x-icon name="file" class="h-4 w-4" />
+            <span>Penilaian Rapor</span>
+        </button>
+        <button type="button" @click="activeTab = 'jadwal'" :class="activeTab === 'jadwal' ? 'border-b-2 border-blue-600 text-blue-700 bg-blue-50/60' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'" class="px-4 py-3 rounded-t-xl transition cursor-pointer shrink-0 inline-flex items-center gap-2">
+            <x-icon name="calendar" class="h-4 w-4" />
+            <span>Jadwal & Izin {{ $izinPending->count() > 0 ? "({$izinPending->count()})" : '' }}</span>
+        </button>
+    </div>
+
+    {{-- TAB 4 (BAGIAN 1): JADWAL LATIHAN --}}
+    <div x-show="activeTab === 'jadwal'" x-cloak class="space-y-6">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
+            <h2 class="mb-3 font-semibold text-sm">Jadwal Latihan Mingguan</h2>
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
                 <thead>
@@ -213,45 +236,83 @@
             </div>
         </form>
     </div>
+    </div>
 
-    <div class="rounded-lg border bg-white p-4 shadow-sm">
-        <div class="mb-3">
-            <h2 class="font-semibold">Pendaftar (Periode Aktif)</h2>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
-                <thead>
-                    <tr class="border-b bg-gray-50 text-left">
-                        <th class="px-3 py-2 font-medium">Nama</th>
-                        <th class="px-3 py-2 font-medium">Kelas</th>
-                        <th class="px-3 py-2 font-medium">Pilihan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($pendaftar as $daftar)
-                        <tr class="border-b align-top last:border-0">
-                            <td class="px-3 py-2 font-medium">{{ $daftar->user->name ?? '-' }}</td>
-                            <td class="px-3 py-2">{{ $daftar->kelas ?? '-' }}</td>
-                            <td class="px-3 py-2 text-gray-600">
-                                {{ $daftar->eskul_utama }}
-                            </td>
-                        </tr>
-                    @empty
+    {{-- TAB 1: ANGGOTA ESKUL --}}
+    <div x-show="activeTab === 'anggota'" x-cloak class="space-y-6">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
+            <div class="mb-3 flex items-center justify-between">
+                <div>
+                    <h2 class="font-bold text-slate-900 text-sm">Daftar Anggota Terdaftar ({{ $disetujui->count() }} Siswa)</h2>
+                    <p class="text-[11px] text-slate-500">Anggota resmi ekstrakurikuler {{ $eskul->name }} pada periode terpilih.</p>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-xs">
+                    <thead class="bg-slate-50 border-b border-slate-200 text-left font-bold text-slate-700">
                         <tr>
-                            <td colspan="3" class="px-3 py-4 text-center text-gray-500">Tidak ada pendaftar.</td>
+                            <th class="px-3 py-2.5">Nama Siswa</th>
+                            <th class="px-3 py-2.5">NIS</th>
+                            <th class="px-3 py-2.5">Kelas Asal</th>
+                            <th class="px-3 py-2.5">Status Pilihan</th>
+                            <th class="px-3 py-2.5 text-center">Aksi</th>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse ($disetujui as $agt)
+                            <tr class="hover:bg-slate-50/70">
+                                <td class="px-3 py-2 font-semibold text-slate-900">{{ $agt->user?->name ?? '-' }}</td>
+                                <td class="px-3 py-2 text-slate-600 font-mono">{{ $agt->nis ?? '-' }}</td>
+                                <td class="px-3 py-2 text-slate-700">{{ $agt->kelas ?? '-' }}</td>
+                                <td class="px-3 py-2">
+                                    <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                        Terdaftar Resmi
+                                    </span>
+                                </td>
+                                <td class="px-3 py-2 text-center">
+                                    @if (! $isArsip)
+                                        <button type="button" onclick="confirmHapusAnggota('{{ route('pembina.anggota.destroy', [$eskul, $agt]) }}', '{{ addslashes($agt->user?->name ?? $agt->nis) }}')" class="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-slate-200 bg-white text-slate-400 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition shadow-2xs cursor-pointer" title="Keluarkan dari Eskul">
+                                            <x-icon name="trash" class="h-3.5 w-3.5" />
+                                        </button>
+                                    @else
+                                        <span class="text-slate-400 text-[11px]">—</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="5" class="px-3 py-6 text-center text-slate-400">Belum ada anggota terdaftar di eskul ini.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <div class="rounded-lg border bg-white p-4 shadow-sm">
-        <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <div>
-                <h2 class="font-semibold">Daftar Pertemuan</h2>
-                <p class="text-[11px] text-slate-400">Pertemuan dibuat saat latihan dimulai — tanggal & nomor terisi otomatis hari ini.</p>
+    {{-- TAB 2: PRESENSI & PERTEMUAN --}}
+    <div x-show="activeTab === 'presensi'" x-cloak class="space-y-6">
+        {{-- Banner Highlight Presensi Kartu Pelajar --}}
+        <div class="rounded-2xl border border-blue-200 bg-gradient-to-r from-blue-50/90 via-indigo-50/60 to-white p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-700 text-white shadow-xs">
+                    <x-icon name="qr" class="h-6 w-6" />
+                </span>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-900">Presensi Digital: Scan Kartu Pelajar Siswa</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Pindai barcode/QR pada kartu pelajar siswa di lokasi latihan untuk verifikasi kehadiran seketika.</p>
+                </div>
             </div>
+            <a href="{{ route('pembina.scan.show', $eskul) }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-blue-800 transition shrink-0 cursor-pointer">
+                <x-icon name="qr" class="h-4 w-4" />
+                <span>Buka Scanner Kamera &rarr;</span>
+            </a>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
+            <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                    <h2 class="font-bold text-slate-900 text-sm">Daftar Pertemuan Latihan</h2>
+                    <p class="text-[11px] text-slate-400">Pertemuan dibuat saat latihan dimulai — tanggal & nomor terisi otomatis hari ini.</p>
+                </div>
             <form method="POST" action="{{ route('pembina.pertemuan.store', $eskul) }}" class="flex flex-wrap items-center gap-2">
                 @csrf
                 <input type="text" name="keterangan" maxlength="200" placeholder="Keterangan (opsional)" class="rounded border px-2 py-1.5 text-sm w-48">
@@ -348,6 +409,12 @@
                 <input type="date" name="tanggal" value="{{ $tanggal }}" class="rounded-xl border-slate-300 px-3 py-1.5 text-xs focus:border-blue-500 focus:ring-blue-500">
             </div>
             <button class="rounded-xl bg-slate-900 px-4 py-1.5 text-white font-bold hover:bg-slate-800 cursor-pointer">Tampilkan</button>
+            @unless ($locked || $isArsip)
+                <button type="button" onclick="document.querySelectorAll('.presensi-select').forEach(el => el.value = 'HADIR')" class="rounded-xl border border-emerald-300 bg-emerald-50 px-3.5 py-1.5 text-emerald-800 font-bold hover:bg-emerald-100 text-xs shadow-2xs transition cursor-pointer inline-flex items-center gap-1.5">
+                    <x-icon name="check" class="h-3.5 w-3.5 text-emerald-600" />
+                    <span>Tandai Semua Hadir</span>
+                </button>
+            @endunless
             @if ($locked)
                 <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-1 rounded-lg border border-amber-200">Presensi Terkunci (Disahkan)</span>
             @endif
@@ -388,7 +455,7 @@
                                         <td class="px-3 py-2 text-slate-600 font-mono">{{ $r->nis ?? '-' }}</td>
                                         <td class="px-3 py-2 text-slate-700">{{ $r->kelas }}</td>
                                         <td class="px-3 py-2">
-                                            <select name="status[{{ $r->id }}]" class="rounded-xl border-slate-300 py-1.5 pl-2.5 pr-8 text-xs font-bold text-slate-800 bg-white shadow-2xs focus:border-blue-500 focus:ring-blue-500 cursor-pointer" @disabled($locked)>
+                                            <select name="status[{{ $r->id }}]" class="presensi-select rounded-xl border-slate-300 py-1.5 pl-2.5 pr-8 text-xs font-bold text-slate-800 bg-white shadow-2xs focus:border-blue-500 focus:ring-blue-500 cursor-pointer" @disabled($locked)>
                                                 <option value="HADIR" class="font-bold text-emerald-700" @selected(($ada?->status->value ?? 'HADIR') === 'HADIR')>Hadir</option>
                                                 <option value="IZIN" class="font-bold text-blue-700" @selected(($ada?->status->value ?? 'HADIR') === 'IZIN')>Izin</option>
                                                 <option value="SAKIT" class="font-bold text-amber-700" @selected(($ada?->status->value ?? 'HADIR') === 'SAKIT')>Sakit</option>
@@ -423,48 +490,81 @@
             </form>
         @endif
     </div>
+    </div>
 
-    <div class="rounded-lg border bg-white p-4 shadow-sm">
-        <h2 class="font-semibold mb-1">Penilaian Akhir Anggota ({{ $disetujui->count() }})</h2>
-        <p class="text-[11px] text-slate-400 mb-3">Isi nilai satu per satu lalu tekan Simpan di barisnya. Predikat otomatis: A ≥ 85, B ≥ 70, C ≥ 55, D &lt; 55. Nilai langsung terlihat di panel admin.</p>
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
-                <thead>
-                    <tr class="border-b bg-gray-50 text-left">
-                        <th class="px-3 py-2 font-medium">Nama</th>
-                        <th class="px-3 py-2 font-medium">Kelas</th>
-                        <th class="px-3 py-2 font-medium">Nilai</th>
-                        <th class="px-3 py-2 font-medium">Predikat</th>
-                        <th class="px-3 py-2 font-medium">Catatan</th>
-                        <th class="px-3 py-2 font-medium">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($disetujui as $r)
-                        <tr class="border-b last:border-0">
-                            <td class="px-3 py-2">{{ $r->user?->name }}</td>
-                            <td class="px-3 py-2">{{ $r->kelas }}</td>
-                            <td class="px-3 py-2"><input type="number" form="nilai-{{ $r->id }}" name="nilai" min="0" max="100" value="{{ $r->nilai }}" placeholder="0–100" class="w-24 rounded border px-2 py-1"></td>
-                            <td class="px-3 py-2">{{ $r->predikat ?? '—' }}</td>
-                            <td class="px-3 py-2"><input type="text" form="nilai-{{ $r->id }}" name="catatan" value="{{ $r->catatan_nilai }}" maxlength="1000" placeholder="Opsional" class="w-full rounded border px-2 py-1 text-sm"></td>
-                            <td class="px-3 py-2">
-                                <form id="nilai-{{ $r->id }}" method="POST" action="{{ route('pembina.nilai.store', $eskul) }}">
-                                    @csrf
-                                    <input type="hidden" name="registration_id" value="{{ $r->id }}">
-                                    <button class="rounded bg-blue-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-700">Simpan</button>
-                                </form>
-                            </td>
+    {{-- TAB 3: PENILAIAN RAPOR --}}
+    <div x-show="activeTab === 'nilai'" x-cloak class="space-y-6">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-3 mb-4">
+                <div>
+                    <h2 class="font-bold text-slate-900 text-sm">Penilaian Akhir Anggota Eskul ({{ $disetujui->count() }} Siswa)</h2>
+                    <p class="text-[11px] text-slate-400">Predikat otomatis rapor: A &ge; 85, B &ge; 70, C &ge; 55, D &lt; 55.</p>
+                </div>
+            </div>
+
+            {{-- Preset Cepat Nilai Massal --}}
+            <div class="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200 mb-4 text-xs">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="font-bold text-slate-700">Preset Nilai Massal:</span>
+                    <select id="bulkPresetNilai" class="rounded-lg border-slate-300 py-1 pl-2.5 pr-8 text-xs font-bold text-slate-800 bg-white shadow-2xs">
+                        <option value="85">85 (Sangat Baik / Predikat A)</option>
+                        <option value="80">80 (Baik / Predikat B)</option>
+                        <option value="78">78 (Baik / Predikat B)</option>
+                        <option value="75">75 (Cukup / Predikat C)</option>
+                    </select>
+                    <button type="button" onclick="const v = document.getElementById('bulkPresetNilai').value; document.querySelectorAll('.nilai-input').forEach(el => { if(!el.value) el.value = v; });" class="px-3.5 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition shadow-2xs cursor-pointer">
+                        Terapkan ke Nilai Kosong
+                    </button>
+                </div>
+                <span class="text-[11px] text-slate-400">Isi otomatis nilai standar ke seluruh siswa yang belum dinilai</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-xs">
+                    <thead>
+                        <tr class="border-b bg-slate-50 text-left font-bold text-slate-700">
+                            <th class="px-3 py-2.5">Nama Siswa</th>
+                            <th class="px-3 py-2.5">Kelas</th>
+                            <th class="px-3 py-2.5">Nilai (0–100)</th>
+                            <th class="px-3 py-2.5">Predikat</th>
+                            <th class="px-3 py-2.5">Catatan Rapor</th>
+                            <th class="px-3 py-2.5 text-center">Aksi</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @foreach ($disetujui as $r)
+                            <tr class="hover:bg-slate-50/60">
+                                <td class="px-3 py-2 font-medium text-slate-900">{{ $r->user?->name }}</td>
+                                <td class="px-3 py-2 text-slate-700">{{ $r->kelas }}</td>
+                                <td class="px-3 py-2"><input type="number" form="nilai-{{ $r->id }}" name="nilai" min="0" max="100" value="{{ $r->nilai }}" placeholder="0–100" class="nilai-input w-24 rounded-lg border border-slate-300 px-2 py-1 text-xs font-bold shadow-2xs"></td>
+                                <td class="px-3 py-2">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded font-bold text-[11px] {{ $r->predikat === 'A' ? 'bg-emerald-100 text-emerald-800' : ($r->predikat === 'B' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-700') }}">
+                                        {{ $r->predikat ?? '—' }}
+                                    </span>
+                                </td>
+                                <td class="px-3 py-2"><input type="text" form="nilai-{{ $r->id }}" name="catatan" value="{{ $r->catatan_nilai }}" maxlength="1000" placeholder="Opsional" class="w-full rounded-lg border border-slate-300 px-2.5 py-1 text-xs shadow-2xs"></td>
+                                <td class="px-3 py-2 text-center">
+                                    <form id="nilai-{{ $r->id }}" method="POST" action="{{ route('pembina.nilai.store', $eskul) }}">
+                                        @csrf
+                                        <input type="hidden" name="registration_id" value="{{ $r->id }}">
+                                        <button class="rounded-lg bg-blue-600 px-3 py-1 text-xs font-bold text-white hover:bg-blue-700 transition shadow-2xs cursor-pointer">Simpan</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <div class="rounded-lg border bg-white p-4 shadow-sm">
-        <div class="mb-3">
-            <h2 class="font-semibold">Izin Menunggu Eskul Ini</h2>
-        </div>
+    {{-- TAB 4 (BAGIAN 2): IZIN MENUNGGU --}}
+    <div x-show="activeTab === 'jadwal'" x-cloak class="space-y-6">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
+            <div class="mb-3">
+                <h2 class="font-bold text-slate-900 text-sm">Permohonan Izin / Sakit Menunggu Verifikasi</h2>
+                <p class="text-[11px] text-slate-400">Verifikasi dokumen dan surat keterangan ketidakhadiran anggota eskul.</p>
+            </div>
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
                 <thead>
@@ -509,6 +609,7 @@
                 </tbody>
             </table>
         </div>
+    </div>
     </div>
 
     {{-- MODAL + TAMBAH ANGGOTA SISWA (MANUAL) --}}

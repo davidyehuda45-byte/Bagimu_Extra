@@ -120,4 +120,46 @@ class DashboardController extends Controller
             'terbaru'
         ));
     }
+
+    public function searchGlobal(\Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
+    {
+        $q = trim((string) $request->query('q', ''));
+        if (strlen($q) < 2) {
+            return response()->json(['results' => []]);
+        }
+
+        $students = \App\Models\Student::with(['user', 'registrations'])
+            ->where(function ($query) use ($q) {
+                $query->where('nama', 'like', "%{$q}%")
+                      ->orWhere('nis', 'like', "%{$q}%");
+            })
+            ->limit(10)
+            ->get()
+            ->map(function ($s) {
+                $reg = $s->registrations->sortByDesc('created_at')->first();
+                $eskul = $reg ? \App\Models\Eskul::with('pembina')->where('name', $reg->eskul_utama)->first() : null;
+                $user = $s->user;
+                $tokenStatus = 'Belum Ada Token';
+                if ($reg) {
+                    $tokenStatus = 'Sudah Dipakai';
+                } elseif ($user && $user->login_token && ! $user->login_token_revoked_at) {
+                    $tokenStatus = 'Token: ' . $user->login_token;
+                }
+
+                return [
+                    'id' => $s->id,
+                    'nis' => $s->nis,
+                    'nama' => $s->nama,
+                    'kelas' => $s->kelas ?: '-',
+                    'status_siswa' => $s->status,
+                    'eskul' => $reg ? $reg->eskul_utama : 'Belum Memilih Eskul',
+                    'pembina' => $eskul?->pembina?->name ?? 'Belum Ditugaskan',
+                    'token_status' => $tokenStatus,
+                    'is_registered' => (bool) $reg,
+                    'detail_url' => route('admin.students.show', $s->id),
+                ];
+            });
+
+        return response()->json(['results' => $students]);
+    }
 }

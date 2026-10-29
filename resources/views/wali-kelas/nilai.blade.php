@@ -25,6 +25,12 @@
                 </select>
             </form>
 
+            <a href="{{ route('wali-kelas.export-nilai', ['kelas_id' => $kelas?->id, 'periode' => $periode?->periode]) }}"
+               class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-emerald-300 bg-emerald-50 text-xs font-bold text-emerald-800 shadow-2xs hover:bg-emerald-100 transition-colors">
+                <x-icon name="chart" class="h-4 w-4 text-emerald-700" />
+                <span>Ekspor Excel (.xls)</span>
+            </a>
+
             <a href="{{ route('wali-kelas.cetak-nilai', ['kelas_id' => $kelas?->id, 'periode' => $periode?->periode]) }}" target="_blank"
                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-700 text-xs font-bold text-white shadow-xs hover:bg-blue-800 transition-colors">
                 <x-icon name="printer" class="h-4 w-4" />

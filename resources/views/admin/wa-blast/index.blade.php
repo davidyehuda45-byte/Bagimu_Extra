@@ -180,68 +180,99 @@
         </div>
     </div>
 
-    {{-- Kartu 2: Statistik Ringkas Siswa --}}
+    {{-- Kartu 2: Statistik Ringkas Siswa & Status Blast --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div class="rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs">
-            <p class="text-xs text-slate-500 font-medium">Total Siswa</p>
+            <p class="text-xs text-slate-500 font-medium">Total Siswa Aktif</p>
             <p class="text-xl font-black text-slate-900 mt-0.5">{{ number_format($totalSiswa) }}</p>
+            <p class="text-[10px] text-slate-400 mt-1">{{ number_format($totalDenganWa) }} memiliki nomor WA</p>
         </div>
         <div class="rounded-xl border border-emerald-200 bg-emerald-50/50 p-3.5 shadow-2xs">
-            <p class="text-xs text-emerald-800 font-medium">Siap Kirim WA</p>
-            <p class="text-xl font-black text-emerald-700 mt-0.5">{{ number_format($totalDenganWa) }}</p>
-        </div>
-        <div class="rounded-xl border border-amber-200 bg-amber-50/50 p-3.5 shadow-2xs">
-            <p class="text-xs text-amber-800 font-medium">Tanpa Nomor WA</p>
-            <p class="text-xl font-black text-amber-700 mt-0.5">{{ number_format($totalTanpaWa) }}</p>
+            <p class="text-xs text-emerald-800 font-medium">Sudah Dikirimi Periode {{ $currentPeriode }}</p>
+            <p class="text-xl font-black text-emerald-700 mt-0.5">{{ number_format($totalSudahBlasted) }}</p>
+            <p class="text-[10px] text-emerald-600 mt-1 font-semibold">Tercatat di sistem</p>
         </div>
         <div class="rounded-xl border border-blue-200 bg-blue-50/50 p-3.5 shadow-2xs">
-            <p class="text-xs text-blue-800 font-medium">Belum Ada Token</p>
-            <p class="text-xl font-black text-blue-700 mt-0.5">{{ number_format($totalBelumToken) }}</p>
+            <p class="text-xs text-blue-800 font-medium">Belum Menerima Blast</p>
+            <p class="text-xl font-black text-blue-700 mt-0.5">{{ number_format($totalBelumBlasted) }}</p>
+            <p class="text-[10px] text-blue-600 mt-1 font-semibold">Siap dikirim bertahap</p>
+        </div>
+        <div class="rounded-xl border border-rose-200 bg-rose-50/50 p-3.5 shadow-2xs">
+            <p class="text-xs text-rose-800 font-medium">Belum Memilih Eskul</p>
+            <p class="text-xl font-black text-rose-700 mt-0.5">{{ number_format($totalBelumDaftar) }}</p>
+            <p class="text-[10px] text-rose-600 mt-1 font-semibold">Prioritas sosialisasi</p>
         </div>
     </div>
 
     {{-- Kartu 3: Form Eksekusi WA Blast Massal --}}
-    <div class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs">
-        <div class="flex items-center gap-2.5 mb-4">
-            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 border border-blue-200">
-                <x-icon name="send" class="h-4 w-4" />
+    <div class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs space-y-4">
+        <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 border border-blue-200">
+                    <x-icon name="send" class="h-4 w-4" />
+                </div>
+                <div>
+                    <h2 class="font-bold text-slate-900 text-sm">Kirim WA Blast</h2>
+                    <p class="text-[11px] text-slate-500">Kirim pemberitahuan dan kredensial login via WhatsApp secara aman dan bertahap.</p>
+                </div>
             </div>
-            <h2 class="font-bold text-slate-900 text-sm">Kirim WA Blast</h2>
+            <div class="hidden sm:inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <x-icon name="shield" class="h-3.5 w-3.5" />
+                <span>Proteksi Anti-Banned Aktif</span>
+            </div>
+        </div>
+
+        {{-- Banner Edukasi Keamanan WA Gateway --}}
+        <div class="rounded-xl border border-emerald-200/80 bg-emerald-50/60 p-3.5 text-xs text-emerald-950 shadow-2xs flex items-start gap-2.5">
+            <x-icon name="info" class="h-4 w-4 text-emerald-700 shrink-0 mt-0.5" />
+            <div class="leading-relaxed">
+                <span class="font-bold">Keamanan Nomor Sekolah Terjamin:</span>
+                Sistem mengirim pesan dengan jeda manusiawi <strong>1,5 detik</strong> per pesan dan secara otomatis membatasi <strong>hanya 1 kali pengiriman per siswa</strong> pada periode berjalan ({{ $currentPeriode }}) agar nomor WhatsApp sekolah terhindar dari pemblokiran Meta/WhatsApp.
+            </div>
         </div>
 
         @if (!$fonnteStatus['connected'])
-            <div class="rounded-xl bg-blue-50/70 px-3.5 py-2.5 border border-blue-200/80 text-slate-700 text-xs mb-4 flex items-center gap-2 shadow-2xs">
+            <div class="rounded-xl bg-blue-50/70 px-3.5 py-2.5 border border-blue-200/80 text-slate-700 text-xs flex items-center gap-2 shadow-2xs">
                 <x-icon name="info" class="h-4 w-4 text-blue-600 shrink-0" />
                 <span>Hubungkan Fonnte API Key pada kartu di atas terlebih dahulu.</span>
             </div>
         @endif
 
-        <form method="POST" action="{{ route('admin.wa-blast.send') }}" class="space-y-4" onsubmit="return confirm('Mulai pengiriman WhatsApp Blast ke siswa yang ditargetkan?')">
+        <form method="POST" action="{{ route('admin.wa-blast.send') }}" class="space-y-4" onsubmit="return confirm('Mulai pengiriman WhatsApp Blast gelombang ini ke siswa yang ditargetkan?')">
             @csrf
             
             {{-- Target Penerima --}}
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1.5">Target Siswa</label>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                    <label class="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
-                        <input type="radio" name="mode" value="all" checked class="text-emerald-600 focus:ring-emerald-500">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                    <label class="flex items-center gap-2.5 p-3 rounded-xl border border-emerald-300 bg-emerald-50/30 hover:bg-emerald-50 cursor-pointer">
+                        <input type="radio" name="mode" value="unblasted" checked class="text-emerald-600 focus:ring-emerald-500">
                         <div class="text-xs">
-                            <span class="font-bold text-slate-800">Semua Siswa WA</span>
-                            <span class="text-slate-500">({{ number_format($totalDenganWa) }})</span>
+                            <span class="font-bold text-slate-900 block">Belum Dikirimi Blast</span>
+                            <span class="text-emerald-700 font-semibold text-[11px]">{{ number_format($totalBelumBlasted) }} siswa (Rekomendasi)</span>
+                        </div>
+                    </label>
+
+                    <label class="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                        <input type="radio" name="mode" value="unregistered" class="text-emerald-600 focus:ring-emerald-500">
+                        <div class="text-xs">
+                            <span class="font-bold text-slate-800 block">Belum Memilih Eskul</span>
+                            <span class="text-slate-500 text-[11px]">{{ number_format($totalBelumDaftar) }} siswa</span>
                         </div>
                     </label>
 
                     <label class="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
                         <input type="radio" name="mode" value="untokenized" class="text-emerald-600 focus:ring-emerald-500">
                         <div class="text-xs">
-                            <span class="font-bold text-slate-800">Belum Punya Token</span>
-                            <span class="text-slate-500">({{ number_format($totalBelumToken) }})</span>
+                            <span class="font-bold text-slate-800 block">Belum Ada Token</span>
+                            <span class="text-slate-500 text-[11px]">{{ number_format($totalBelumToken) }} siswa</span>
                         </div>
                     </label>
 
                     <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
                         <input type="radio" name="mode" value="kelas" class="text-emerald-600 focus:ring-emerald-500" id="radio-mode-kelas">
                         <div class="text-xs flex-1">
+                            <span class="font-bold text-slate-800 block mb-1">Per Kelas Tertentu</span>
                             <select name="kelas" onchange="document.getElementById('radio-mode-kelas').checked = true" class="block w-full rounded-lg border-slate-300 text-xs py-1">
                                 <option value="">— Pilih Kelas —</option>
                                 @foreach ($kelasList as $k)
@@ -251,6 +282,22 @@
                         </div>
                     </label>
                 </div>
+            </div>
+
+            {{-- Pengaturan Gelombang & Pencegahan Duplikasi --}}
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-2">
+                    <label for="batch_limit" class="font-bold text-slate-700 shrink-0">Batas Gelombang:</label>
+                    <select name="batch_limit" id="batch_limit" class="rounded-lg border-slate-300 text-xs py-1 font-semibold text-slate-800">
+                        <option value="25" selected>25 Siswa / Gelombang (Sangat Aman)</option>
+                        <option value="50">50 Siswa / Gelombang (Aman)</option>
+                        <option value="0">Semua Target Sekaligus</option>
+                    </select>
+                </div>
+                <label class="flex items-center gap-2 cursor-pointer font-medium text-slate-700 select-none">
+                    <input type="checkbox" name="skip_already_blasted" value="1" checked class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+                    <span>Lewati siswa yang sudah pernah menerima blast pada periode {{ $currentPeriode }}</span>
+                </label>
             </div>
 
             {{-- Template Pesan --}}
@@ -318,8 +365,18 @@
     {{-- Kartu 4: Daftar Target Siswa --}}
     <div class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
-            <h2 class="font-bold text-slate-900 text-sm">Daftar Kontak Siswa</h2>
+            <div class="flex flex-wrap items-center gap-2">
+                <h2 class="font-bold text-slate-900 text-sm mr-2">Daftar Kontak Siswa</h2>
+                <div class="inline-flex rounded-xl bg-slate-100 p-0.5 text-xs font-semibold">
+                    <a href="{{ route('admin.wa-blast.index', array_merge(request()->except('filter_blast', 'page'), [])) }}" class="px-2.5 py-1 rounded-lg transition {{ !request('filter_blast') ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900' }}">Semua</a>
+                    <a href="{{ route('admin.wa-blast.index', array_merge(request()->except('filter_blast', 'page'), ['filter_blast' => 'belum_kirim'])) }}" class="px-2.5 py-1 rounded-lg transition {{ request('filter_blast') === 'belum_kirim' ? 'bg-white text-blue-700 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900' }}">Belum Dikirim ({{ number_format($totalBelumBlasted) }})</a>
+                    <a href="{{ route('admin.wa-blast.index', array_merge(request()->except('filter_blast', 'page'), ['filter_blast' => 'sudah_kirim'])) }}" class="px-2.5 py-1 rounded-lg transition {{ request('filter_blast') === 'sudah_kirim' ? 'bg-white text-emerald-700 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900' }}">Sudah Terkirim ({{ number_format($totalSudahBlasted) }})</a>
+                </div>
+            </div>
             <form method="GET" action="{{ route('admin.wa-blast.index') }}" class="flex items-center gap-2">
+                @if(request('filter_blast'))
+                    <input type="hidden" name="filter_blast" value="{{ request('filter_blast') }}">
+                @endif
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama / NIS / WA..." class="rounded-xl border-slate-300 text-xs py-1.5 px-3">
                 <button class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 font-semibold text-xs hover:bg-slate-200 cursor-pointer">Cari</button>
             </form>
@@ -334,13 +391,15 @@
                         <th class="py-2 px-3">Kelas</th>
                         <th class="py-2 px-3">WhatsApp</th>
                         <th class="py-2 px-3">Token</th>
-                        <th class="py-2 px-3 text-right">Status</th>
+                        <th class="py-2 px-3">Blast ({{ $currentPeriode }})</th>
+                        <th class="py-2 px-3 text-right">Status Kontak</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($students as $s)
                         @php
-                            $wa = $s->whatsapp ?: ($s->wali_kontak ?: ($s->user?->registrations?->first()?->whatsapp ?? ''));
+                            $wa = $s->whatsapp ?: ($s->wali_kontak ?: ($s->registrations?->first()?->whatsapp ?? ''));
+                            $isBlasted = isset($blastedNisList[$s->nis]);
                         @endphp
                         <tr class="hover:bg-slate-50">
                             <td class="py-2 px-3 font-mono font-bold text-slate-800">{{ $s->nis }}</td>
@@ -360,6 +419,19 @@
                                     <span class="text-slate-400 italic">Belum terbit</span>
                                 @endif
                             </td>
+                            <td class="py-2 px-3">
+                                @if ($isBlasted)
+                                    <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-600"></span>
+                                        Sudah Dikirim
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold bg-slate-100 text-slate-600">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>
+                                        Belum Dikirim
+                                    </span>
+                                @endif
+                            </td>
                             <td class="py-2 px-3 text-right">
                                 @if ($wa)
                                     <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -374,7 +446,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-5 text-center text-slate-400">Tidak ada data siswa ditemukan.</td>
+                            <td colspan="7" class="py-5 text-center text-slate-400">Tidak ada data siswa ditemukan.</td>
                         </tr>
                     @endforelse
                 </tbody>

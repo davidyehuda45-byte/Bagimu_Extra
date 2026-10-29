@@ -50,8 +50,34 @@
     isSemuaTerpilih() {
         const visibleIds = this.filteredList.map(s => s.id);
         return visibleIds.length > 0 && visibleIds.every(id => this.selected.includes(id));
+    },
+    waCopied: false,
+    salinWa() {
+        const list = {{ Js::from($students->filter(fn($s) => !isset($regPeta[$s->nis]))->values()->map(fn($s) => ['nama' => $s->nama, 'nis' => $s->nis])) }};
+        if (!list || list.length === 0) {
+            alert('Luar biasa! Seluruh siswa di rombel ini sudah memilih ekstrakurikuler.');
+            return;
+        }
+        let text = '*PENGINGAT PENDAFTARAN EKSTRAKURIKULER*\n';
+        text += 'Rombel: {{ $kelas?->nama }}\n';
+        text += 'Tahun Ajaran: {{ $periode?->periode ?? '2026/2027' }}\n\n';
+        text += 'Yth. Bapak/Ibu Wali Murid dan Siswa,\n';
+        text += 'Diberitahukan bahwa batas pendaftaran eskul akan segera ditutup. Berikut adalah daftar siswa yang *BELUM* memilih ekstrakurikuler:\n\n';
+        list.forEach((s, idx) => {
+            text += (idx + 1) + '. ' + s.nama + ' (NIS: ' + s.nis + ')\n';
+        });
+        text += '\nBagi siswa di atas, mohon segera memilih eskul melalui portal resmi:\n{{ route('siswa.login') }}\n\n';
+        text += 'Terima kasih atas perhatian dan kerjasamanya.\nSalam,\nWali Kelas ({{ $kelas?->wali_kelas_nama ?? auth()->user()->name }})';
+
+        navigator.clipboard.writeText(text).then(() => {
+            this.waCopied = true;
+            setTimeout(() => this.waCopied = false, 3000);
+        });
     }
 }">
+    @php
+        $belumDaftarCount = $students->filter(fn($s) => !isset($regPeta[$s->nis]))->count();
+    @endphp
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-2">
@@ -60,13 +86,29 @@
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
                         {{ $students->count() }} Siswa
                     </span>
+                    @if ($belumDaftarCount > 0)
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                            {{ $belumDaftarCount }} Belum Memilih
+                        </span>
+                    @else
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            100% Lengkap
+                        </span>
+                    @endif
                 @endif
             </div>
             <p class="text-xs text-slate-500 mt-0.5">Daftar siswa dalam rombel Anda dan status ekstrakurikuler yang diikuti.</p>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
             @if ($kelas)
+                @if ($belumDaftarCount > 0)
+                    <button type="button" @click="salinWa()" class="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-3.5 py-2 text-xs font-bold shadow-2xs transition cursor-pointer">
+                        <x-icon name="send" class="h-3.5 w-3.5 text-emerald-600" />
+                        <span x-text="waCopied ? 'Teks WA Tersalin!' : 'Salin Pengingat WA ({{ $belumDaftarCount }})'"></span>
+                    </button>
+                @endif
+
                 <button type="button" @click="bukaModal = true" class="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 text-xs font-bold shadow-xs shadow-blue-600/20 transition cursor-pointer">
                     <x-icon name="plus" class="h-3.5 w-3.5" />
                     <span>+ Kelas Saya</span>

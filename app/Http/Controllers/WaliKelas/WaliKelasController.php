@@ -307,5 +307,59 @@ class WaliKelasController extends Controller
             'kepsekNama'
         ));
     }
+
+    public function exportNilai(Request $request)
+    {
+        [$kelas] = $this->resolveKelas($request);
+        $periode = $this->periodeAktif($request);
+
+        if (! $kelas || ! $periode) {
+            return back()->with('error', 'Data rombel atau periode tidak valid.');
+        }
+
+        $dataNilai = Registration::with(['user', 'student'])
+            ->where('kelas', $kelas->nama)
+            ->where('periode', $periode->periode)
+            ->where('status', Status::APPROVED)
+            ->orderBy('nis')
+            ->get();
+
+        $filename = 'Rekap_Nilai_' . str_replace([' ', '/', '\\'], '_', $kelas->nama) . '_' . str_replace('/', '-', $periode->periode) . '.xls';
+
+        $output = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+        $output .= '<head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Nilai Eskul</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>';
+        $output .= '<body>';
+        $output .= '<h3>REKAPITULASI NILAI EKSTRAKURIKULER RAPOR</h3>';
+        $output .= '<p><strong>Rombel Kelas:</strong> ' . e($kelas->nama) . ' | <strong>Tahun Ajaran:</strong> ' . e($periode->periode) . ' | <strong>Wali Kelas:</strong> ' . e($kelas->wali_kelas_nama ?? auth()->user()->name) . '</p>';
+        $output .= '<table border="1" cellpadding="5" cellspacing="0">';
+        $output .= '<tr style="background-color: #1e3a8a; color: #ffffff; font-weight: bold;">';
+        $output .= '<th>No</th><th>NIS</th><th>NISN</th><th>Nama Lengkap Siswa</th><th>L/P</th><th>Ekstrakurikuler</th><th>Nilai Angka</th><th>Predikat</th><th>Catatan Capaian / Deskripsi Rapor</th>';
+        $output .= '</tr>';
+
+        $no = 1;
+        foreach ($dataNilai as $reg) {
+            $student = $reg->student;
+            $output .= '<tr>';
+            $output .= '<td align="center">' . $no++ . '</td>';
+            $output .= '<td style="mso-number-format:\'@\';">' . e($reg->nis) . '</td>';
+            $output .= '<td style="mso-number-format:\'@\';">' . e($student?->nisn ?: '-') . '</td>';
+            $output .= '<td>' . e($student?->nama ?: ($reg->user?->name ?: '-')) . '</td>';
+            $output .= '<td align="center">' . e($reg->gender?->value ?: ($student?->gender?->value ?: '-')) . '</td>';
+            $output .= '<td>' . e($reg->eskul_utama) . '</td>';
+            $output .= '<td align="center"><strong>' . ($reg->nilai !== null ? e($reg->nilai) : '-') . '</strong></td>';
+            $output .= '<td align="center"><strong>' . e($reg->predikat ?: '-') . '</strong></td>';
+            $output .= '<td>' . e($reg->catatan_nilai ?: '-') . '</td>';
+            $output .= '</tr>';
+        }
+
+        $output .= '</table>';
+        $output .= '</body></html>';
+
+        return response($output, 200, [
+            'Content-Type' => 'application/vnd.ms-excel; charset=utf-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Cache-Control' => 'max-age=0',
+        ]);
+    }
 }
 

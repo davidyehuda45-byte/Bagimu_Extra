@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\NotifChannel;
+use App\Enums\NotifStatus;
+use App\Enums\PeriodeStatus;
 use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Models\AdminLog;
+use App\Models\NotificationLog;
+use App\Models\Periode;
 use App\Models\Student;
 use App\Models\User;
 use App\Services\FonnteService;
@@ -44,9 +49,49 @@ class WaBlastController extends Controller
             ->sort(SORT_NATURAL)
             ->values();
 
+        $currentPeriode = Periode::where('status', PeriodeStatus::DIBUKA->value)->latest('periode')->value('periode')
+            ?? Periode::latest('periode')->value('periode') ?? '2026/2027';
+
+        // Siswa yang sudah dikirimi WA blast pada periode berjalan
+        $blastedNisList = NotificationLog::where('channel', NotifChannel::WA)
+            ->where('dedupe_key', 'like', "wa_blast:{$currentPeriode}:%")
+            ->where('status', NotifStatus::TERKIRIM)
+            ->pluck('dedupe_key')
+            ->map(fn ($k) => str_replace("wa_blast:{$currentPeriode}:", '', $k))
+            ->flip()
+            ->all();
+
+        $totalSudahBlasted = count($blastedNisList);
+
+        $totalBelumBlasted = Student::where('status', 'AKTIF')
+            ->where(function ($q) {
+                $q->whereNotNull('whatsapp')->where('whatsapp', '!=', '');
+            })
+            ->whereNotIn('nis', array_keys($blastedNisList))
+            ->count();
+
+        $totalBelumDaftar = Student::where('status', 'AKTIF')
+            ->whereDoesntHave('registrations', function ($q) use ($currentPeriode) {
+                $q->where('periode', $currentPeriode);
+            })
+            ->where(function ($q) {
+                $q->whereNotNull('whatsapp')->where('whatsapp', '!=', '');
+            })
+            ->whereNotIn('nis', array_keys($blastedNisList))
+            ->count();
+
         // Sample target siswa untuk preview
-        $query = Student::with(['user', 'user.registrations'])
+        $query = Student::with(['user', 'registrations'])
             ->where('status', 'AKTIF');
+
+        if ($request->filled('filter_blast')) {
+            $f = $request->input('filter_blast');
+            if ($f === 'belum_kirim') {
+                $query->whereNotIn('nis', array_keys($blastedNisList));
+            } elseif ($f === 'sudah_kirim') {
+                $query->whereIn('nis', array_keys($blastedNisList));
+            }
+        }
 
         if ($request->filled('kelas')) {
             $query->where('kelas', $request->input('kelas'));
@@ -77,7 +122,12 @@ class WaBlastController extends Controller
             'totalTanpaWa',
             'totalBelumToken',
             'kelasList',
-            'students'
+            'students',
+            'currentPeriode',
+            'totalSudahBlasted',
+            'totalBelumBlasted',
+            'totalBelumDaftar',
+            'blastedNisList'
         ));
     }
 
@@ -133,16 +183,31 @@ class WaBlastController extends Controller
         }
 
         $request->validate([
-            'mode' => ['required', 'string', 'in:all,kelas,untokenized,selected'],
+            'mode' => ['required', 'string', 'in:all,kelas,untokenized,unregistered,unblasted,selected'],
             'pesan' => ['required', 'string', 'max:2000'],
             'kelas' => ['nullable', 'string'],
             'ids' => ['nullable', 'array'],
+            'batch_limit' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'skip_already_blasted' => ['nullable', 'boolean'],
         ]);
 
-        $mode = $request->input('mode', 'all');
-        $pesanTemplate = $request->input('pesan');
+        $currentPeriode = Periode::where('status', PeriodeStatus::DIBUKA->value)->latest('periode')->value('periode')
+            ?? Periode::latest('periode')->value('periode') ?? '2026/2027';
 
-        $query = Student::with(['user', 'user.registrations'])->where('status', 'AKTIF');
+        $mode = $request->input('mode', 'unblasted');
+        $pesanTemplate = $request->input('pesan');
+        $skipAlreadyBlasted = $request->boolean('skip_already_blasted', true);
+        $batchLimit = $request->filled('batch_limit') ? (int) $request->input('batch_limit') : 25;
+
+        // Ambil daftar NIS yang sudah pernah dikirim blast di periode ini
+        $blastedNis = NotificationLog::where('channel', NotifChannel::WA)
+            ->where('dedupe_key', 'like', "wa_blast:{$currentPeriode}:%")
+            ->where('status', NotifStatus::TERKIRIM)
+            ->pluck('dedupe_key')
+            ->map(fn ($k) => str_replace("wa_blast:{$currentPeriode}:", '', $k))
+            ->all();
+
+        $query = Student::with(['user', 'registrations'])->where('status', 'AKTIF');
 
         if ($mode === 'selected') {
             $selectedIds = (array) $request->input('ids', []);
@@ -159,20 +224,39 @@ class WaBlastController extends Controller
                       $u->whereNull('login_token')->orWhereNotNull('login_token_revoked_at');
                   });
             });
+        } elseif ($mode === 'unregistered') {
+            // Siswa belum memilih eskul di periode ini
+            $query->whereDoesntHave('registrations', function ($q) use ($currentPeriode) {
+                $q->where('periode', $currentPeriode);
+            });
         }
 
-        $students = $query->get();
+        // Terapkan perlindungan 1x kirim per periode jika skip_already_blasted aktif atau mode unblasted
+        if ($skipAlreadyBlasted || $mode === 'unblasted') {
+            if (! empty($blastedNis)) {
+                $query->whereNotIn('nis', $blastedNis);
+            }
+        }
 
-        // Hanya siswa dengan nomor WA
-        $targets = $students->filter(function ($s) {
-            $reg = $s->user?->registrations?->first();
+        $allMatching = $query->get();
+
+        // Hanya siswa dengan nomor WA valid
+        $targets = $allMatching->filter(function ($s) {
+            $reg = $s->registrations?->first();
             $wa = $s->whatsapp ?: ($s->wali_kontak ?: ($reg?->whatsapp ?? ''));
 
             return ! empty(trim((string) $wa));
         });
 
-        if ($targets->isEmpty()) {
-            return back()->with('warning', 'Tidak ada siswa dengan nomor WhatsApp valid pada target yang dipilih.');
+        $totalEligible = $targets->count();
+
+        if ($totalEligible === 0) {
+            return back()->with('warning', 'Semua siswa pada target yang dipilih sudah pernah menerima WhatsApp Blast di periode ' . $currentPeriode . ' atau tidak memiliki nomor WhatsApp.');
+        }
+
+        // Potong sesuai batch limit gelombang aman
+        if ($batchLimit > 0 && $targets->count() > $batchLimit) {
+            $targets = $targets->take($batchLimit);
         }
 
         @set_time_limit(300);
@@ -183,7 +267,7 @@ class WaBlastController extends Controller
         $loginUrl = route('siswa.login');
 
         foreach ($targets as $student) {
-            $reg = $student->user?->registrations?->first();
+            $reg = $student->registrations?->first();
             $rawWa = $student->whatsapp ?: ($student->wali_kontak ?: ($reg?->whatsapp ?? ''));
             $normWa = Whatsapp::normalize($rawWa);
 
@@ -225,18 +309,48 @@ class WaBlastController extends Controller
 
             $sendResult = $fonnte->sendMessage($normWa, $renderedMessage);
 
+            $dedupeKey = "wa_blast:{$currentPeriode}:{$student->nis}";
+
+            NotificationLog::create([
+                'channel' => NotifChannel::WA,
+                'to' => $normWa,
+                'template' => 'wa_blast',
+                'payload' => [
+                    'student_id' => $student->id,
+                    'nis' => $student->nis,
+                    'nama' => $student->nama,
+                    'periode' => $currentPeriode,
+                    'mode' => $mode,
+                ],
+                'status' => $sendResult['success'] ? NotifStatus::TERKIRIM : NotifStatus::GAGAL,
+                'attempts' => 1,
+                'provider_resp' => $sendResult['raw'] ?? ($sendResult['message'] ?? null),
+                'dedupe_key' => $dedupeKey,
+                'sent_at' => now(),
+            ]);
+
             if ($sendResult['success']) {
                 $successCount++;
             } else {
                 $failCount++;
             }
 
-            usleep(30000); // 30ms
+            // Jeda aman anti-banned: 1.5 detik per pesan
+            usleep(1500000);
         }
 
-        AdminLog::record('wa_blast.send', 'Student', null, "WA Blast: {$successCount} sukses, {$failCount} gagal (Total target: {$targets->count()})");
+        AdminLog::record('wa_blast.send', 'Student', null, "WA Blast gelombang: {$successCount} sukses, {$failCount} gagal (Gelombang ini: {$targets->count()}, Periode: {$currentPeriode})");
 
-        $statusMsg = "WA Blast selesai: {$successCount} pesan berhasil dikirim".($failCount > 0 ? ", {$failCount} gagal." : '.');
+        $sisaAntrean = $totalEligible - $targets->count();
+        $statusMsg = "Gelombang pengiriman selesai: {$successCount} pesan berhasil dikirim (dengan jeda proteksi 1,5s)";
+        if ($failCount > 0) {
+            $statusMsg .= ", {$failCount} gagal";
+        }
+        if ($sisaAntrean > 0) {
+            $statusMsg .= ". Masih ada {$sisaAntrean} siswa yang belum dikirimi di target ini (silakan klik kirim gelombang berikutnya).";
+        } else {
+            $statusMsg .= ". Semua siswa pada target ini telah berhasil dikirimi.";
+        }
 
         return redirect()->route('admin.wa-blast.index')->with('status', $statusMsg);
     }

@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:admin,operator,kepala_sekolah', \App\Http\Middleware\BlockKepsekMutations::class])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('search-global', [DashboardController::class, 'searchGlobal'])->name('search-global');
 
     Route::resource('eskuls', EskulController::class);
     Route::post('eskuls/{eskul}/delegasi', [EskulController::class, 'delegasi'])->name('eskuls.delegasi');

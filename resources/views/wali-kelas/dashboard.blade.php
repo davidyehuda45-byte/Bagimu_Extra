@@ -78,7 +78,9 @@
             <span class="text-xs font-bold text-amber-800 uppercase tracking-wider block">Belum Memilih Eskul</span>
             <div class="mt-2 flex items-baseline justify-between">
                 <span class="text-2xl font-black text-amber-700">{{ $belumIkut }}</span>
-                <span class="text-xs text-amber-600 font-bold">Perlu diarahkan</span>
+                <a href="{{ route('wali-kelas.siswa', ['kelas_id' => $kelas?->id, 'periode' => $periode?->periode]) }}" class="text-xs font-bold text-amber-700 hover:underline">
+                    Ingatkan Siswa &rarr;
+                </a>
             </div>
         </div>
 

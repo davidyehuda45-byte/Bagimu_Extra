@@ -6,6 +6,8 @@ use App\Enums\LoginMethod;
 use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Models\LoginHistory;
+use App\Models\Periode;
+use App\Models\Registration;
 use App\Models\Student;
 use App\Models\User;
 use App\Support\LoginToken;
@@ -259,5 +261,88 @@ class SiswaLoginController extends Controller
         }
 
         throw ValidationException::withMessages([$field => $message]);
+    }
+
+    /**
+     * Portal publik untuk cek status pendaftaran siswa dan info eskul via NIS tanpa perlu token.
+     */
+    public function cekStatus(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->validate([
+            'nis' => ['required', 'string', 'max:20'],
+        ]);
+
+        $nis = trim($data['nis']);
+        $student = Student::where('nis', $nis)->first();
+
+        if (! $student) {
+            return response()->json([
+                'success' => false,
+                'message' => "Nomor Induk Siswa (NIS {$nis}) tidak ditemukan di sistem. Periksa kembali kartu pelajar Anda.",
+            ], 404);
+        }
+
+        $reg = Registration::where('nis', $nis)->latest()->first();
+
+        if (! $reg) {
+            return response()->json([
+                'success' => true,
+                'status' => 'BELUM_MENDAFTAR',
+                'nama' => $student->nama,
+                'nis' => $student->nis,
+                'kelas' => $student->kelas ?? '-',
+                'message' => "Siswa atas nama {$student->nama} ({$student->kelas}) terdaftar aktif, namun belum memilih ekstrakurikuler. Silakan gunakan token pendaftaran Anda pada tab Masuk Pendaftaran.",
+            ]);
+        }
+
+        $eskul = \App\Models\Eskul::with(['jadwals', 'pembina'])->where('name', $reg->eskul_utama)->first();
+
+        return response()->json([
+            'success' => true,
+            'status' => 'TERDAFTAR',
+            'nama' => $student->nama,
+            'nis' => $student->nis,
+            'kelas' => $reg->kelas ?: ($student->kelas ?? '-'),
+            'eskul_utama' => $reg->eskul_utama,
+            'eskul_cadangan' => $reg->eskul_cadangan,
+            'periode' => $reg->periode,
+            'pembina_nama' => $eskul?->pembina?->name ?? 'Belum ditentukan',
+            'pembina_kontak' => $eskul?->pembina?->whatsapp ?? null,
+            'jadwal' => $eskul?->jadwals?->map(fn ($j) => $j->hari.' ('.substr($j->jam_mulai, 0, 5).' - '.substr($j->jam_selesai, 0, 5).')')->implode(', ') ?: 'Jadwal fleksibel / diumumkan pembina',
+            'tgl_daftar' => $reg->created_at?->translatedFormat('d F Y, H:i') ?? '-',
+            'kartu_url' => route('siswa.kartu.public', $student->nis),
+        ]);
+    }
+
+    /**
+     * Tampilan kartu peserta ID-1 publik (dapat dicetak/disimpan siswa sewaktu-waktu tanpa auto-logout).
+     */
+    public function cetakKartuPublic(string $nis): View
+    {
+        $student = Student::where('nis', $nis)->firstOrFail();
+        $registration = Registration::where('nis', $nis)->latest()->firstOrFail();
+
+        $periode = Periode::where('periode', $registration->periode)->first()
+            ?? Periode::where('status', \App\Enums\PeriodeStatus::DIBUKA)->first();
+
+        $schoolName = \App\Models\AppSetting::get('school.name', 'SMK Bagimu Negeriku');
+        $tahunAjaran = $periode?->tahun_ajaran ?? ($registration->periode ?? '2026/2027');
+
+        $berlakuSampai = null;
+        if ($periode && $periode->tgl_selesai) {
+            $berlakuSampai = \Illuminate\Support\Carbon::parse($periode->tgl_selesai)->translatedFormat('d F Y');
+        } else {
+            $tahunParts = explode('/', $tahunAjaran);
+            $berlakuSampai = isset($tahunParts[1]) ? '30 Juni '.trim($tahunParts[1]) : 'Akhir Tahun Ajaran';
+        }
+
+        return view('siswa.kartu-public', [
+            'student' => $student,
+            'registration' => $registration,
+            'periode' => $periode,
+            'schoolName' => $schoolName,
+            'tahunAjaran' => $tahunAjaran,
+            'berlakuSampai' => $berlakuSampai,
+        ]);
     }
 }

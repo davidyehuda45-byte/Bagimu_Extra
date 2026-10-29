@@ -54,6 +54,15 @@ Route::middleware('guest')->group(function () {
         ->middleware([\App\Http\Middleware\MaintenanceMode::class, 'throttle:15,1'])
         ->name('siswa.direct-login');
 
+    // Portal Publik Cek Status Pendaftaran & Cetak Ulang Kartu via NIS
+    Route::post('siswa/cek-status', [SiswaLoginController::class, 'cekStatus'])
+        ->middleware([\App\Http\Middleware\MaintenanceMode::class, 'throttle:30,1'])
+        ->name('siswa.cek-status');
+
+    Route::get('siswa/kartu/{nis}', [SiswaLoginController::class, 'cetakKartuPublic'])
+        ->middleware([\App\Http\Middleware\MaintenanceMode::class, 'throttle:30,1'])
+        ->name('siswa.kartu.public');
+
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
 

@@ -111,7 +111,41 @@
     <div class="flex w-full lg:w-[42%] min-h-screen flex-col justify-center items-center px-4 sm:px-6 py-10 bg-slate-50/80">
         <div class="w-full max-w-[420px]">
             {{-- Kartu Form Melayang Sesuai Foto Referensi 2 --}}
-            <div class="card relative rounded-3xl sm:rounded-[32px] border border-slate-200/90 bg-white p-7 sm:p-9 shadow-xl shadow-slate-200/60">
+            <div class="card relative rounded-3xl sm:rounded-[32px] border border-slate-200/90 bg-white p-7 sm:p-9 shadow-xl shadow-slate-200/60"
+                 x-data="{
+                    tab: 'login',
+                    nisCek: '',
+                    loadingCek: false,
+                    errorCek: null,
+                    resultCek: null,
+                    async cekStatus() {
+                        if (!this.nisCek.trim()) return;
+                        this.loadingCek = true;
+                        this.errorCek = null;
+                        this.resultCek = null;
+                        try {
+                            const res = await fetch('{{ route('siswa.cek-status') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').getAttribute('content')
+                                },
+                                body: JSON.stringify({ nis: this.nisCek.trim() })
+                            });
+                            const data = await res.json();
+                            if (!res.ok) {
+                                this.errorCek = data.message || 'NIS tidak ditemukan.';
+                            } else {
+                                this.resultCek = data;
+                            }
+                        } catch (e) {
+                            this.errorCek = 'Gagal memeriksa status. Periksa koneksi internet Anda.';
+                        } finally {
+                            this.loadingCek = false;
+                        }
+                    }
+                 }">
                 {{-- Mobile Logo --}}
                 <div class="mb-5 flex items-center gap-3 lg:hidden">
                     <x-school-logo :size="48" class="shadow-sm shrink-0" />
@@ -124,109 +158,185 @@
 
                 {{-- Pill Badge Portal Siswa Sesuai Foto 2 --}}
                 <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold ring-1 ring-inset ring-blue-600/15 mb-3">
-                    <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                    </svg>
+                    <x-icon name="user" class="h-3.5 w-3.5 shrink-0" />
                     <span>Portal Siswa</span>
                 </div>
 
-                {{-- Judul Halaman Sesuai Foto 2 --}}
-                <h2 class="text-2xl sm:text-[26px] font-black text-slate-900 tracking-tight">Masuk Akun Siswa</h2>
-                <p class="mt-1 text-xs sm:text-sm text-slate-500 mb-5 leading-normal">Gunakan NIS dan Token 8 digit yang tertera di kartu pelajar Anda.</p>
-
-                @if (session('error'))
-                    <div class="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-xs font-semibold text-rose-800 flex items-start gap-2">
-                        <svg class="h-4 w-4 shrink-0 text-rose-600 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                        <span>{{ session('error') }}</span>
-                    </div>
-                @endif
-                @if (session('status'))
-                    <div class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 text-xs font-semibold text-emerald-800 flex items-start gap-2">
-                        <svg class="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                        <span>{{ session('status') }}</span>
-                    </div>
-                @endif
-
-                <form method="POST" action="{{ route('siswa.login') }}" id="loginForm" novalidate data-no-validate data-stempel class="space-y-4" x-data="{ loading: false, showToken: false }" @submit="handleSiswaLoginSubmit($event, $data)">
-                    @csrf
-
-                    {{-- Input NIS Bersih Sesuai Mockup Foto 2 --}}
-                    <div>
-                        <label for="nis" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">Nomor Induk Siswa (NIS)</label>
-                        <input id="nis"
-                               type="text"
-                               inputmode="numeric"
-                               autocomplete="username"
-                               name="nis"
-                               value="{{ old('nis', $initialNis ?? request('nis', '')) }}"
-                               autofocus
-                               placeholder="cth: 10001"
-                               oninput="this.classList.remove('err')"
-                               class="w-full rounded-xl border border-slate-200 bg-white py-2.5 sm:py-3 px-3.5 text-sm font-semibold text-slate-900 placeholder:font-normal placeholder:text-slate-400 focus:border-blue-600 focus:outline-hidden focus:ring-4 focus:ring-blue-100 transition shadow-xs" />
-                        <x-input-error :messages="$errors->get('nis')" class="mt-1.5" />
-                    </div>
-
-                    {{-- Input Token dengan Eye Toggle Sesuai Mockup Foto 2 --}}
-                    <div>
-                        <div class="flex items-center justify-between mb-1.5">
-                            <label for="token" class="block text-xs sm:text-sm font-semibold text-slate-700">Token Pendaftaran</label>
-                            <span class="text-[11px] font-medium text-slate-400">8 digit unik</span>
-                        </div>
-                        <div class="relative">
-                            <input id="token"
-                                   :type="showToken ? 'text' : 'password'"
-                                   name="token"
-                                   maxlength="100"
-                                   autocomplete="current-password"
-                                   placeholder="••••••••"
-                                   oninput="this.classList.remove('err')"
-                                   class="w-full rounded-xl border border-slate-200 bg-white py-2.5 sm:py-3 pl-3.5 pr-10 text-sm font-semibold text-slate-900 placeholder:font-normal placeholder:text-slate-400 focus:border-blue-600 focus:outline-hidden focus:ring-4 focus:ring-blue-100 transition shadow-xs" />
-                            <button type="button" @click="showToken = !showToken" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-hidden cursor-pointer" tabindex="-1">
-                                <svg x-show="!showToken" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                                <svg x-show="showToken" x-cloak class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.88 9.88 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
-                            </button>
-                        </div>
-                        <x-input-error :messages="$errors->get('token')" class="mt-1.5" />
-                    </div>
-
-                    {{-- Kotak Catatan Soft Blue --}}
-                    <div class="my-4 flex items-start gap-2.5 rounded-xl border border-blue-200/80 bg-blue-50/70 p-3 text-xs leading-relaxed text-slate-700 shadow-2xs">
-                        <x-icon name="info" class="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                        <p><strong class="font-bold text-blue-950">Catatan:</strong> <span class="text-slate-600">Token bersifat sekali pakai dan hangus setelah pendaftaran selesai.</span></p>
-                    </div>
-
-                    {{-- Tombol Masuk Sesuai Foto Referensi 2 --}}
-                    <button type="submit"
-                            :disabled="loading"
-                            class="w-full h-11 sm:h-12 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-sm sm:text-[15px] font-bold text-white shadow-md shadow-blue-600/30 transition cursor-pointer disabled:opacity-75 disabled:cursor-wait">
-                        <span x-show="!loading" class="inline-flex items-center justify-center gap-2">
-                            <span>Masuk / Pilih Eskul</span>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-[18px] h-[18px] shrink-0">
-                                <circle cx="12" cy="12" r="10" />
-                                <path d="M12 16v-4" />
-                                <path d="M12 8h.01" />
-                            </svg>
-                        </span>
-                        <span x-show="loading" x-cloak class="inline-flex items-center justify-center gap-2">
-                            <svg class="h-4 w-4 animate-spin text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"/></svg>
-                            <span>Memproses Masuk…</span>
-                        </span>
+                {{-- Tab Switcher: Masuk Pendaftaran vs Cek Status & Kartu --}}
+                <div class="grid grid-cols-2 p-1 bg-slate-100 rounded-2xl mb-4 text-xs font-bold text-center">
+                    <button type="button" @click="tab = 'login'" :class="tab === 'login' ? 'bg-white text-blue-700 shadow-2xs' : 'text-slate-500 hover:text-slate-900'" class="py-2 rounded-xl transition cursor-pointer">
+                        Masuk Pendaftaran
                     </button>
+                    <button type="button" @click="tab = 'cek'" :class="tab === 'cek' ? 'bg-white text-blue-700 shadow-2xs' : 'text-slate-500 hover:text-slate-900'" class="py-2 rounded-xl transition cursor-pointer">
+                        Cek Status & Kartu
+                    </button>
+                </div>
 
-                    {{-- Link Bantuan & Navigasi Sesuai Foto Referensi 2 --}}
-                    <div class="mt-5 text-center space-y-2">
-                        <p class="text-xs text-slate-500">Lupa token? Hubungi <span class="font-medium text-slate-700">admin/wali kelas</span> anda.</p>
-                        <p class="text-xs text-slate-600">Bukan siswa? <a href="{{ route('pembina.login') }}" class="font-semibold text-blue-600 hover:text-blue-700 hover:underline">Masuk sebagai Pembina / Wali Kelas &rarr;</a></p>
-                        <div class="pt-2">
-                            <a href="{{ route('home') }}" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-blue-600 hover:underline transition">
-                                &larr; Kembali ke Beranda
-                            </a>
+                {{-- PANEL 1: MASUK PENDAFTARAN --}}
+                <div x-show="tab === 'login'" x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
+                    <h2 class="text-2xl sm:text-[26px] font-black text-slate-900 tracking-tight">Masuk Akun Siswa</h2>
+                    <p class="mt-1 text-xs sm:text-sm text-slate-500 mb-5 leading-normal">Gunakan NIS dan Token 8 digit yang tertera di kartu pelajar Anda.</p>
+
+                    @if (session('error'))
+                        <div class="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-xs font-semibold text-rose-800 flex items-start gap-2">
+                            <x-icon name="info" class="h-4 w-4 shrink-0 text-rose-600 mt-0.5" />
+                            <span>{{ session('error') }}</span>
                         </div>
+                    @endif
+                    @if (session('status'))
+                        <div class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 text-xs font-semibold text-emerald-800 flex items-start gap-2">
+                            <x-icon name="check" class="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" />
+                            <span>{{ session('status') }}</span>
+                        </div>
+                    @endif
+
+                    <form method="POST" action="{{ route('siswa.login') }}" id="loginForm" novalidate data-no-validate data-stempel class="space-y-4" x-data="{ loading: false, showToken: false }" @submit="handleSiswaLoginSubmit($event, $data)">
+                        @csrf
+
+                        {{-- Input NIS Bersih Sesuai Mockup Foto 2 --}}
+                        <div>
+                            <label for="nis" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">Nomor Induk Siswa (NIS)</label>
+                            <input id="nis"
+                                   type="text"
+                                   inputmode="numeric"
+                                   autocomplete="username"
+                                   name="nis"
+                                   value="{{ old('nis', $initialNis ?? request('nis', '')) }}"
+                                   autofocus
+                                   placeholder="cth: 10001"
+                                   oninput="this.classList.remove('err')"
+                                   class="w-full rounded-xl border border-slate-200 bg-white py-2.5 sm:py-3 px-3.5 text-sm font-semibold text-slate-900 placeholder:font-normal placeholder:text-slate-400 focus:border-blue-600 focus:outline-hidden focus:ring-4 focus:ring-blue-100 transition shadow-xs" />
+                            <x-input-error :messages="$errors->get('nis')" class="mt-1.5" />
+                        </div>
+
+                        {{-- Input Token dengan Eye Toggle Sesuai Mockup Foto 2 --}}
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label for="token" class="block text-xs sm:text-sm font-semibold text-slate-700">Token Pendaftaran</label>
+                                <span class="text-[11px] font-medium text-slate-400">8 digit unik</span>
+                            </div>
+                            <div class="relative">
+                                <input id="token"
+                                       :type="showToken ? 'text' : 'password'"
+                                       name="token"
+                                       maxlength="100"
+                                       autocomplete="current-password"
+                                       placeholder="••••••••"
+                                       oninput="this.classList.remove('err')"
+                                       class="w-full rounded-xl border border-slate-200 bg-white py-2.5 sm:py-3 pl-3.5 pr-10 text-sm font-semibold text-slate-900 placeholder:font-normal placeholder:text-slate-400 focus:border-blue-600 focus:outline-hidden focus:ring-4 focus:ring-blue-100 transition shadow-xs" />
+                                <button type="button" @click="showToken = !showToken" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-hidden cursor-pointer" tabindex="-1">
+                                    <span x-show="!showToken"><x-icon name="eye" class="h-4 w-4" /></span>
+                                    <span x-show="showToken" x-cloak><x-icon name="eye-off" class="h-4 w-4" /></span>
+                                </button>
+                            </div>
+                            <x-input-error :messages="$errors->get('token')" class="mt-1.5" />
+                        </div>
+
+                        {{-- Kotak Catatan Soft Blue --}}
+                        <div class="my-4 flex items-start gap-2.5 rounded-xl border border-blue-200/80 bg-blue-50/70 p-3 text-xs leading-relaxed text-slate-700 shadow-2xs">
+                            <x-icon name="info" class="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                            <p><strong class="font-bold text-blue-950">Catatan:</strong> <span class="text-slate-600">Token bersifat sekali pakai dan hangus setelah pendaftaran selesai.</span></p>
+                        </div>
+
+                        {{-- Tombol Masuk Sesuai Foto Referensi 2 --}}
+                        <button type="submit"
+                                :disabled="loading"
+                                class="w-full h-11 sm:h-12 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-sm sm:text-[15px] font-bold text-white shadow-md shadow-blue-600/30 transition cursor-pointer disabled:opacity-75 disabled:cursor-wait">
+                            <span x-show="!loading" class="inline-flex items-center justify-center gap-2">
+                                <span>Masuk / Pilih Eskul</span>
+                                <x-icon name="arrow-right" class="h-4 w-4" />
+                            </span>
+                            <span x-show="loading" x-cloak class="inline-flex items-center justify-center gap-2">
+                                <span>Memproses Masuk…</span>
+                            </span>
+                        </button>
+                    </form>
+                </div>
+
+                {{-- PANEL 2: PORTAL CEK STATUS & CETAK KARTU (CUKUP NIS) --}}
+                <div x-show="tab === 'cek'" x-cloak x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-4">
+                    <div>
+                        <h2 class="text-2xl sm:text-[26px] font-black text-slate-900 tracking-tight">Cek Status & Kartu</h2>
+                        <p class="mt-1 text-xs sm:text-sm text-slate-500 leading-normal">Cukup masukkan Nomor Induk Siswa (NIS) untuk mengecek pilihan eskul atau mencetak ulang kartu Anda.</p>
                     </div>
-                </form>
+
+                    <form @submit.prevent="cekStatus()" class="space-y-3">
+                        <div>
+                            <label for="nisCek" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">Nomor Induk Siswa (NIS)</label>
+                            <div class="flex gap-2">
+                                <input id="nisCek"
+                                       type="text"
+                                       inputmode="numeric"
+                                       x-model="nisCek"
+                                       placeholder="cth: 2012038"
+                                       class="flex-1 rounded-xl border border-slate-200 bg-white py-2.5 px-3.5 text-sm font-semibold text-slate-900 placeholder:font-normal placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition shadow-xs" />
+                                <button type="submit"
+                                        :disabled="loadingCek || !nisCek.trim()"
+                                        class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs disabled:opacity-50 cursor-pointer">
+                                    <span x-show="!loadingCek">Periksa</span>
+                                    <span x-show="loadingCek" x-cloak>Cek...</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    {{-- Pesan Error Cek --}}
+                    <div x-show="errorCek" x-cloak class="rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-xs font-semibold text-rose-800 flex items-start gap-2">
+                        <x-icon name="info" class="h-4 w-4 shrink-0 text-rose-600 mt-0.5" />
+                        <span x-text="errorCek"></span>
+                    </div>
+
+                    {{-- Hasil Cek: Belum Terdaftar --}}
+                    <div x-show="resultCek && resultCek.status === 'BELUM_MENDAFTAR'" x-cloak class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs space-y-3 shadow-2xs">
+                        <div class="flex items-start gap-2.5">
+                            <x-icon name="info" class="h-4 w-4 shrink-0 text-amber-700 mt-0.5" />
+                            <div>
+                                <p class="font-bold text-amber-900 text-sm" x-text="resultCek ? resultCek.nama + ' (' + resultCek.kelas + ')' : ''"></p>
+                                <p class="text-amber-800 mt-0.5" x-text="resultCek?.message"></p>
+                            </div>
+                        </div>
+                        <button type="button" @click="tab = 'login'" class="w-full py-2 rounded-xl bg-amber-600 text-white font-bold hover:bg-amber-700 transition cursor-pointer text-center">
+                            Beralih ke Form Masuk & Pilih Eskul &rarr;
+                        </button>
+                    </div>
+
+                    {{-- Hasil Cek: Terdaftar Resmi --}}
+                    <div x-show="resultCek && resultCek.status === 'TERDAFTAR'" x-cloak class="rounded-2xl border border-emerald-200 bg-white p-4 text-xs space-y-3 shadow-sm">
+                        <div class="flex items-start justify-between border-b border-slate-100 pb-3">
+                            <div>
+                                <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                    <x-icon name="check-circle" class="h-3 w-3" />
+                                    <span>TERDAFTAR RESMI</span>
+                                </span>
+                                <h3 class="font-extrabold text-slate-900 text-base mt-1" x-text="resultCek?.nama"></h3>
+                                <p class="text-slate-500 text-xs">NIS: <strong x-text="resultCek?.nis"></strong> &bull; Kelas: <strong x-text="resultCek?.kelas"></strong></p>
+                            </div>
+                        </div>
+
+                        <div class="rounded-xl bg-blue-50/70 border border-blue-200/80 p-3 space-y-1.5">
+                            <span class="block text-[10px] font-bold uppercase tracking-wider text-blue-700">Ekstrakurikuler Terdaftar</span>
+                            <p class="text-sm font-black text-blue-950" x-text="resultCek?.eskul_utama"></p>
+                            <p class="text-slate-600 text-[11px]">Guru Pembina: <strong x-text="resultCek?.pembina_nama"></strong></p>
+                            <p class="text-slate-600 text-[11px]">Jadwal: <span x-text="resultCek?.jadwal"></span></p>
+                        </div>
+
+                        <a :href="resultCek?.kartu_url" target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition shadow-xs cursor-pointer">
+                            <x-icon name="printer" class="h-4 w-4" />
+                            <span>Lihat / Cetak Kartu Peserta ID-1</span>
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Link Bantuan Bawah --}}
+                <div class="mt-5 text-center space-y-2">
+                    <p class="text-xs text-slate-500">Lupa token? Hubungi <span class="font-medium text-slate-700">admin/wali kelas</span> anda.</p>
+                    <p class="text-xs text-slate-600">Bukan siswa? <a href="{{ route('pembina.login') }}" class="font-semibold text-blue-600 hover:text-blue-700 hover:underline">Masuk sebagai Pembina / Wali Kelas &rarr;</a></p>
+                    <div class="pt-2">
+                        <a href="{{ route('home') }}" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-blue-600 hover:underline transition">
+                            &larr; Kembali ke Beranda
+                        </a>
+                    </div>
+                </div>
             </div>
 
             {{-- Footer Bawah Kartu Sesuai Foto Referensi 2 --}}

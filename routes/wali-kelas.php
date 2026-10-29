@@ -14,5 +14,6 @@ Route::middleware(['auth', 'role:wali_kelas,admin', \App\Http\Middleware\Mainten
         Route::post('siswa/keluarkan-massal', [WaliKelasController::class, 'bulkKeluarkanSiswa'])->name('siswa.keluarkan-massal');
         Route::get('nilai', [WaliKelasController::class, 'nilai'])->name('nilai');
         Route::get('nilai/cetak', [WaliKelasController::class, 'cetakNilai'])->name('cetak-nilai');
+        Route::get('nilai/export', [WaliKelasController::class, 'exportNilai'])->name('export-nilai');
     });
 

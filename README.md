@@ -16,28 +16,35 @@ Antarmuka dibangun dengan pendekatan minimalis modern menggunakan palet warna fu
 
 ### 1. Portal Siswa
 - **Autentikasi Token Aman:** Akses masuk menggunakan kombinasi Nomor Induk Siswa (NIS) dan Token Login sekali pakai yang diterbitkan oleh pihak sekolah.
-- **Pemilihan Ekstrakurikuler Dinamis:** Pemantauan kuota berjalan (*real-time*), deskripsi kegiatan, dan jadwal latihan mingguan sebelum menetapkan pilihan.
+- **Pemilihan Ekstrakurikuler Dinamis:** Pemantauan kuota berjalan (*real-time*), deskripsi kegiatan, dan jadwal latihan mingguan sebelum menetapkan pilihan langsung tanpa proses seleksi manual yang berbelit.
+- **Portal Cek Status & Cetak Ulang Mandiri:** Siswa yang telah mendaftar dan tokennya telah terpakai dapat memeriksa status kepesertaan resmi, informasi pembina pengampu, jadwal mingguan, serta mencetak atau menyimpan ulang Kartu ID-1 langsung melalui NIS tanpa kendala sesi keluar otomatis.
 - **Kartu Peserta Digital ID-1:** Penerbitan kartu tanda anggota resmi berdimensi presisi (85,6 mm x 53,98 mm) lengkap dengan kode QR verifikasi keabsahan, identitas siswa, dan latar dinamis instansi.
 - **Proteksi Data Final:** Pilihan langsung terkunci setelah konfirmasi untuk mencegah manipulasi data pendaftaran.
 
 ### 2. Panel Wali Kelas
 - **Direktori Rombel:** Pemantauan daftar siswa aktif dalam rombel kelas perwalian beserta status kepemilikan ekstrakurikuler.
+- **Pengingat WhatsApp 1-Klik:** Tombol salin format pesan pengingat siap tempel ke grup WhatsApp kelas berisi daftar siswa yang belum menentukan pilihan eskul.
+- **Ekspor Rekap Nilai e-Rapor (.xls):** Fasilitas unduh lembar nilai ekstrakurikuler rombel perwalian ke format berkas Excel yang selaras dengan kebutuhan buku nilai e-Rapor.
 - **Manajemen Kelas (+ Kelas Saya):** Kemudahan mengelompokkan siswa ke dalam rombel perwalian melalui modal pencarian dan filter jenjang/status penempatan.
 - **Penyesuaian Penempatan:** Fitur pembatalan atau pengeluaran siswa dari rombel perwalian baik per individu maupun checklist massal (*bulk action*).
 
 ### 3. Panel Pembina Ekstrakurikuler
+- **Antarmuka 4 Tab Modern:** Tata letak responsif ramah layar ponsel yang membagi modul kegiatan secara rapi ke dalam tab Anggota, Presensi Pertemuan, Nilai Rapor, serta Jadwal & Izin.
 - **Kelola Jadwal Latihan:** Pengaturan hari, rentang jam, dan lokasi latihan mingguan.
-- **Presensi Pertemuan Ganda:**
+- **Presensi Pertemuan & Pemindai QR Kartu Pelajar:**
   - Pemindaian instan kode QR kartu pelajar menggunakan kamera peramban.
+  - Fitur sekali klik "Tandai Semua Hadir" untuk kecepatan presensi lapangan tanpa klik satu per satu.
   - Pengisian presensi manual yang dikelompokkan teratur berdasarkan rombel kelas (Hadir, Izin, Sakit, Alpa).
 - **Pengesahan Sesi:** Fitur penguncian data absensi per tanggal pertemuan untuk menjamin validitas rekapitulasi.
 - **Verifikasi Izin & Sakit:** Peninjauan permohonan ketidakhadiran siswa beserta pratinjau dokumen atau foto bukti lampiran.
 - **Pendaftaran Siswa Susulan (+ Tambah Anggota):** Fitur manual untuk mendaftarkan siswa yang terkendala akses perangkat atau kuota internet.
-- **Evaluasi & Penilaian Akhir:** Input skor capaian (skala 0-100) dengan konversi predikat otomatis (A, B, C, D) dan catatan pembina untuk kebutuhan raport.
+- **Evaluasi & Preset Nilai Cepat:** Input skor capaian (skala 0-100) dilengkapi pilihan preset nilai standar (85, 80, 78, 75) untuk pengisian otomatis seluruh baris yang masih kosong, konversi predikat otomatis (A, B, C, D), dan catatan pembina.
 - **Riwayat & Arsip Multi-Periode:** Pembina dapat memilih dan memantau riwayat pendaftaran, kehadiran, dan penilaian anggota eskul dari tahun ajaran lampau dalam mode arsip aman (*read-only*).
 - **Ekspor Laporan:** Pengunduhan rekapitulasi kehadiran dan data anggota per periode dalam format Excel dan CSV.
 
 ### 4. Panel Administrator & Kesiswaan
+- **Pencarian Cepat Global (Spotlight `Ctrl+K`):** Akses instan dari seluruh bilah navigasi staf untuk mencari data siswa dalam hitungan detik berdasarkan NIS atau Nama lengkap dengan status eskul, nama pembina, dan kredensial token.
+- **WhatsApp Blast Anti-Banned & Proteksi Spam:** Pengiriman pesan massal terkelola dengan batas gelombang aman (25–50 siswa per gelombang), jeda waktu manusiawi (1,5 detik per nomor), serta pembatasan tegas maksimal 1 kali pengiriman per siswa per periode pendaftaran guna menjaga reputasi nomor WhatsApp instansi dari pemblokiran Meta.
 - **Pengaturan Identitas Instansi:** Kustomisasi nama instansi, logo (penyimpanan mandiri tanpa dependensi symlink), nomor kontak pengaduan, slogan, dan alamat.
 - **Periode & Jendela Pendaftaran Terpadu:** Pengaturan tahun ajaran aktif dan arsip lampau menggunakan dropdown pemilih interaktif satu pintu, kontrol buka/tutup jendela pendaftaran instan, form penjadwalan otomatis, kartu metrik partisipasi kesiswaan, rincian detail periode langsung di tempat tanpa navigasi terpisah, serta tabel riwayat komparasi seluruh periode.
 - **Rekapitulasi & Riwayat Multi-Periode:** Pemantauan data historis lintas tahun ajaran yang menyajikan informasi nama pembina pengampu, jumlah pendaftar per eskul, sebaran asal rombel kelas siswa, rincian siswa, serta ekspor rekapitulasi menyeluruh ke format Excel.
