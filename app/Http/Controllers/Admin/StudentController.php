@@ -96,11 +96,18 @@ class StudentController extends Controller
             ?? Periode::orderByDesc('periode')->first();
 
         $query = $this->filterStudentsQuery($request)
-            ->with(['user.registrations' => function ($q) use ($periode) {
-                if ($periode) {
-                    $q->where('periode', $periode->periode);
-                }
-            }])
+            ->with([
+                'user.registrations' => function ($q) use ($periode) {
+                    if ($periode) {
+                        $q->where('periode', $periode->periode);
+                    }
+                },
+                'registrations' => function ($q) use ($periode) {
+                    if ($periode) {
+                        $q->where('periode', $periode->periode);
+                    }
+                },
+            ])
             ->orderBy('kelas')
             ->orderBy('nama');
 

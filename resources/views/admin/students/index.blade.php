@@ -146,11 +146,11 @@
 
     {{-- Status Pendaftaran Eskul --}}
     <div>
-        <label for="eskul-status-filter" class="block font-semibold mb-1 text-slate-700 text-xs">Status Eskul</label>
+        <label for="eskul-status-filter" class="block font-semibold mb-1 text-slate-700 text-xs">Status Pemilihan</label>
         <select id="eskul-status-filter" name="eskul_status" class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
-            <option value="">Semua Siswa</option>
-            <option value="terdaftar" @selected(request('eskul_status') === 'terdaftar')>Sudah Terdaftar</option>
-            <option value="belum" @selected(request('eskul_status') === 'belum')>Belum Mendaftar</option>
+            <option value="">Semua Status</option>
+            <option value="terdaftar" @selected(request('eskul_status') === 'terdaftar')>Sudah Memilih</option>
+            <option value="belum" @selected(request('eskul_status') === 'belum')>Belum Memilih</option>
         </select>
     </div>
 
@@ -218,6 +218,7 @@
                     <th class="py-2.5 px-3">Kelas</th>
                     <th class="py-2.5 px-3">Jurusan</th>
                     <th class="py-2.5 px-3">Status</th>
+                    <th class="py-2.5 px-3">Pilihan Eskul</th>
                     <th class="py-2.5 px-3">Token Login</th>
                     <th class="py-2.5 px-3 text-right">Aksi</th>
                 </tr>

@@ -7,6 +7,7 @@ use App\Enums\Jurusan;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Student extends Model
 {
@@ -36,6 +37,11 @@ class Student extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function registrations(): HasMany
+    {
+        return $this->hasMany(Registration::class, 'nis', 'nis');
     }
 
     public function scopeAktif(Builder $query): Builder

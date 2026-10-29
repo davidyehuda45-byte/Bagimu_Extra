@@ -1,4 +1,8 @@
 @forelse ($students as $s)
+    @php
+        $reg = $s->registrations?->first() ?? $s->user?->registrations?->first();
+        $waNum = $s->whatsapp ?: ($s->wali_kontak ?: ($reg?->whatsapp ?? ''));
+    @endphp
     <tr class="border-b border-slate-100 hover:bg-slate-50/70 transition-colors">
         <td class="py-3 px-3 w-10 text-center">
             <input type="checkbox" class="student-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer h-4 w-4" value="{{ $s->id }}" data-nama="{{ $s->nama }}" data-nis="{{ $s->nis }}" onchange="updateSelectedCount()">
@@ -7,10 +11,6 @@
         <td class="py-3 px-3 font-mono text-xs text-slate-500">{{ $s->nisn ?? '—' }}</td>
         <td class="py-3 px-3">
             <div class="font-medium text-slate-800">{{ $s->nama }}</div>
-            @php
-                $reg = $s->user?->registrations?->first();
-                $waNum = $s->whatsapp ?: ($s->wali_kontak ?: ($reg?->whatsapp ?? ''));
-            @endphp
             <div class="flex flex-wrap items-center gap-1.5 mt-1">
                 @if ($waNum)
                     <a href="https://wa.me/{{ \App\Support\Whatsapp::normalize($waNum) }}" target="_blank" rel="noopener noreferrer"
@@ -25,15 +25,6 @@
                         <span>Belum ada WA</span>
                     </span>
                 @endif
-                <span class="text-slate-300 text-[10px]">•</span>
-                @if ($reg)
-                    <span class="inline-flex items-center gap-1 rounded-md bg-blue-50 text-blue-800 border border-blue-200/70 px-1.5 py-0.5 text-[10px] font-bold">
-                        <x-icon name="trophy" class="h-2.5 w-2.5 text-blue-600" />
-                        <span>{{ $reg->eskul_utama }}</span>
-                    </span>
-                @else
-                    <span class="inline-block text-[10px] text-amber-600 font-medium italic">Belum mendaftar eskul</span>
-                @endif
             </div>
         </td>
         <td class="py-3 px-3">
@@ -44,6 +35,19 @@
             <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold {{ $s->status === 'AKTIF' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
                 {{ $s->status }}
             </span>
+        </td>
+        <td class="py-3 px-3">
+            @if ($reg)
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200/80 shadow-2xs" title="Terdaftar di {{ $reg->eskul_utama }}">
+                    <x-icon name="trophy" class="h-3.5 w-3.5 text-blue-600 shrink-0" />
+                    <span class="truncate max-w-[150px]">{{ $reg->eskul_utama }}</span>
+                </span>
+            @else
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-medium bg-slate-100 text-slate-500 border border-slate-200/60">
+                    <x-icon name="clock" class="h-3 w-3 text-slate-400 shrink-0" />
+                    <span>Belum Memilih</span>
+                </span>
+            @endif
         </td>
         <td class="py-3 px-3">
             @if ($s->user?->login_token && !$s->user?->login_token_revoked_at)
@@ -107,7 +111,7 @@
     </tr>
 @empty
     <tr>
-        <td colspan="9" class="py-10 px-3 text-center text-slate-400">
+        <td colspan="10" class="py-10 px-3 text-center text-slate-400">
             <div class="mx-auto flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-slate-400 mb-2">
                 <x-icon name="search" class="h-5 w-5" />
             </div>

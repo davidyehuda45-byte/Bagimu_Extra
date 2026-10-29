@@ -6,12 +6,16 @@ use App\Enums\PeriodeStatus;
 use App\Enums\Role;
 use App\Enums\Status;
 use App\Http\Controllers\Controller;
+use App\Models\AdminLog;
 use App\Models\AppSetting;
+use App\Models\ClassHistory;
 use App\Models\Periode;
 use App\Models\Registration;
 use App\Models\SchoolClass;
 use App\Models\Student;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class WaliKelasController extends Controller
@@ -110,8 +114,25 @@ class WaliKelasController extends Controller
 
         $students = collect();
         $regPeta = collect();
+        $calonSiswa = collect();
+        $tingkatKelas = null;
+        $daftarKelasAsal = collect();
 
         if ($kelas) {
+            $tingkatKelas = \App\Support\Kelas::tingkat($kelas->nama);
+
+            // Calon siswa: siswa aktif yang saat ini belum terdaftar di kelas rombel ini
+            $calonSiswa = Student::where('status', 'AKTIF')
+                ->where(function ($q) use ($kelas) {
+                    $q->whereNull('kelas')
+                      ->orWhere('kelas', '!=', $kelas->nama);
+                })
+                ->orderBy('kelas')
+                ->orderBy('nama')
+                ->get(['id', 'nis', 'nama', 'gender', 'kelas']);
+
+            $daftarKelasAsal = $calonSiswa->pluck('kelas')->filter()->unique()->values();
+
             $students = Student::where('kelas', $kelas->nama)
                 ->orderBy('no_absen')
                 ->orderBy('nama')
@@ -132,8 +153,103 @@ class WaliKelasController extends Controller
             'periode',
             'periodes',
             'students',
-            'regPeta'
+            'regPeta',
+            'calonSiswa',
+            'tingkatKelas',
+            'daftarKelasAsal'
         ));
+    }
+
+    public function masukkanSiswa(Request $request): RedirectResponse
+    {
+        [$kelas] = $this->resolveKelas($request);
+
+        if (! $kelas) {
+            return back()->with('error', 'Anda belum ditugaskan ke rombel kelas mana pun.');
+        }
+
+        $data = $request->validate([
+            'student_ids' => ['required', 'array', 'min:1'],
+            'student_ids.*' => ['required', 'integer', 'exists:students,id'],
+        ]);
+
+        $students = Student::whereIn('id', $data['student_ids'])->where('status', 'AKTIF')->get();
+        $waliNama = $kelas->wali_kelas_nama ?? auth()->user()->name;
+        $periodeStr = Periode::where('status', PeriodeStatus::DIBUKA)->first()?->periode ?? date('Y');
+        $count = 0;
+
+        DB::transaction(function () use ($students, $kelas, $waliNama, $periodeStr, &$count) {
+            foreach ($students as $s) {
+                $kelasLama = $s->kelas;
+                $s->update([
+                    'kelas' => $kelas->nama,
+                    'wali_nama' => $waliNama,
+                ]);
+
+                if ($s->user_id) {
+                    ClassHistory::create([
+                        'user_id' => $s->user_id,
+                        'periode' => $periodeStr,
+                        'kelas_lama' => $kelasLama,
+                        'kelas_baru' => $kelas->nama,
+                        'actor_id' => (string) auth()->id(),
+                        'reason' => 'Dimasukkan ke rombel oleh Wali Kelas ' . $waliNama,
+                    ]);
+                }
+                $count++;
+            }
+        });
+
+        AdminLog::record('wali_kelas.add_students', 'Student', null, "Wali kelas {$waliNama} memasukkan {$count} siswa ke rombel {$kelas->nama}.");
+
+        return back()->with('status', "Berhasil menambahkan {$count} siswa ke dalam rombel {$kelas->nama}.");
+    }
+
+    public function keluarkanSiswa(Request $request): RedirectResponse
+    {
+        [$kelas] = $this->resolveKelas($request);
+
+        if (! $kelas) {
+            return back()->with('error', 'Anda belum ditugaskan ke rombel kelas mana pun.');
+        }
+
+        $data = $request->validate([
+            'student_id' => ['required', 'integer', 'exists:students,id'],
+        ]);
+
+        $student = Student::where('id', $data['student_id'])->where('kelas', $kelas->nama)->firstOrFail();
+        $waliNama = $kelas->wali_kelas_nama ?? auth()->user()->name;
+
+        $student->update([
+            'kelas' => null,
+        ]);
+
+        AdminLog::record('wali_kelas.remove_student', 'Student', (string) $student->id, "Wali kelas {$waliNama} mengeluarkan siswa {$student->nama} ({$student->nis}) dari rombel {$kelas->nama}.");
+
+        return back()->with('status', "Siswa {$student->nama} telah dikeluarkan dari rombel {$kelas->nama}.");
+    }
+
+    public function bulkKeluarkanSiswa(Request $request): RedirectResponse
+    {
+        [$kelas] = $this->resolveKelas($request);
+
+        if (! $kelas) {
+            return back()->with('error', 'Anda belum ditugaskan ke rombel kelas mana pun.');
+        }
+
+        $data = $request->validate([
+            'student_ids' => ['required', 'array', 'min:1'],
+            'student_ids.*' => ['required', 'integer', 'exists:students,id'],
+        ]);
+
+        $waliNama = $kelas->wali_kelas_nama ?? auth()->user()->name;
+        $count = Student::whereIn('id', $data['student_ids'])
+            ->where('kelas', $kelas->nama)
+            ->update(['kelas' => null]);
+
+        AdminLog::record('wali_kelas.bulk_remove_students', 'Student', null, "Wali kelas {$waliNama} mengeluarkan {$count} siswa secara massal dari rombel {$kelas->nama}.");
+
+        return back()->with('status', "Berhasil mengeluarkan {$count} siswa dari rombel {$kelas->nama}.");
     }
 
     public function nilai(Request $request): View
