@@ -1,6 +1,7 @@
 @forelse ($students as $s)
     @php
         $reg = $s->registrations?->first() ?? $s->user?->registrations?->first();
+        $user = $s->user ?? $reg?->user;
         $waNum = $s->whatsapp ?: ($s->wali_kontak ?: ($reg?->whatsapp ?? ''));
     @endphp
     <tr class="border-b border-slate-100 hover:bg-slate-50/70 transition-colors">
@@ -50,18 +51,35 @@
             @endif
         </td>
         <td class="py-3 px-3">
-            @if ($s->user?->login_token && !$s->user?->login_token_revoked_at)
-                @php $waNum = $s->whatsapp ?: ($s->wali_kontak ?: ($reg?->whatsapp ?? '')); @endphp
-                <div class="inline-flex items-center gap-1 font-mono font-bold text-xs bg-blue-50 text-blue-900 px-2 py-1 rounded-lg border border-blue-200">
-                    <span class="tracking-widest">{{ $s->user->login_token }}</span>
-                    <button type="button" onclick="salinToken(this, '{{ $s->user->login_token }}')"
-                            class="text-blue-400 hover:text-blue-700 px-0.5" title="Salin Token"><x-icon name="copy" class="h-3.5 w-3.5" /></button>
-                    <button type="button" onclick="sendTokenViaWa('{{ addslashes($s->nama) }}', '{{ $s->nis }}', '{{ $s->user->login_token }}', '{{ $waNum }}')"
-                            class="text-emerald-600 hover:text-emerald-800 px-1 hover:scale-110 transition-transform" title="Kirim Token via WhatsApp"><x-icon name="send" class="h-3.5 w-3.5" /></button>
+            @if ($reg)
+                {{-- Siswa sudah terdaftar di eskul (token telah digunakan dan terkunci) --}}
+                <div class="flex flex-col items-start gap-1">
+                    <span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
+                        <x-icon name="check-circle" class="h-3 w-3 text-emerald-600 shrink-0" />
+                        <span>Sudah Dipakai</span>
+                    </span>
+                    @if ($user?->login_token)
+                        <span class="font-mono text-[11px] text-slate-400 font-semibold" title="Token yang telah digunakan untuk memilih eskul">{{ $user->login_token }}</span>
+                    @endif
                 </div>
-                @if ($s->user?->password_set_at)
+            @elseif ($user?->login_token && !$user?->login_token_revoked_at)
+                {{-- Siswa belum terdaftar dan token aktif siap dipakai --}}
+                <div class="inline-flex items-center gap-1 font-mono font-bold text-xs bg-blue-50 text-blue-900 px-2 py-1 rounded-lg border border-blue-200">
+                    <span class="tracking-widest">{{ $user->login_token }}</span>
+                    <button type="button" onclick="salinToken(this, '{{ $user->login_token }}')"
+                            class="text-blue-400 hover:text-blue-700 px-0.5 cursor-pointer" title="Salin Token"><x-icon name="copy" class="h-3.5 w-3.5" /></button>
+                    <button type="button" onclick="sendTokenViaWa('{{ addslashes($s->nama) }}', '{{ $s->nis }}', '{{ $user->login_token }}', '{{ $waNum }}')"
+                            class="text-emerald-600 hover:text-emerald-800 px-1 hover:scale-110 transition-transform cursor-pointer" title="Kirim Token via WhatsApp"><x-icon name="send" class="h-3.5 w-3.5" /></button>
+                </div>
+                @if ($user?->password_set_at)
                     <span class="block text-[10px] text-slate-400 font-medium mt-0.5">+ Password aktif</span>
                 @endif
+            @elseif ($user?->login_token && $user?->login_token_revoked_at)
+                {{-- Token dicabut admin sebelum mendaftar --}}
+                <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200">
+                    <x-icon name="alert-triangle" class="h-3 w-3 text-amber-600 shrink-0" />
+                    <span>Token Dicabut</span>
+                </span>
             @else
                 <span class="text-xs text-slate-400 italic">Belum ada token</span>
             @endif
@@ -80,25 +98,32 @@
                         <x-icon name="pencil" class="h-3.5 w-3.5 text-slate-400" />
                         <span>Ubah Data</span>
                     </a>
-                    <form method="POST" action="{{ route('admin.students.token', $s) }}">
-                        @csrf
-                        <button type="submit" class="flex w-full items-center gap-2 rounded-xl px-2.5 py-2 hover:bg-blue-50 text-blue-700 font-medium text-left">
-                            <x-icon name="key" class="h-3.5 w-3.5 text-blue-500" />
-                            <span>{{ $s->user?->login_token ? 'Reset Token' : 'Terbitkan Token' }}</span>
-                        </button>
-                    </form>
-                    @if ($s->user?->login_token && !$s->user?->login_token_revoked_at)
-                        <button type="button" onclick="sendTokenViaWa('{{ addslashes($s->nama) }}', '{{ $s->nis }}', '{{ $s->user->login_token }}', '{{ $waNum }}')" class="flex w-full items-center gap-2 rounded-xl px-2.5 py-2 hover:bg-emerald-50 text-emerald-700 font-medium text-left">
-                            <x-icon name="message-square" class="h-3.5 w-3.5 text-emerald-600" />
-                            <span>Kirim Token ke WA</span>
-                        </button>
-                        <form method="POST" action="{{ route('admin.students.revoke', $s) }}">
+                    @if (! $reg)
+                        <form method="POST" action="{{ route('admin.students.token', $s) }}">
                             @csrf
-                            <button type="submit" class="flex w-full items-center gap-2 rounded-xl px-2.5 py-2 hover:bg-amber-50 text-amber-700 font-medium text-left">
-                                <x-icon name="x" class="h-3.5 w-3.5 text-amber-500" />
-                                <span>Cabut Token</span>
+                            <button type="submit" class="flex w-full items-center gap-2 rounded-xl px-2.5 py-2 hover:bg-blue-50 text-blue-700 font-medium text-left cursor-pointer">
+                                <x-icon name="key" class="h-3.5 w-3.5 text-blue-500" />
+                                <span>{{ $user?->login_token ? 'Reset Token' : 'Terbitkan Token' }}</span>
                             </button>
                         </form>
+                        @if ($user?->login_token && !$user?->login_token_revoked_at)
+                            <button type="button" onclick="sendTokenViaWa('{{ addslashes($s->nama) }}', '{{ $s->nis }}', '{{ $user->login_token }}', '{{ $waNum }}')" class="flex w-full items-center gap-2 rounded-xl px-2.5 py-2 hover:bg-emerald-50 text-emerald-700 font-medium text-left cursor-pointer">
+                                <x-icon name="message-square" class="h-3.5 w-3.5 text-emerald-600" />
+                                <span>Kirim Token ke WA</span>
+                            </button>
+                            <form method="POST" action="{{ route('admin.students.revoke', $s) }}">
+                                @csrf
+                                <button type="submit" class="flex w-full items-center gap-2 rounded-xl px-2.5 py-2 hover:bg-amber-50 text-amber-700 font-medium text-left cursor-pointer">
+                                    <x-icon name="x" class="h-3.5 w-3.5 text-amber-500" />
+                                    <span>Cabut Token</span>
+                                </button>
+                            </form>
+                        @endif
+                    @else
+                        <div class="px-2.5 py-2 text-[11px] font-semibold text-emerald-700 bg-emerald-50/70 rounded-xl flex items-center gap-1.5">
+                            <x-icon name="check-circle" class="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                            <span>Pilihan Terkunci</span>
+                        </div>
                     @endif
                     <div class="my-1 border-t border-slate-100"></div>
                     <button type="button" onclick="confirmDeleteSingle('{{ $s->id }}', '{{ addslashes($s->nama) }}', '{{ $s->nis }}')" class="flex w-full items-center gap-2 rounded-xl px-2.5 py-2 hover:bg-rose-50 text-rose-600 font-medium text-left">

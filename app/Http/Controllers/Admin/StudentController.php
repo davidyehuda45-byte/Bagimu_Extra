@@ -107,6 +107,7 @@ class StudentController extends Controller
                         $q->where('periode', $periode->periode);
                     }
                 },
+                'registrations.user',
             ])
             ->orderBy('kelas')
             ->orderBy('nama');
