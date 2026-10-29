@@ -209,20 +209,15 @@ class WaBlastController extends Controller
                 $token = LoginToken::issue($user);
             }
 
-            $directLoginUrl = route('siswa.direct-login', [
-                'nis' => $student->nis,
-                'token' => $token,
-            ]);
-
             $replacements = [
                 '{nama}' => $student->nama,
                 '{nis}' => $student->nis,
-                '{nisn}' => $student->nisn ?? '-',
                 '{kelas}' => $student->kelas,
                 '{token}' => $token,
-                '{link}' => $directLoginUrl,
+                '{link}' => $loginUrl,
                 '{login_url}' => $loginUrl,
                 '{aplikasi}' => $appName,
+                '{sekolah}' => \App\Models\AppSetting::get('school.name', $appName),
                 '{eskul}' => $reg?->eskul_utama ?? 'Belum memilih',
             ];
 

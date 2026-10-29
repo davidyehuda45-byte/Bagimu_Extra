@@ -3,7 +3,44 @@
 @section('title', 'Detail Eskul — ' . $eskul->name)
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-6" x-data="{
+    bukaModal: false,
+    search: '',
+    filterTingkat: 'all',
+    filterKelas: 'all',
+    selected: [],
+    calonList: {{ Js::from($calonSiswa) }},
+    get filteredList() {
+        return this.calonList.filter(s => {
+            if (this.filterTingkat !== 'all') {
+                const k = (s.kelas || '').trim();
+                if (!k.startsWith(this.filterTingkat)) return false;
+            }
+            if (this.filterKelas !== 'all') {
+                if ((s.kelas || '') !== this.filterKelas) return false;
+            }
+            if (this.search.trim()) {
+                const q = this.search.toLowerCase();
+                const nama = (s.nama || '').toLowerCase();
+                const nis = (s.nis || '').toLowerCase();
+                if (!nama.includes(q) && !nis.includes(q)) return false;
+            }
+            return true;
+        });
+    },
+    pilihSemua() {
+        const visibleIds = this.filteredList.map(s => s.id);
+        if (this.isSemuaTerpilih()) {
+            this.selected = this.selected.filter(id => !visibleIds.includes(id));
+        } else {
+            this.selected = [...new Set([...this.selected, ...visibleIds])];
+        }
+    },
+    isSemuaTerpilih() {
+        const visibleIds = this.filteredList.map(s => s.id);
+        return visibleIds.length > 0 && visibleIds.every(id => this.selected.includes(id));
+    }
+}">
     <div class="flex flex-wrap items-center gap-2">
         <a href="{{ route('pembina.eskul.index') }}" class="text-sm text-blue-600 hover:underline">&larr; Kembali ke Eskul Saya</a>
     </div>
@@ -18,6 +55,10 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
+                <button type="button" @click="bukaModal = true" class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-700 transition shadow-sm cursor-pointer">
+                    <x-icon name="plus" class="h-3.5 w-3.5" />
+                    <span>+ Tambah Anggota</span>
+                </button>
                 <a href="{{ route('pembina.eskul.export', [$eskul, 'format' => 'excel']) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition shadow-sm">
                     <x-icon name="chart" class="h-3.5 w-3.5" /> Export Excel
                 </a>
@@ -297,6 +338,7 @@
                                 <th class="px-3 py-2.5">Kelas</th>
                                 <th class="px-3 py-2.5">Status Presensi</th>
                                 <th class="px-3 py-2.5">Keterangan</th>
+                                <th class="px-3 py-2.5 text-center w-12">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -305,7 +347,7 @@
                             @endphp
                             @foreach ($grouped as $namaKelas => $list)
                                 <tr class="bg-slate-100/70">
-                                    <td colspan="5" class="px-3 py-1.5 font-bold text-slate-800 text-[11px]">
+                                    <td colspan="6" class="px-3 py-1.5 font-bold text-slate-800 text-[11px]">
                                         Rombel: {{ $namaKelas }} ({{ $list->count() }} Siswa)
                                     </td>
                                 </tr>
@@ -325,6 +367,11 @@
                                         </td>
                                         <td class="px-3 py-2">
                                             <input type="text" name="keterangan[{{ $r->id }}]" value="{{ $ada?->keterangan }}" maxlength="200" placeholder="Keterangan izin/sakit..." class="rounded-xl border-slate-300 px-3 py-1.5 text-xs w-full max-w-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500" @disabled($locked)>
+                                        </td>
+                                        <td class="px-3 py-2 text-center">
+                                            <button type="button" onclick="confirmHapusAnggota('{{ route('pembina.anggota.destroy', [$eskul, $r]) }}', '{{ addslashes($r->user?->name ?? $r->nis) }}')" class="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-slate-200 bg-white text-slate-400 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition shadow-2xs cursor-pointer" title="Keluarkan dari Eskul">
+                                                <x-icon name="trash" class="h-3.5 w-3.5" />
+                                            </button>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -429,5 +476,160 @@
             </table>
         </div>
     </div>
+
+    {{-- MODAL + TAMBAH ANGGOTA SISWA (MANUAL) --}}
+    <div x-show="bukaModal"
+         x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+         style="display: none;"
+         @keydown.escape.window="bukaModal = false">
+
+        <div class="w-full max-w-3xl rounded-3xl bg-white shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]"
+             @click.outside="bukaModal = false">
+
+            {{-- Header Modal --}}
+            <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/70">
+                <div class="flex items-center gap-3">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
+                        <x-icon name="user" class="h-5 w-5" />
+                    </span>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">Tambah Anggota ke Eskul {{ $eskul->name }}</h3>
+                        <p class="text-xs text-slate-500">Pendaftaran manual bagi siswa yang belum memilih eskul (tidak memiliki HP atau kuota).</p>
+                    </div>
+                </div>
+                <button type="button" @click="bukaModal = false" class="rounded-xl p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer">
+                    <x-icon name="x" class="h-5 w-5" />
+                </button>
+            </div>
+
+            {{-- Catatan Panduan --}}
+            <div class="p-4 bg-blue-50/70 border-b border-blue-100 text-xs text-blue-900 flex items-start gap-2.5">
+                <x-icon name="info" class="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                <span><b>Perhatian Pembina:</b> Menambahkan siswa secara manual akan langsung menyetujui pendaftaran siswa ke ekstrakurikuler ini untuk periode aktif saat ini.</span>
+            </div>
+
+            {{-- Filter & Search Controls --}}
+            <div class="p-4 border-b border-slate-100 bg-white grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Tingkat Kelas</label>
+                    <select x-model="filterTingkat" class="w-full border-slate-300 rounded-xl py-2 px-3 text-xs font-semibold text-slate-700 focus:border-blue-500 focus:ring-blue-500">
+                        <option value="all">Semua Tingkat</option>
+                        <option value="10">Kelas 10 (Sepuluh)</option>
+                        <option value="11">Kelas 11 (Sebelas)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Rombel / Kelas</label>
+                    <select x-model="filterKelas" class="w-full border-slate-300 rounded-xl py-2 px-3 text-xs font-semibold text-slate-700 focus:border-blue-500 focus:ring-blue-500">
+                        <option value="all">Semua Kelas</option>
+                        @foreach ($daftarKelasCalon as $kc)
+                            <option value="{{ $kc }}">{{ $kc }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Cari Nama atau NIS</label>
+                    <div class="relative">
+                        <input type="text" x-model="search" placeholder="Ketik nama atau NIS..." class="w-full border-slate-300 rounded-xl py-2 pl-8 pr-3 text-xs text-slate-800 focus:border-blue-500 focus:ring-blue-500">
+                        <div class="absolute left-2.5 top-2.5 text-slate-400 pointer-events-none">
+                            <x-icon name="search" class="h-3.5 w-3.5" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Form & Tabel Calon Siswa --}}
+            <form method="POST" action="{{ route('pembina.anggota.store', $eskul) }}" class="flex-1 flex flex-col min-h-0">
+                @csrf
+
+                <div class="p-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between text-xs">
+                    <button type="button" @click="pilihSemua()" class="font-bold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">
+                        <span x-text="isSemuaTerpilih() ? 'Batalkan Pilih Semua' : 'Centang Semua yang Ditampilkan'"></span>
+                    </button>
+                    <span class="font-bold text-slate-600">
+                        <span x-text="selected.length" class="text-blue-600"></span> siswa dipilih
+                    </span>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-4 min-h-[220px]">
+                    <table class="min-w-full text-xs">
+                        <thead class="bg-slate-50 text-slate-700 uppercase tracking-wider font-bold text-[11px] sticky top-0 z-10 shadow-2xs">
+                            <tr>
+                                <th class="py-2 px-3 text-left">NIS</th>
+                                <th class="py-2 px-3 text-left">Nama Siswa</th>
+                                <th class="py-2 px-3 text-center">L/P</th>
+                                <th class="py-2 px-3 text-left">Kelas</th>
+                                <th class="py-2 px-3 text-center w-12">Pilih</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <template x-for="s in filteredList" :key="s.id">
+                                <tr class="hover:bg-blue-50/40 transition-colors" :class="selected.includes(s.id) ? 'bg-blue-50/60 font-semibold' : ''">
+                                    <td class="py-2 px-3 font-mono font-bold text-slate-800" x-text="s.nis"></td>
+                                    <td class="py-2 px-3 text-slate-900" x-text="s.nama"></td>
+                                    <td class="py-2 px-3 text-center text-slate-500 font-bold" x-text="s.gender ? (s.gender.value ? s.gender.value[0] : s.gender[0]) : '-'"></td>
+                                    <td class="py-2 px-3">
+                                        <span x-show="s.kelas" class="inline-flex items-center px-2 py-0.5 rounded-md font-semibold bg-slate-100 text-slate-600 text-[10px]" x-text="s.kelas"></span>
+                                        <span x-show="!s.kelas" class="inline-flex items-center px-2 py-0.5 rounded-md font-semibold bg-amber-50 text-amber-700 text-[10px]">Belum Ada Kelas</span>
+                                    </td>
+                                    <td class="py-2 px-3 text-center">
+                                        <input type="checkbox" name="student_ids[]" :value="s.id" x-model="selected" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 h-4 w-4 cursor-pointer">
+                                    </td>
+                                </tr>
+                            </template>
+                            <tr x-show="filteredList.length === 0">
+                                <td colspan="5" class="py-8 text-center text-slate-400">
+                                    Tidak ada data calon siswa yang cocok dengan filter atau pencarian.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                {{-- Footer Modal --}}
+                <div class="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
+                    <span class="text-xs text-slate-500">
+                        Total calon siswa belum memilih eskul: <b>{{ $calonSiswa->count() }}</b>
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <button type="button" @click="bukaModal = false" class="rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer">
+                            Batal
+                        </button>
+                        <button type="submit"
+                                :disabled="selected.length === 0"
+                                class="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-5 py-2 text-xs font-bold text-white hover:bg-blue-700 transition shadow-xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+                            <x-icon name="plus" class="h-3.5 w-3.5" />
+                            <span>Daftarkan <span x-text="selected.length > 0 ? selected.length : ''"></span> Siswa Terpilih</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- Form Hidden untuk Aksi Hapus/Keluarkan Anggota --}}
+    <form id="form-hapus-anggota" method="POST" action="" style="display: none;">
+        @csrf
+        @method('DELETE')
+    </form>
 </div>
+
+<script>
+function confirmHapusAnggota(url, nama) {
+    if (confirm(`Keluarkan siswa "${nama}" dari ekstrakurikuler ini?\n\nSiswa akan dapat memilih eskul kembali.`)) {
+        const form = document.getElementById('form-hapus-anggota');
+        form.action = url;
+        form.submit();
+    }
+}
+</script>
 @endsection

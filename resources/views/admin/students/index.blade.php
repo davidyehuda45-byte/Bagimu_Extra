@@ -750,8 +750,8 @@ function sendTokenViaWa(nama, nis, token, defaultPhone = '') {
     document.getElementById('wa-student-name').textContent = `${nama} (NIS: ${nis})`;
     document.getElementById('wa-phone-input').value = defaultPhone || '';
 
-    const loginUrl = "{{ url('/siswa/login') }}";
-    const msg = `Halo *${nama}* (NIS: *${nis}*),\n\nBerikut adalah kredensial token login untuk pemilihan Ekstrakurikuler:\n\n*Token Login:* ${token}\n*Tautan Login:* ${loginUrl}\n\nSilakan simpan token ini dengan baik untuk login ke portal siswa.\nTerima kasih.`;
+    const loginUrl = "{{ route('siswa.login') }}";
+    const msg = `Halo *${nama}*,\n\nBerikut adalah kredensial akun kamu untuk Sistem Ekstrakurikuler:\n\n*NIS:* ${nis}\n*Token Login:* ${token}\n\nSilakan buka tautan login berikut lalu masukkan NIS dan Token kamu:\n${loginUrl}\n\nSimpan pesan ini dengan baik. Terima kasih!`;
 
     document.getElementById('wa-message-preview').value = msg;
 
@@ -895,9 +895,9 @@ function handleDirectStudentUpload(input) {
 }
 
 const WA_TEMPLATES = {
-    token: "Halo {nama} ({kelas}),\nBerikut adalah kredensial akun kamu untuk Sistem Ekstrakurikuler SMK Bagimu Negeriku:\n\n*Token Login: {token}*\nNIS: {nis}\n\nSilakan buka tautan berikut untuk memilih ekstrakurikuler:\n{link}\n\nSimpan pesan ini dengan baik. Terima kasih!",
-    pengumuman: "Halo {nama} ({kelas}),\nPemberitahuan resmi: Pendaftaran kegiatan ekstrakurikuler SMK Bagimu Negeriku untuk periode baru telah dibuka!\n\nSilakan segera login ke sistem melalui tautan di bawah dan tentukan pilihan eskul terbaikmu:\n{link}\n\nJangan sampai terlambat ya!",
-    custom: "Halo {nama},\n\n[Tuliskan pengumuman atau instruksi Anda di sini]\n\nSalam,\nPengurus Ekstrakurikuler SMK Bagimu Negeriku"
+    token: "Halo {nama} ({kelas}),\nBerikut adalah kredensial akun kamu untuk Sistem Ekstrakurikuler:\n\n*NIS:* {nis}\n*Token Login:* {token}\n\nSilakan buka tautan login berikut lalu masukkan NIS dan Token kamu:\n{link}\n\nSimpan pesan ini dengan baik. Terima kasih!",
+    pengumuman: "Halo {nama} ({kelas}),\nPemberitahuan resmi: Pendaftaran kegiatan ekstrakurikuler untuk periode baru telah dibuka!\n\nSilakan segera login ke sistem melalui tautan di bawah dan tentukan pilihan eskul terbaikmu:\n{link}\n\nJangan sampai terlambat ya!",
+    custom: "Halo {nama},\n\n[Tuliskan pengumuman atau instruksi Anda di sini]\n\nSalam,\nPengurus Ekstrakurikuler"
 };
 
 function openWaBlastModal(mode = 'all') {
@@ -974,10 +974,10 @@ function updateWaBlastPreview() {
     let text = textarea.value;
     text = text.replace(/\{nama\}/g, 'Budi Santoso')
                .replace(/\{nis\}/g, '10234')
-               .replace(/\{nisn\}/g, '0081234567')
                .replace(/\{kelas\}/g, '10 RPL 1')
                .replace(/\{token\}/g, 'K7X9PQ')
                .replace(/\{link\}/g, window.location.origin + '/siswa/login')
+               .replace(/\{login_url\}/g, window.location.origin + '/siswa/login')
                .replace(/\{aplikasi\}/g, 'Bagimu Extra');
 
     previewBox.textContent = text || '(Pratinjau pesan akan muncul di sini...)';

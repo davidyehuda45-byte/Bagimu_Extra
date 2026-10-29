@@ -17,6 +17,8 @@ Route::middleware(['auth', 'role:pembina', \App\Http\Middleware\MaintenanceMode:
     Route::get('eskul', [EskulSayaController::class, 'index'])->name('eskul.index');
     Route::get('eskul/{eskul}', [EskulSayaController::class, 'show'])->name('eskul.show');
     Route::get('eskul/{eskul}/export', [EskulSayaController::class, 'export'])->name('eskul.export');
+    Route::post('eskul/{eskul}/anggota', [EskulSayaController::class, 'tambahAnggota'])->name('anggota.store');
+    Route::delete('eskul/{eskul}/anggota/{registration}', [EskulSayaController::class, 'hapusAnggota'])->name('anggota.destroy');
 
     Route::post('eskul/{eskul}/jadwals', [JadwalController::class, 'store'])->name('jadwals.store');
     Route::put('jadwals/{jadwal}', [JadwalController::class, 'update'])->name('jadwals.update');

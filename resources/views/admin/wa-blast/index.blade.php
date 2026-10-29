@@ -280,8 +280,7 @@
                     <button type="button" onclick="insertPageTag('{token}')" class="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-[11px] cursor-pointer">{token}</button>
                     <button type="button" onclick="insertPageTag('{nis}')" class="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-[11px] cursor-pointer">{nis}</button>
                     <button type="button" onclick="insertPageTag('{kelas}')" class="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-[11px] cursor-pointer">{kelas}</button>
-                    <button type="button" onclick="insertPageTag('{link}')" class="px-1.5 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-mono text-[11px] cursor-pointer" title="Tautan langsung login & pilih eskul">{link} (Auto-Login)</button>
-                    <button type="button" onclick="insertPageTag('{login_url}')" class="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-[11px] cursor-pointer" title="Halaman login biasa">{login_url}</button>
+                    <button type="button" onclick="insertPageTag('{login_url}')" class="px-1.5 py-0.5 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 font-mono text-[11px] cursor-pointer" title="Tautan halaman login siswa">{login_url}</button>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -390,9 +389,9 @@
 
 <script>
 const PAGE_WA_TEMPLATES = {
-    token: "Halo {nama} ({kelas}),\nBerikut adalah kredensial akun kamu untuk Sistem Ekstrakurikuler SMK Bagimu Negeriku:\n\n*Token Login: {token}*\nNIS: {nis}\n\nKlik tautan berikut untuk langsung masuk & memilih ekstrakurikuler:\n{link}\n\nSimpan pesan ini dengan baik. Terima kasih!",
-    pengumuman: "Halo {nama} ({kelas}),\nPemberitahuan resmi: Pendaftaran kegiatan ekstrakurikuler SMK Bagimu Negeriku untuk periode baru telah dibuka!\n\nSilakan langsung klik tautan di bawah untuk masuk dan memilih eskul favoritmu:\n{link}\n\nJangan sampai terlambat ya!",
-    custom: "Halo {nama},\n\n[Tuliskan pesan atau pengumuman Anda di sini]\n\nSalam,\nPengurus Ekstrakurikuler SMK Bagimu Negeriku"
+    token: "Halo {nama} ({kelas}),\nBerikut adalah kredensial akun kamu untuk Sistem Ekstrakurikuler:\n\n*NIS:* {nis}\n*Token Login:* {token}\n\nSilakan buka tautan login berikut lalu masukkan NIS dan Token kamu:\n{login_url}\n\nSimpan pesan ini dengan baik. Terima kasih!",
+    pengumuman: "Halo {nama} ({kelas}),\nPemberitahuan resmi: Pendaftaran kegiatan ekstrakurikuler untuk periode baru telah dibuka!\n\nSilakan segera login ke sistem melalui tautan di bawah dan tentukan pilihan eskul favoritmu:\n{login_url}\n\nJangan sampai terlambat ya!",
+    custom: "Halo {nama},\n\n[Tuliskan pesan atau pengumuman Anda di sini]\n\nSalam,\nPengurus Ekstrakurikuler"
 };
 
 function setPageTemplate(type) {
@@ -423,10 +422,9 @@ function updatePagePreview() {
     let text = textarea.value;
     text = text.replace(/\{nama\}/g, 'Budi Santoso')
                .replace(/\{nis\}/g, '10234')
-               .replace(/\{nisn\}/g, '0081234567')
                .replace(/\{kelas\}/g, '10 RPL 1')
                .replace(/\{token\}/g, '98231456')
-               .replace(/\{link\}/g, window.location.origin + '/siswa/masuk?nis=10234&token=98231456')
+               .replace(/\{link\}/g, window.location.origin + '/siswa/login')
                .replace(/\{login_url\}/g, window.location.origin + '/siswa/login')
                .replace(/\{aplikasi\}/g, 'Bagimu Extra');
 

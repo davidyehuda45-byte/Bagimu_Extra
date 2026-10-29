@@ -1,47 +1,162 @@
 # Bagimu Extra
 
-**Sistem Informasi & Manajemen Pendaftaran Ekstrakurikuler Digital**  
-*SMK Bagimu Negeriku Semarang*
+Sistem informasi dan manajemen pendaftaran ekstrakurikuler berbasis web untuk institusi pendidikan, dirancang untuk menyederhanakan alur pendaftaran, distribusi kuota, presensi kegiatan, hingga penilaian akhir siswa secara transparan, akuntabel, dan efisien.
 
 ---
 
-## 📌 Ringkasan Sistem
-**Bagimu Extra** adalah platform berbasis web modern untuk menyederhanakan proses pendaftaran, manajemen kuota, presensi kehadiran, dan pelaporan kegiatan ekstrakurikuler sekolah. Sistem ini dirancang dengan antarmuka yang bersih, cepat, serta ramah pengguna bagi siswa maupun pembina non-IT.
+## Ringkasan Sistem
+
+Bagimu Extra menyediakan portal terintegrasi multi-peran yang menghubungkan Siswa, Wali Kelas, Pembina Ekstrakurikuler, dan Administrator Kesiswaan ke dalam satu sistem terpadu. Sistem ini menerapkan arsitektur *white-label ready*, memungkinkan seluruh identitas instansi (nama sekolah, kontak, logo, motto, dan alamat) dikonfigurasi secara dinamis langsung melalui panel kontrol.
+
+Antarmuka dibangun dengan pendekatan minimalis modern menggunakan palet warna fungsional (*slate*, *blue*, *emerald*, *amber*, dan *rose*) serta pustaka ikon vektor terpadu tanpa ketergantungan pada pustaka pihak ketiga yang membebani kinerja peramban.
 
 ---
 
-## ✨ Fitur Utama
+## Fitur Berdasarkan Peran
 
-- **Pendaftaran Siswa Satu Arah (One-Shot Flow):**
-  - Siswa masuk menggunakan kombinasi **NIS** dan **Token Pendaftaran** 8-karakter unik.
-  - Pemilihan ekstrakurikuler dengan pemantauan kuota dan jadwal latihan interaktif.
-  - Token bersifat sekali pakai (*burned on submit*); data terkunci permanen untuk mencegah manipulasi.
-  - Auto-logout otomatis dengan hitung mundur 5 detik demi keamanan sesi.
-- **Bukti Pendaftaran Digital & Cetak PDF:**
-  - Siswa memperoleh bukti resmi pendaftaran yang dapat langsung dicetak atau disimpan sebagai PDF.
-- **Portal Pembina & Presensi Pertemuan:**
-  - Pintu masuk khusus pembina dengan tab berdampingan di halaman login.
-  - Pencatatan kehadiran dan perizinan (*Hadir, Izin, Sakit, Alpa*) per sesi pertemuan.
-- **Panel Administrator & Tata Usaha (TU):**
-  - Manajemen master data siswa, penerbitan token login, kenaikan kelas, dan pembukaan jendela pendaftaran.
-  - Verifikasi keabsahan sertifikat dan rekapitulasi nilai akhir.
+### 1. Portal Siswa
+- **Autentikasi Token Aman:** Akses masuk menggunakan kombinasi Nomor Induk Siswa (NIS) dan Token Login sekali pakai yang diterbitkan oleh pihak sekolah.
+- **Pemilihan Ekstrakurikuler Dinamis:** Pemantauan kuota berjalan (*real-time*), deskripsi kegiatan, dan jadwal latihan mingguan sebelum menetapkan pilihan.
+- **Kartu Peserta Digital ID-1:** Penerbitan kartu tanda anggota resmi berdimensi presisi (85,6 mm x 53,98 mm) lengkap dengan kode QR verifikasi keabsahan, identitas siswa, dan latar dinamis instansi.
+- **Proteksi Data Final:** Pilihan langsung terkunci setelah konfirmasi untuk mencegah manipulasi data pendaftaran.
+
+### 2. Panel Wali Kelas
+- **Direktori Rombel:** Pemantauan daftar siswa aktif dalam rombel kelas perwalian beserta status kepemilikan ekstrakurikuler.
+- **Manajemen Kelas (+ Kelas Saya):** Kemudahan mengelompokkan siswa ke dalam rombel perwalian melalui modal pencarian dan filter jenjang/status penempatan.
+- **Penyesuaian Penempatan:** Fitur pembatalan atau pengeluaran siswa dari rombel perwalian baik per individu maupun checklist massal (*bulk action*).
+
+### 3. Panel Pembina Ekstrakurikuler
+- **Kelola Jadwal Latihan:** Pengaturan hari, rentang jam, dan lokasi latihan mingguan.
+- **Presensi Pertemuan Ganda:**
+  - Pemindaian instan kode QR kartu pelajar menggunakan kamera peramban.
+  - Pengisian presensi manual yang dikelompokkan teratur berdasarkan rombel kelas (Hadir, Izin, Sakit, Alpa).
+- **Pengesahan Sesi:** Fitur penguncian data absensi per tanggal pertemuan untuk menjamin validitas rekapitulasi.
+- **Verifikasi Izin & Sakit:** Peninjauan permohonan ketidakhadiran siswa beserta pratinjau dokumen atau foto bukti lampiran.
+- **Pendaftaran Siswa Susulan (+ Tambah Anggota):** Fitur manual untuk mendaftarkan siswa yang terkendala akses perangkat atau kuota internet.
+- **Evaluasi & Penilaian Akhir:** Input skor capaian (skala 0-100) dengan konversi predikat otomatis (A, B, C, D) dan catatan pembina untuk kebutuhan raport.
+- **Ekspor Laporan:** Pengunduhan rekapitulasi kehadiran dan data anggota dalam format Excel dan CSV.
+
+### 4. Panel Administrator & Kesiswaan
+- **Pengaturan Identitas Instansi:** Kustomisasi nama instansi, logo (penyimpanan mandiri tanpa dependensi symlink), nomor kontak pengaduan, slogan, dan alamat.
+- **Periode & Jendela Waktu:** Pengaturan tahun ajaran aktif, periode registrasi, pembatasan rentang waktu akses, dan mekanisme roll-over akademik.
+- **Direktori Siswa & Pelacakan Status:** Pelacakan status pemilihan eskul dengan penanda visual status pendaftaran, filter instan tanpa reload, serta ekspor data multi-format.
+- **Distribusi Kredensial WhatsApp:** Integrasi gateway WhatsApp (Fonnte) untuk penerbitan dan pengiriman kredensial login (NIS dan Token) secara mandiri tanpa tautan otomatis yang berisiko.
+- **Pengelolaan Akses Pengguna:** Tata kelola akun staf, pembina eskul, wali kelas, operator, dan pimpinan sekolah.
 
 ---
 
-## 🛠️ Tumpukan Teknologi (Tech Stack)
+## Tumpukan Teknologi
 
-- **Backend:** Laravel 12 (PHP 8.2+)
-- **Frontend:** Blade Templates, React 19 (Inertia.js), Tailwind CSS, Alpine.js
-- **Database:** PostgreSQL / SQLite
-- **Security:** Throttle Rate Limiting, MFA / 2FA Support, Token Hashing
+| Komponen | Teknologi |
+| :--- | :--- |
+| Framework Backend | Laravel 12 (PHP 8.2+) |
+| Templating & UI | Blade Templates, Alpine.js |
+| CSS Framework | Tailwind CSS v4 |
+| Pustaka Ikon | Komponen Ikon Vektor Lucide (SVG Standar) |
+| Basis Data | PostgreSQL / MySQL / SQLite |
+| Gateway Notifikasi | Fonnte WhatsApp API Client |
+| Pengelolaan Sesi & Autentikasi | Laravel Multi-Guard Session & Stateful Token |
 
 ---
 
-## 📄 Lisensi & Hak Cipta
-
-Proyek ini dilindungi di bawah lisensi [MIT License](LICENSE).
+## Struktur Direktori Utama
 
 ```text
-Copyright (c) 2026 David Yehuda Surbakti & Vines Fernando Siritoitet
-SMK Bagimu Negeriku Semarang. Seluruh hak cipta dilindungi.
+bagimu-extra-laravel/
+|-- app/
+|   |-- Enums/                  Definisi nilai enum (Status, Peran, Jurusan, dll)
+|   |-- Http/
+|   |   |-- Controllers/
+|   |   |   |-- Admin/          Pengendali modul kesiswaan, periode, dan pengaturan
+|   |   |   |-- Pembina/        Pengendali modul presensi, jadwal, dan penilaian eskul
+|   |   |   |-- Siswa/          Pengendali alur autentikasi dan pendaftaran peserta
+|   |   |   `-- WaliKelas/      Pengendali alur perwalian dan penempatan rombel
+|   |   `-- Middleware/         Pemeriksaan hak akses, pemeliharaan, dan peran
+|   |-- Models/                 Definisi model Eloquent dan relasi basis data
+|   `-- Support/                Kelas pembantu (format teks, ekspor file, nomor WhatsApp)
+|-- database/
+|   |-- migrations/             Struktur skema tabel basis data
+|   `-- seeders/                Data awal pengujian dan inisialisasi akun
+|-- public/
+|   `-- uploads/                Direktori penyimpanan logo dan berkas statis
+|-- resources/
+|   `-- views/
+|       |-- admin/              Halaman antarmuka kesiswaan dan administrator
+|       |-- components/         Komponen Blade (ikon SVG, kartu, logo dinamis)
+|       |-- pembina/            Halaman antarmuka pembina ekstrakurikuler
+|       |-- siswa/              Halaman antarmuka pemilihan dan kartu peserta
+|       `-- wali-kelas/         Halaman antarmuka penempatan siswa rombel
+`-- routes/
+    |-- admin.php               Daftar rute modul kesiswaan
+    |-- pembina.php             Daftar rute modul pembina
+    |-- wali-kelas.php          Daftar rute modul wali kelas
+    `-- web.php                 Rute autentikasi publik dan portal siswa
 ```
+
+---
+
+## Panduan Instalasi Lokal
+
+### Prasyarat Sistem
+- PHP versi 8.2 atau lebih tinggi
+- Composer versi 2.x
+- Node.js versi 18 atau lebih tinggi & NPM
+- Ekstensi PHP: `pdo`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json`, `bcmath`
+
+### Langkah Pemasangan
+
+1. Kloning repositori proyek:
+   ```bash
+   git clone https://github.com/davidyehuda45-byte/Bagimu_Extra.git
+   cd Bagimu_Extra
+   ```
+
+2. Pasang dependensi PHP dan pustaka aset:
+   ```bash
+   composer install
+   npm install
+   ```
+
+3. Konfigurasi file lingkungan:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. Sesuaikan parameter koneksi basis data pada file `.env`:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=bagimu_extra
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
+
+5. Jalankan migrasi skema tabel beserta data awal:
+   ```bash
+   php artisan migrate --seed
+   ```
+
+6. Kompilasi aset antarmuka dan jalankan server pengembangan:
+   ```bash
+   npm run build
+   php artisan serve
+   ```
+
+Aplikasi dapat diakses melalui peramban pada alamat `http://127.0.0.1:8000`.
+
+---
+
+## Standar Kode & Antarmuka
+
+Proyek ini menerapkan standar teknis ketat untuk menjaga kualitas dan integritas sistem:
+- **Bebas Emoji Teks:** Seluruh elemen visual antarmuka wajib menggunakan komponen ikon resmi (`<x-icon name="..." />`). Penggunaan simbol emoji teks dilarang.
+- **Desain Fungsional & Bebas AI Slop:** Menghindari warna ungu, efek neon berlebih, atau gradasi multi-warna ekstrem. Menjaga palet warna korporat yang bersih, kontras tinggi, dan nyaman untuk penggunaan durasi panjang.
+- **Portabilitas Deployment:** Mengutamakan direktori penyimpanan berkas publik yang tidak membutuhkan tautan simbolik (*symlink*) untuk mendukung kemudahan implementasi di lingkungan shared hosting cPanel.
+
+---
+
+## Lisensi
+
+Proyek ini dilisensikan di bawah ketentuan [MIT License](LICENSE).

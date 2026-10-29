@@ -5,16 +5,23 @@ namespace App\Http\Controllers\Pembina;
 use App\Enums\IzinStatus;
 use App\Enums\KehadiranStatus;
 use App\Enums\PeriodeStatus;
+use App\Enums\Role;
 use App\Enums\Status;
 use App\Http\Controllers\Controller;
+use App\Models\AdminLog;
 use App\Models\Eskul;
 use App\Models\Izin;
 use App\Models\Kehadiran;
 use App\Models\Periode;
 use App\Models\Registration;
+use App\Models\StatusHistory;
+use App\Models\Student;
+use App\Models\User;
 use App\Support\CsvExport;
 use App\Support\ExcelExport;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class EskulSayaController extends Controller
@@ -134,7 +141,17 @@ class EskulSayaController extends Controller
             return $p;
         });
 
-        return view('pembina.eskul.show', compact('eskul', 'pendaftar', 'jadwals', 'izinPending', 'tanggal', 'disetujui', 'peta', 'locked', 'pertemuans', 'rombelStats'));
+        $registeredNis = Registration::whereIn('periode', $periodeAktif)->pluck('nis')->filter()->toArray();
+        $calonSiswa = Student::where('status', 'AKTIF')
+            ->whereNotIn('nis', $registeredNis)
+            ->orderBy('kelas')
+            ->orderBy('nama')
+            ->get();
+
+        $tingkatCalon = $calonSiswa->pluck('kelas')->map(fn ($k) => \App\Support\Kelas::tingkat($k))->filter()->unique()->sort()->values();
+        $daftarKelasCalon = $calonSiswa->pluck('kelas')->filter()->unique()->sort(SORT_NATURAL)->values();
+
+        return view('pembina.eskul.show', compact('eskul', 'pendaftar', 'jadwals', 'izinPending', 'tanggal', 'disetujui', 'peta', 'locked', 'pertemuans', 'rombelStats', 'calonSiswa', 'tingkatCalon', 'daftarKelasCalon'));
     }
 
     public function export(Request $request, Eskul $eskul)
@@ -211,5 +228,143 @@ class EskulSayaController extends Controller
         }
 
         return CsvExport::download($namaBerkas . '.csv', $headers, $rows);
+    }
+
+    public function tambahAnggota(Request $request, Eskul $eskul)
+    {
+        $me = $request->user();
+        $isMilik = $eskul->pembina_id === $me->id
+            || ($eskul->temp_pembina_id === $me->id
+                && $eskul->temp_pembina_sampai
+                && $eskul->temp_pembina_sampai->gte(today()));
+
+        if (! $isMilik) {
+            abort(403);
+        }
+
+        $data = $request->validate([
+            'student_ids' => ['required', 'array', 'min:1'],
+            'student_ids.*' => ['required', 'integer', 'exists:students,id'],
+        ]);
+
+        $periodeAktif = Periode::where('status', PeriodeStatus::DIBUKA)->first();
+        if (! $periodeAktif) {
+            return back()->with('error', 'Tidak ada periode pendaftaran aktif saat ini.');
+        }
+
+        $students = Student::whereIn('id', $data['student_ids'])->where('status', 'AKTIF')->get();
+        if ($students->isEmpty()) {
+            return back()->with('error', 'Pilih minimal satu data siswa aktif.');
+        }
+
+        // Cek sisa kuota jika kuota eskul dibatasi
+        if ($eskul->kuota_aktif && $eskul->kuota > 0) {
+            $currentCount = Registration::where('periode', $periodeAktif->periode)
+                ->where('eskul_utama', $eskul->name)
+                ->where('status', Status::APPROVED)
+                ->count();
+
+            if ($currentCount + $students->count() > $eskul->kuota) {
+                return back()->with('error', "Kuota eskul tidak mencukupi. Sisa kuota tersedia: " . max(0, $eskul->kuota - $currentCount) . " siswa.");
+            }
+        }
+
+        $count = 0;
+        DB::transaction(function () use ($students, $eskul, $periodeAktif, $me, &$count) {
+            foreach ($students as $student) {
+                // Pastikan siswa belum terdaftar di eskul mana pun pada periode ini
+                $sudah = Registration::where('periode', $periodeAktif->periode)
+                    ->where(function ($q) use ($student) {
+                        $q->where('nis', $student->nis);
+                        if ($student->user_id) {
+                            $q->orWhere('user_id', $student->user_id);
+                        }
+                    })
+                    ->exists();
+
+                if ($sudah) {
+                    continue;
+                }
+
+                $user = $student->user;
+                if (! $user) {
+                    $user = User::create([
+                        'name' => $student->nama,
+                        'email' => $student->nis . '@siswa.local',
+                        'username' => $student->nis,
+                        'password' => Hash::make(Str::random(16)),
+                        'role' => Role::STUDENT,
+                        'student_status' => $student->status ?? 'AKTIF',
+                    ]);
+                    $student->update(['user_id' => $user->id]);
+                }
+
+                $wa = $student->whatsapp ?: ($student->wali_kontak ?: '');
+                $reg = Registration::create([
+                    'user_id' => $user->id,
+                    'periode' => $periodeAktif->periode,
+                    'kelas' => $student->kelas ?? '10',
+                    'jurusan' => $student->jurusan,
+                    'nis' => $student->nis,
+                    'no_absen' => $student->no_absen ?? 1,
+                    'nama_wali_kelas' => $student->wali_nama ?? 'Belum ditentukan',
+                    'usia' => $student->usia ?? 16,
+                    'gender' => $student->gender ?? \App\Enums\Gender::LAKI_LAKI,
+                    'whatsapp' => $wa,
+                    'eskul_utama' => $eskul->name,
+                    'eskul_cadangan' => null,
+                    'alasan' => 'Didaftarkan manual oleh Pembina Eskul ' . $me->name,
+                    'status' => Status::APPROVED,
+                    'verify_token' => bin2hex(random_bytes(32)),
+                ]);
+
+                StatusHistory::create([
+                    'registration_id' => $reg->id,
+                    'old_status' => null,
+                    'new_status' => Status::APPROVED,
+                    'actor_id' => (string) $me->id,
+                    'actor_email' => $me->email,
+                    'reason' => 'Didaftarkan manual oleh Pembina Eskul ' . $me->name,
+                ]);
+
+                $count++;
+            }
+        });
+
+        AdminLog::record('pembina.add_students', 'Registration', null, "Pembina {$me->name} mendaftarkan {$count} siswa secara manual ke eskul {$eskul->name}.");
+
+        return back()->with('status', "Berhasil menambahkan {$count} siswa ke dalam ekstrakurikuler {$eskul->name}.");
+    }
+
+    public function hapusAnggota(Request $request, Eskul $eskul, Registration $registration)
+    {
+        $me = $request->user();
+        $isMilik = $eskul->pembina_id === $me->id
+            || ($eskul->temp_pembina_id === $me->id
+                && $eskul->temp_pembina_sampai
+                && $eskul->temp_pembina_sampai->gte(today()));
+
+        if (! $isMilik) {
+            abort(403);
+        }
+
+        if ($registration->eskul_utama !== $eskul->name) {
+            return back()->with('error', 'Siswa ini bukan anggota dari ekstrakurikuler Anda.');
+        }
+
+        // Guard keselamatan data: Cek apakah siswa sudah memiliki catatan presensi atau nilai
+        $hasPresensi = Kehadiran::where('registration_id', $registration->id)->exists();
+        $hasNilai = $registration->nilai !== null;
+
+        if ($hasPresensi || $hasNilai) {
+            return back()->with('error', "Siswa {$registration->user?->name} sudah memiliki riwayat presensi atau nilai dan tidak dapat dikeluarkan sembarangan. Silakan hubungi admin kesiswaan jika perlu pembatalan khusus.");
+        }
+
+        $nama = $registration->user?->name ?? $registration->nis;
+        $registration->delete();
+
+        AdminLog::record('pembina.remove_student', 'Registration', (string) $registration->id, "Pembina {$me->name} mengeluarkan siswa {$nama} dari eskul {$eskul->name}.");
+
+        return back()->with('status', "Siswa {$nama} berhasil dikeluarkan dari eskul {$eskul->name}. Siswa kini dapat memilih eskul kembali.");
     }
 }
