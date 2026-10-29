@@ -4,15 +4,12 @@
 
 @section('content')
 <div class="space-y-6">
-    {{-- Header Banner Sesuai Foto Desain Resmi (Latar Gedung Sekolah SMK Bagimu Negeriku) --}}
-    <div class="relative overflow-hidden rounded-3xl bg-[#0e5cda] text-white shadow-lg shadow-blue-900/10 min-h-[240px] sm:min-h-[280px] p-6 sm:p-8 xl:p-9 flex flex-col justify-between">
-        {{-- Foto Asli Kampus SMK Bagimu Negeriku (Bersih Tanpa Teks Bawaan) --}}
-        <img src="{{ asset('images/dashboard-banner-clean.jpg') }}?v={{ filemtime(public_path('images/dashboard-banner-clean.jpg')) }}"
-             alt="Kampus SMK Bagimu Negeriku"
-             class="pointer-events-none absolute inset-0 h-full w-full object-cover object-right select-none z-0" />
-
-        {{-- Gradient Overlay untuk Menjamin Keterbacaan Teks di Semua Resolusi Layar --}}
-        <div class="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0a4fc0]/90 via-[#0e5cda]/75 to-transparent sm:from-transparent sm:via-transparent z-0"></div>
+    {{-- Header Banner --}}
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0e5cda] via-[#1d4ed8] to-[#1e3a8a] text-white shadow-lg shadow-blue-900/10 min-h-[240px] sm:min-h-[280px] p-6 sm:p-8 xl:p-9 flex flex-col justify-between">
+        {{-- Ornamen Dekoratif Abstrak Elegan --}}
+        <div class="pointer-events-none absolute -right-20 -top-20 h-96 w-96 rounded-full bg-sky-400/20 blur-3xl z-0"></div>
+        <div class="pointer-events-none absolute -left-20 bottom-0 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl z-0"></div>
+        <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px] opacity-10 z-0"></div>
 
         {{-- Konten Utama Banner --}}
         <div class="relative z-10 space-y-4 max-w-2xl">
@@ -20,11 +17,11 @@
             <div class="flex items-center gap-3.5">
                 <x-school-logo :size="48" class="rounded-full bg-white p-1 shadow-md ring-2 ring-white/50 shrink-0" />
                 <div class="leading-tight">
-                    <p class="text-base sm:text-lg font-black tracking-tight text-white leading-tight drop-shadow-xs">Bagimu Extra</p>
-                    <p class="text-xs font-semibold text-white/90">SMK Bagimu Negeriku</p>
+                    <p class="text-base sm:text-lg font-black tracking-tight text-white leading-tight drop-shadow-xs">{{ config('app.name', 'Bagimu Extra') }}</p>
+                    <p class="text-xs font-semibold text-white/90">{{ \App\Models\AppSetting::get('school.name', 'SMK Bagimu Negeriku') }}</p>
                     <p class="text-[11px] font-medium text-blue-100 mt-0.5 flex items-center gap-1">
                         <x-icon name="sparkles" class="h-3 w-3 text-sky-200 shrink-0" />
-                        <span>4B Berbudi • Berkualitas • Berdaya • Berhasil</span>
+                        <span>{{ \App\Models\AppSetting::get('school.motto', '4B Berbudi • Berkualitas • Berdaya • Berhasil') }}</span>
                     </p>
                 </div>
             </div>

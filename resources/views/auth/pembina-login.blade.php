@@ -19,14 +19,12 @@
     $motto = \App\Models\AppSetting::get('school.motto', '4B Berbudi • Berkualitas • Berdaya • Berhasil');
 @endphp
 <main class="flex min-h-screen">
-    {{-- Panel Branding Desktop - Sesuai Mockup Desain Resmi (58% Lebar Layar) --}}
-    <div class="relative hidden w-full lg:w-[58%] min-h-screen flex-col justify-between overflow-hidden p-8 xl:p-12 text-white lg:flex"
-         style="background-color: #1a62d8;">
-        
-        {{-- Foto Asli Gedung & Langit SMK Bagimu Negeriku (Bersih Tanpa Teks Bawaan) --}}
-        <img src="{{ asset('images/gedung-backdrop-clean.jpg') }}?v={{ filemtime(public_path('images/gedung-backdrop-clean.jpg')) }}"
-             alt="Gedung {{ $sekolah }}"
-             class="pointer-events-none absolute inset-0 h-full w-full object-cover object-right select-none z-0" />
+    {{-- Panel Branding Desktop (58% Lebar Layar) --}}
+    <div class="relative hidden w-full lg:w-[58%] min-h-screen flex-col justify-between overflow-hidden p-8 xl:p-12 text-white lg:flex bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-950">
+        {{-- Ornamen Dekoratif Latar Belakang Gradasi Modern --}}
+        <div class="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-blue-500/20 blur-3xl z-0"></div>
+        <div class="pointer-events-none absolute -left-20 bottom-10 h-80 w-80 rounded-full bg-indigo-500/20 blur-3xl z-0"></div>
+        <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px] opacity-10 z-0"></div>
 
         {{-- Header Sekolah Modern & Elegan --}}
         <div class="relative z-10 flex items-center justify-between gap-4">

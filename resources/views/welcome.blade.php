@@ -36,12 +36,12 @@
     $sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra'));
     $motto = \App\Models\AppSetting::get('school.motto', '4B Berbudi · Berkualitas · Berdaya · Berhasil');
     $logoSetting = \App\Models\AppSetting::get('school.logo');
-    $splashLogo = $logoSetting ? (str_starts_with($logoSetting, 'http') ? $logoSetting : asset(ltrim($logoSetting, '/'))) : asset('splash-logo.png');
+    $splashLogo = $logoSetting ? (str_starts_with($logoSetting, 'http') ? $logoSetting : asset(ltrim($logoSetting, '/'))) : asset('logo.png');
 @endphp
 
 <!-- ====== SPLASH SCREEN ====== -->
 <div id="splash" role="status" aria-label="Memuat aplikasi">
-  <div class="sp-badge"><img src="{{ $splashLogo }}" alt="Logo {{ $sekolah }}" onerror="this.onerror=null; this.src='{{ asset('splash-logo.png') }}';"></div>
+  <div class="sp-badge"><img src="{{ $splashLogo }}" alt="Logo {{ $sekolah }}" style="object-fit: contain; padding: 12px;" onerror="this.onerror=null; this.src='{{ asset('logo.png') }}';"></div>
   <div class="sp-ekskul" id="sp-ekskul"></div>
   <h2 class="sp-name">{{ $sekolah }}</h2>
   <p class="sp-motto">{{ $motto }}</p>
@@ -78,15 +78,12 @@
         </div>
     </header>
 
-    {{-- Hero Section - Sesuai Foto Desain Resmi (Latar Kampus SMK Bagimu Negeriku) --}}
-    <section class="relative overflow-hidden rounded-3xl bg-[#0e5cda] text-white shadow-xl shadow-blue-900/10 min-h-[360px] sm:min-h-[400px] px-6 py-10 sm:px-10 sm:py-12 lg:px-12 lg:py-14 flex flex-col justify-between">
-        {{-- Foto Asli Kampus SMK Bagimu Negeriku (Bersih Tanpa Teks Bawaan) --}}
-        <img src="{{ asset('images/dashboard-banner-clean.jpg') }}?v={{ filemtime(public_path('images/dashboard-banner-clean.jpg')) }}"
-             alt="Kampus SMK Bagimu Negeriku"
-             class="pointer-events-none absolute inset-0 h-full w-full object-cover object-right select-none z-0" />
-
-        {{-- Gradient Overlay Halus untuk Kontras & Keterbacaan Sempurna --}}
-        <div class="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0a4fc0]/95 via-[#0e5cda]/80 to-transparent sm:via-[#0e5cda]/65 z-0"></div>
+    {{-- Hero Section --}}
+    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0e5cda] via-[#1d4ed8] to-[#1e3a8a] text-white shadow-xl shadow-blue-900/10 min-h-[360px] sm:min-h-[400px] px-6 py-10 sm:px-10 sm:py-12 lg:px-12 lg:py-14 flex flex-col justify-between">
+        {{-- Ornamen Dekoratif Abstrak Elegan --}}
+        <div class="pointer-events-none absolute -right-20 -top-20 h-96 w-96 rounded-full bg-sky-400/20 blur-3xl z-0"></div>
+        <div class="pointer-events-none absolute -left-20 bottom-0 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl z-0"></div>
+        <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px] opacity-10 z-0"></div>
 
         <div class="relative z-10 max-w-3xl space-y-6">
             {{-- Branding Sekolah: Logo + Nama + Slogan 4B --}}
@@ -100,7 +97,7 @@
                 </div>
                 <div class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/20 backdrop-blur-md text-white border border-white/30 shadow-xs">
                     <x-icon name="sparkles" class="h-3 w-3 text-sky-200 shrink-0" />
-                    <span>4B Berbudi • Berkualitas • Berdaya • Berhasil</span>
+                    <span>{{ $motto }}</span>
                 </div>
             </div>
 
