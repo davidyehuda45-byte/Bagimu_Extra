@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Pembina\AnggotaController;
 use App\Http\Controllers\Pembina\DashboardController;
 use App\Http\Controllers\Pembina\EskulSayaController;
 use App\Http\Controllers\Pembina\IzinController;
@@ -13,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:pembina', \App\Http\Middleware\MaintenanceMode::class])->prefix('pembina')->name('pembina.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('anggota', [AnggotaController::class, 'index'])->name('anggota.index');
+    Route::get('anggota/export', [AnggotaController::class, 'export'])->name('anggota.export');
 
     Route::get('eskul', [EskulSayaController::class, 'index'])->name('eskul.index');
     Route::get('eskul/{eskul}', [EskulSayaController::class, 'show'])->name('eskul.show');

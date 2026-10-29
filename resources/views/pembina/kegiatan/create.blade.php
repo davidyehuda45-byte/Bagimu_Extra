@@ -13,37 +13,34 @@
     <form method="POST" action="{{ route('pembina.kegiatan.store') }}" class="space-y-4 rounded-3xl border border-slate-200/90 bg-white p-6 text-sm shadow-xs">
         @csrf
 
+        @if ($eskuls->count() === 1)
+            <input type="hidden" name="eskul_id" value="{{ $eskuls->first()->id }}">
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Ekstrakurikuler</span>
+                <span class="text-sm font-bold text-blue-900">{{ $eskuls->first()->name }}</span>
+            </div>
+        @else
+            <div>
+                <label class="mb-1 block font-semibold text-slate-700 text-xs">Ekstrakurikuler</label>
+                <select name="eskul_id" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600" required>
+                    @foreach ($eskuls as $eskul)
+                        <option value="{{ $eskul->id }}" @selected(old('eskul_id') == $eskul->id)>{{ $eskul->name }}</option>
+                    @endforeach
+                </select>
+                @error('eskul_id')
+                    <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                @enderror
+            </div>
+        @endif
+
+        <input type="hidden" name="jenis" value="{{ old('jenis', 'LATIHAN') }}">
+
         <div>
-            <label class="mb-1 block font-semibold text-slate-700 text-xs">Ekstrakurikuler</label>
-            <select name="eskul_id" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600" required>
-                @foreach ($eskuls as $eskul)
-                    <option value="{{ $eskul->id }}" @selected(old('eskul_id') == $eskul->id)>{{ $eskul->name }}</option>
-                @endforeach
-            </select>
-            @error('eskul_id')
+            <label class="mb-1 block font-semibold text-slate-700 text-xs">Tanggal Pelaksanaan</label>
+            <input type="date" name="tanggal" value="{{ old('tanggal', today()->toDateString()) }}" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600" required>
+            @error('tanggal')
                 <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
             @enderror
-        </div>
-
-        <div class="grid gap-3 sm:grid-cols-2">
-            <div>
-                <label class="mb-1 block font-semibold text-slate-700 text-xs">Tanggal Pelaksanaan</label>
-                <input type="date" name="tanggal" value="{{ old('tanggal', today()->toDateString()) }}" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600" required>
-                @error('tanggal')
-                    <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
-                @enderror
-            </div>
-            <div>
-                <label class="mb-1 block font-semibold text-slate-700 text-xs">Jenis Kegiatan</label>
-                <select name="jenis" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600" required>
-                    <option value="LATIHAN" @selected(old('jenis') === 'LATIHAN')>Latihan Rutin</option>
-                    <option value="LOMBA" @selected(old('jenis') === 'LOMBA')>Lomba / Kompetisi</option>
-                    <option value="ACARA" @selected(old('jenis') === 'ACARA')>Acara / Pertemuan Khusus</option>
-                </select>
-                @error('jenis')
-                    <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
-                @enderror
-            </div>
         </div>
 
         {{-- Waktu Jam Mulai & Jam Selesai --}}

@@ -14,28 +14,28 @@
         @csrf
         @method('PUT')
 
-        <div>
-            <label class="mb-1 block font-semibold text-slate-700 text-xs">Ekstrakurikuler</label>
-            <select name="eskul_id" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600" required>
-                @foreach ($eskuls as $eskul)
-                    <option value="{{ $eskul->id }}" @selected((string) old('eskul_id', $kegiatan->eskul_id) === (string) $eskul->id)>{{ $eskul->name }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="grid gap-3 sm:grid-cols-2">
-            <div>
-                <label class="mb-1 block font-semibold text-slate-700 text-xs">Tanggal Pelaksanaan</label>
-                <input type="date" name="tanggal" value="{{ old('tanggal', $kegiatan->tanggal->format('Y-m-d')) }}" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600" required>
+        @if ($eskuls->count() === 1)
+            <input type="hidden" name="eskul_id" value="{{ $eskuls->first()->id }}">
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Ekstrakurikuler</span>
+                <span class="text-sm font-bold text-blue-900">{{ $eskuls->first()->name }}</span>
             </div>
+        @else
             <div>
-                <label class="mb-1 block font-semibold text-slate-700 text-xs">Jenis Kegiatan</label>
-                <select name="jenis" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600" required>
-                    <option value="LATIHAN" @selected(old('jenis', $kegiatan->jenis->value) === 'LATIHAN')>Latihan Rutin</option>
-                    <option value="LOMBA" @selected(old('jenis', $kegiatan->jenis->value) === 'LOMBA')>Lomba / Kompetisi</option>
-                    <option value="ACARA" @selected(old('jenis', $kegiatan->jenis->value) === 'ACARA')>Acara / Pertemuan Khusus</option>
+                <label class="mb-1 block font-semibold text-slate-700 text-xs">Ekstrakurikuler</label>
+                <select name="eskul_id" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600" required>
+                    @foreach ($eskuls as $eskul)
+                        <option value="{{ $eskul->id }}" @selected((string) old('eskul_id', $kegiatan->eskul_id) === (string) $eskul->id)>{{ $eskul->name }}</option>
+                    @endforeach
                 </select>
             </div>
+        @endif
+
+        <input type="hidden" name="jenis" value="{{ old('jenis', $kegiatan->jenis->value ?? 'LATIHAN') }}">
+
+        <div>
+            <label class="mb-1 block font-semibold text-slate-700 text-xs">Tanggal Pelaksanaan</label>
+            <input type="date" name="tanggal" value="{{ old('tanggal', $kegiatan->tanggal->format('Y-m-d')) }}" class="w-full rounded-xl border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600" required>
         </div>
 
         <div class="grid gap-3 sm:grid-cols-2">

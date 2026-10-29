@@ -18,7 +18,7 @@ Antarmuka dibangun dengan pendekatan minimalis modern menggunakan palet warna fu
 - **Autentikasi Token Aman:** Akses masuk menggunakan kombinasi Nomor Induk Siswa (NIS) dan Token Login sekali pakai yang diterbitkan oleh pihak sekolah.
 - **Pemilihan Ekstrakurikuler Dinamis:** Pemantauan kuota berjalan (*real-time*), deskripsi kegiatan, dan jadwal latihan mingguan sebelum menetapkan pilihan langsung tanpa proses seleksi manual yang berbelit.
 - **Portal Cek Status & Cetak Ulang Mandiri:** Siswa yang telah mendaftar dan tokennya telah terpakai dapat memeriksa status kepesertaan resmi, informasi pembina pengampu, jadwal mingguan, serta mencetak atau menyimpan ulang Kartu ID-1 langsung melalui NIS tanpa kendala sesi keluar otomatis.
-- **Kartu Peserta Digital ID-1:** Penerbitan kartu tanda anggota resmi berdimensi presisi (85,6 mm x 53,98 mm) lengkap dengan kode QR verifikasi keabsahan, identitas siswa, dan latar dinamis instansi.
+- **Kartu Peserta Dual-Orientasi & QR Code Presensi:** Penerbitan kartu tanda anggota resmi berdimensi presisi standar internasional ID-1 (CR80) dengan pilihan tata letak Horizontal (85,6 mm x 54 mm) dan Vertikal / Tegak (54 mm x 85,6 mm), lengkap dengan kode QR resmi berbasis NIS untuk pemindaian presensi, tombol Unduh Gambar (PNG) tajam, serta Cetak / Simpan PDF terisolasi.
 - **Proteksi Data Final:** Pilihan langsung terkunci setelah konfirmasi untuk mencegah manipulasi data pendaftaran.
 
 ### 2. Panel Wali Kelas
@@ -29,10 +29,13 @@ Antarmuka dibangun dengan pendekatan minimalis modern menggunakan palet warna fu
 - **Penyesuaian Penempatan:** Fitur pembatalan atau pengeluaran siswa dari rombel perwalian baik per individu maupun checklist massal (*bulk action*).
 
 ### 3. Panel Pembina Ekstrakurikuler
-- **Antarmuka 4 Tab Modern:** Tata letak responsif ramah layar ponsel yang membagi modul kegiatan secara rapi ke dalam tab Anggota, Presensi Pertemuan, Nilai Rapor, serta Jadwal & Izin.
-- **Kelola Jadwal Latihan:** Pengaturan hari, rentang jam, dan lokasi latihan mingguan.
+- **Direktori Anggota Siswa:** Menu dedicated direktori murid binaan (`/pembina/anggota`) yang menyajikan tabel anggota eskul lengkap dengan ringkasan kehadiran (berapa kali Hadir, Tidak Hadir: Izin/Sakit/Alpa, dan Total Pertemuan), NIS, Kelas Rombel, status Nilai Rapor, filter pencarian instan, dan ekspor data Excel.
+- **Navigasi Mandiri 6 Menu:** Tata kelola panel pembina terpadu dengan navigasi langsung ke Dashboard Saya, Direktori Anggota, Eskul Saya, Scan Presensi QR, Penilaian Rapor, serta Kegiatan & Jadwal.
+- **Banner Dashboard Modern:** Latar gradasi biru modern dan ornamen mesh abstrak elegan bebas dari foto fisik gedung lama.
+- **Penyederhanaan Modul Kegiatan:** Penghapusan filter eskul redundan (otomatis terarah ke eskul binaan) dan peniadaan opsi klasifikasi jenis kegiatan yang tidak diperlukan.
+- **Antarmuka 4 Tab Modern:** Tata letak responsif ramah layar ponsel yang membagi modul eskul secara rapi ke dalam tab Anggota, Presensi Pertemuan, Nilai Rapor, serta Jadwal & Izin.
 - **Presensi Pertemuan & Pemindai QR Kartu Pelajar:**
-  - Pemindaian instan kode QR kartu pelajar menggunakan kamera peramban.
+  - Pemindaian instan kode QR kartu pelajar menggunakan kamera peramban yang membaca data NIS dari kartu resmi peserta.
   - Fitur sekali klik "Tandai Semua Hadir" untuk kecepatan presensi lapangan tanpa klik satu per satu.
   - Pengisian presensi manual yang dikelompokkan teratur berdasarkan rombel kelas (Hadir, Izin, Sakit, Alpa).
 - **Pengesahan Sesi:** Fitur penguncian data absensi per tanggal pertemuan untuk menjamin validitas rekapitulasi.

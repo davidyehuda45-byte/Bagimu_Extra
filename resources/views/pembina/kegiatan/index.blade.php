@@ -12,30 +12,29 @@
         <a href="{{ route('pembina.kegiatan.create') }}" class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">Tambah Kegiatan</a>
     </div>
 
-    <form method="GET" action="{{ route('pembina.kegiatan.index') }}" class="flex flex-wrap items-end gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-xs">
-        <div>
-            <label class="mb-1 block text-xs font-semibold text-slate-700">Eskul</label>
-            <select name="eskul_id" class="rounded-xl border border-slate-300 pl-3 pr-9 py-2 text-xs sm:text-sm bg-white focus:border-blue-600 focus:ring-blue-600 focus:outline-hidden min-w-[150px]">
-                <option value="">Semua eskul</option>
-                @foreach ($eskuls as $eskul)
-                    <option value="{{ $eskul->id }}" @selected((string) $eskulFilter === (string) $eskul->id)>{{ $eskul->name }}</option>
-                @endforeach
-            </select>
+    <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-xs">
+        <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-slate-500">Ekstrakurikuler:</span>
+            @if ($eskuls->count() > 1)
+                <form method="GET" action="{{ route('pembina.kegiatan.index') }}" class="inline-flex items-center gap-2">
+                    <select name="eskul_id" class="rounded-xl border border-slate-300 pl-3 pr-8 py-1.5 text-xs font-bold text-slate-800 bg-white focus:border-blue-600 focus:ring-blue-600" onchange="this.form.submit()">
+                        <option value="">Semua Eskul Binaan</option>
+                        @foreach ($eskuls as $eskul)
+                            <option value="{{ $eskul->id }}" @selected((string) $eskulFilter === (string) $eskul->id)>{{ $eskul->name }}</option>
+                        @endforeach
+                    </select>
+                </form>
+            @else
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-blue-50 text-blue-800 text-xs font-bold border border-blue-200">
+                    <x-icon name="trophy" class="h-3.5 w-3.5 text-blue-600" />
+                    <span>{{ $eskuls->first()?->name ?? 'Eskul Binaan' }}</span>
+                </span>
+            @endif
         </div>
-        <div>
-            <label class="mb-1 block text-xs font-semibold text-slate-700">Jenis Kegiatan</label>
-            <select name="jenis" class="rounded-xl border border-slate-300 pl-3 pr-9 py-2 text-xs sm:text-sm bg-white focus:border-blue-600 focus:ring-blue-600 focus:outline-hidden min-w-[140px]">
-                <option value="">Semua jenis</option>
-                <option value="LATIHAN" @selected($jenisFilter === 'LATIHAN')>Latihan</option>
-                <option value="LOMBA" @selected($jenisFilter === 'LOMBA')>Lomba</option>
-                <option value="ACARA" @selected($jenisFilter === 'ACARA')>Acara</option>
-            </select>
+        <div class="text-xs text-slate-400 font-medium">
+            Agenda & jadwal latihan ekstrakurikuler
         </div>
-        <button type="submit" class="rounded-xl bg-blue-700 px-4 py-2 text-xs font-bold text-white hover:bg-blue-800 transition shadow-2xs">Saring</button>
-        @if ($eskulFilter || $jenisFilter)
-            <a href="{{ route('pembina.kegiatan.index') }}" class="rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition">Reset</a>
-        @endif
-    </form>
+    </div>
 
     {{-- Ringkasan --}}
     <div class="grid gap-3 sm:grid-cols-3">

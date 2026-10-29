@@ -278,6 +278,16 @@ class PendaftaranController extends Controller
             $berlakuSampai = isset($tahunParts[1]) ? '30 Juni ' . trim($tahunParts[1]) : 'Akhir Tahun Ajaran';
         }
 
+        $qrCodeData = $user->student?->nis ?? ($registration?->nis ?? $user->username);
+        $qrSvg = null;
+        try {
+            if (class_exists(\SimpleSoftwareIO\QrCode\Facades\QrCode::class)) {
+                $qrSvg = (string) \SimpleSoftwareIO\QrCode\Facades\QrCode::size(120)->margin(0)->generate($qrCodeData);
+            }
+        } catch (\Throwable $e) {
+            $qrSvg = null;
+        }
+
         return view('siswa.sukses', [
             'user' => $user,
             'registration' => $registration,
@@ -285,6 +295,8 @@ class PendaftaranController extends Controller
             'schoolName' => $schoolName,
             'tahunAjaran' => $tahunAjaran,
             'berlakuSampai' => $berlakuSampai,
+            'qrSvg' => $qrSvg,
+            'qrCodeData' => $qrCodeData,
         ]);
     }
 

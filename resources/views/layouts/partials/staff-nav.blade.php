@@ -17,6 +17,10 @@
                     <x-icon name="home" class="h-4 w-4 shrink-0" />
                     <span>Dashboard Saya</span>
                 </a>
+                <a href="{{ route('pembina.anggota.index') }}" class="{{ $link(Route::is('pembina.anggota.*')) }}">
+                    <x-icon name="users" class="h-4 w-4 shrink-0" />
+                    <span>Direktori Anggota</span>
+                </a>
             @endif
             @if ($isWaliKelas)
                 <a href="{{ route('wali-kelas.dashboard') }}" class="{{ $link(Route::is('wali-kelas.dashboard')) }}">
@@ -81,13 +85,28 @@
                     </a>
                 @endif
                 @if ($isPembina)
-                    <a href="{{ route('pembina.eskul.index') }}" class="{{ $link(Route::is('pembina.eskul.*')) }}">
+                    @php
+                        $pembinaEskul = \App\Models\Eskul::where('pembina_id', $user->id)
+                            ->orWhere(fn ($q) => $q->where('temp_pembina_id', $user->id)->whereDate('temp_pembina_sampai', '>=', today()))
+                            ->first();
+                    @endphp
+                    <a href="{{ route('pembina.eskul.index') }}" class="{{ $link(Route::is('pembina.eskul.index') || (Route::is('pembina.eskul.show') && request('tab') !== 'nilai')) }}">
                         <x-icon name="trophy" class="h-4 w-4 shrink-0" />
                         <span>Eskul Saya</span>
                     </a>
+                    @if ($pembinaEskul)
+                        <a href="{{ route('pembina.scan.show', $pembinaEskul->id) }}" class="{{ $link(Route::is('pembina.scan.*')) }}">
+                            <x-icon name="scan" class="h-4 w-4 shrink-0" />
+                            <span>Scan Presensi</span>
+                        </a>
+                        <a href="{{ route('pembina.eskul.show', [$pembinaEskul->id, 'tab' => 'nilai']) }}" class="{{ $link(Route::is('pembina.eskul.show') && request('tab') === 'nilai') }}">
+                            <x-icon name="file" class="h-4 w-4 shrink-0" />
+                            <span>Penilaian Rapor</span>
+                        </a>
+                    @endif
                     <a href="{{ route('pembina.kegiatan.index') }}" class="{{ $link(Route::is('pembina.kegiatan.*')) }}">
                         <x-icon name="calendar" class="h-4 w-4 shrink-0" />
-                        <span>Kegiatan</span>
+                        <span>Kegiatan & Jadwal</span>
                     </a>
                 @endif
             </div>
