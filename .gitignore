@@ -24,3 +24,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Antigravity AI internal instructions & session state
+/AGENTS.md
+/PROJECT_STATE.md
