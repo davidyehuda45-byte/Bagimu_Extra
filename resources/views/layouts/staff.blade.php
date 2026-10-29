@@ -36,18 +36,6 @@
             </div>
         </div>
 
-        @if($isAdmin)
-        <div class="px-3.5 pt-3">
-            <button type="button" @click="$dispatch('open-spotlight')" class="w-full flex items-center justify-between gap-2 rounded-xl border border-slate-200/90 bg-slate-50/80 px-3 py-2 text-xs font-medium text-slate-400 hover:border-slate-300 hover:bg-white hover:text-slate-700 transition shadow-2xs cursor-pointer">
-                <span class="flex items-center gap-2">
-                    <x-icon name="search" class="h-3.5 w-3.5 text-slate-400" />
-                    <span>Cari siswa (NIS/Nama)...</span>
-                </span>
-                <kbd class="rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-slate-400 shadow-2xs">Ctrl K</kbd>
-            </button>
-        </div>
-        @endif
-
         <nav id="staff-sidebar-nav" class="min-h-0 flex-1 overflow-y-auto px-3.5 py-4">
             @include('layouts.partials.staff-nav')
         </nav>
@@ -79,21 +67,14 @@
                 <x-school-logo :size="32" />
                 <span class="text-sm font-extrabold text-slate-900 tracking-tight">{{ config('app.name', 'Bagimu Extra') }}</span>
             </div>
-            <div class="flex items-center gap-2">
-                @if($isAdmin)
-                <button type="button" @click="$dispatch('open-spotlight')" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors" aria-label="Cari Cepat (Ctrl+K)">
-                    <x-icon name="search" class="h-4 w-4" />
-                </button>
-                @endif
-                <x-popover label="Menu navigasi" panelClass="w-64 max-h-[75vh] overflow-y-auto">
-                    <x-slot:trigger>
-                        <button type="button" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors" aria-label="Menu navigasi" aria-haspopup="menu">
-                            <x-icon name="menu" class="h-5 w-5" />
-                        </button>
-                    </x-slot:trigger>
-                    @include('layouts.partials.staff-nav')
-                </x-popover>
-            </div>
+            <x-popover label="Menu navigasi" panelClass="w-64 max-h-[75vh] overflow-y-auto">
+                <x-slot:trigger>
+                    <button type="button" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors" aria-label="Menu navigasi" aria-haspopup="menu">
+                        <x-icon name="menu" class="h-5 w-5" />
+                    </button>
+                </x-slot:trigger>
+                @include('layouts.partials.staff-nav')
+            </x-popover>
         </header>
 
         <main id="konten-utama" class="w-full p-4 sm:p-6 lg:p-8">
@@ -151,116 +132,6 @@ style="display: none;"
         </div>
     </div>
 </div>
-
-@if($isAdmin)
-{{-- Global Quick Search (Spotlight Ctrl+K) --}}
-<div x-data="{
-    open: false,
-    query: '',
-    loading: false,
-    results: [],
-    timer: null,
-    search() {
-        clearTimeout(this.timer);
-        if (this.query.trim().length < 2) {
-            this.results = [];
-            this.loading = false;
-            return;
-        }
-        this.loading = true;
-        this.timer = setTimeout(() => {
-            fetch('{{ route('admin.search-global') }}?q=' + encodeURIComponent(this.query.trim()))
-                .then(r => r.json())
-                .then(data => {
-                    this.results = data.results || [];
-                    this.loading = false;
-                })
-                .catch(() => {
-                    this.results = [];
-                    this.loading = false;
-                });
-        }, 200);
-    },
-    openSearch() {
-        this.open = true;
-        this.$nextTick(() => {
-            this.$refs.searchInput?.focus();
-        });
-    },
-    closeSearch() {
-        this.open = false;
-        this.query = '';
-        this.results = [];
-    }
-}"
-@open-spotlight.window="openSearch()"
-@keydown.window.prevent.ctrl.k="openSearch()"
-@keydown.window.prevent.meta.k="openSearch()"
-x-show="open"
-x-cloak
-class="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 sm:pt-24 bg-slate-900/50 backdrop-blur-xs"
-style="display: none;"
-@keydown.escape.window="closeSearch()">
-    <div class="w-full max-w-xl rounded-2xl bg-white shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[80vh]" @click.outside="closeSearch()">
-        <div class="flex items-center gap-3 border-b border-slate-100 px-4 py-3.5 bg-slate-50/50">
-            <x-icon name="search" class="h-5 w-5 text-slate-400 shrink-0" />
-            <input
-                x-ref="searchInput"
-                type="text"
-                x-model="query"
-                @input="search()"
-                placeholder="Cari berdasarkan NIS atau Nama siswa..."
-                class="w-full bg-transparent text-sm text-slate-800 placeholder-slate-400 focus:outline-hidden"
-            />
-            <kbd class="hidden sm:inline-block rounded border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-400 shadow-2xs">ESC</kbd>
-        </div>
-
-        <div class="flex-1 overflow-y-auto divide-y divide-slate-100 p-2">
-            <template x-if="loading">
-                <div class="p-6 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
-                    <svg class="animate-spin h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-                    Mencari data siswa...
-                </div>
-            </template>
-
-            <template x-if="!loading && query.length >= 2 && results.length === 0">
-                <div class="p-8 text-center text-xs text-slate-400">
-                    Tidak ditemukan siswa dengan kata kunci &quot;<span x-text="query" class="font-semibold text-slate-600"></span>&quot;.
-                </div>
-            </template>
-
-            <template x-if="!loading && query.length < 2">
-                <div class="p-8 text-center text-xs text-slate-400">
-                    Ketik minimal 2 karakter (NIS atau nama siswa) untuk mencari data instan.
-                </div>
-            </template>
-
-            <template x-for="item in results" :key="item.id">
-                <a :href="item.detail_url" class="group flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition block">
-                    <div class="min-w-0 pr-3">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition" x-text="item.nama"></span>
-                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600" x-text="item.kelas"></span>
-                        </div>
-                        <div class="flex items-center gap-2 mt-1 text-[11px] text-slate-500">
-                            <span>NIS: <strong x-text="item.nis"></strong></span>
-                            <span>•</span>
-                            <span class="truncate" :class="item.is_registered ? 'text-blue-600 font-medium' : 'text-slate-400'" x-text="item.eskul"></span>
-                        </div>
-                    </div>
-                    <div class="text-right shrink-0">
-                        <span class="inline-flex items-center gap-1 text-[11px] font-semibold" :class="item.is_registered ? 'text-emerald-600' : 'text-amber-600'">
-                            <span class="h-1.5 w-1.5 rounded-full" :class="item.is_registered ? 'bg-emerald-500' : 'bg-amber-500'"></span>
-                            <span x-text="item.is_registered ? 'Terdaftar' : 'Belum Daftar'"></span>
-                        </span>
-                        <div class="text-[10px] text-slate-400 mt-0.5" x-text="item.token_status"></div>
-                    </div>
-                </a>
-            </template>
-        </div>
-    </div>
-</div>
-@endif
 
 <script>
 (function() {

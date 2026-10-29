@@ -43,7 +43,6 @@ Antarmuka dibangun dengan pendekatan minimalis modern menggunakan palet warna fu
 - **Ekspor Laporan:** Pengunduhan rekapitulasi kehadiran dan data anggota per periode dalam format Excel dan CSV.
 
 ### 4. Panel Administrator & Kesiswaan
-- **Pencarian Cepat Global (Spotlight `Ctrl+K`):** Akses instan dari seluruh bilah navigasi staf untuk mencari data siswa dalam hitungan detik berdasarkan NIS atau Nama lengkap dengan status eskul, nama pembina, dan kredensial token.
 - **WhatsApp Blast Anti-Banned & Proteksi Spam:** Pengiriman pesan massal terkelola dengan batas gelombang aman (25–50 siswa per gelombang), jeda waktu manusiawi (1,5 detik per nomor), serta pembatasan tegas maksimal 1 kali pengiriman per siswa per periode pendaftaran guna menjaga reputasi nomor WhatsApp instansi dari pemblokiran Meta.
 - **Pengaturan Identitas Instansi:** Kustomisasi nama instansi, logo (penyimpanan mandiri tanpa dependensi symlink), nomor kontak pengaduan, slogan, dan alamat.
 - **Periode & Jendela Pendaftaran Terpadu:** Pengaturan tahun ajaran aktif dan arsip lampau menggunakan dropdown pemilih interaktif satu pintu, kontrol buka/tutup jendela pendaftaran instan, form penjadwalan otomatis, kartu metrik partisipasi kesiswaan, rincian detail periode langsung di tempat tanpa navigasi terpisah, serta tabel riwayat komparasi seluruh periode.
