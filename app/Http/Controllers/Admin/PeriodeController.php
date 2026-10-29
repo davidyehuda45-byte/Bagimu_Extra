@@ -7,20 +7,51 @@ use App\Http\Controllers\Controller;
 use App\Models\AdminLog;
 use App\Models\PendaftaranWindow;
 use App\Models\Periode;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class PeriodeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $periodes = Periode::with(['window'])->withCount('registrations')->orderByDesc('periode')->paginate(15);
-        $activePeriode = Periode::where('status', PeriodeStatus::DIBUKA)->orderByDesc('periode')->first()
-            ?? Periode::orderByDesc('periode')->first();
-        $window = $activePeriode ? PendaftaranWindow::firstOrNew(['periode' => $activePeriode->periode]) : null;
+        $allPeriodes = Periode::with(['window'])->withCount('registrations')->orderByDesc('periode')->get();
 
-        return view('admin.periodes.index', compact('periodes', 'activePeriode', 'window'));
+        $selectedPeriodeCode = $request->query('periode');
+        $selectedPeriode = $selectedPeriodeCode
+            ? Periode::with(['window'])->withCount('registrations')->find($selectedPeriodeCode)
+            : null;
+
+        if (! $selectedPeriode) {
+            $selectedPeriode = Periode::with(['window'])->withCount('registrations')->where('status', PeriodeStatus::DIBUKA)->orderByDesc('periode')->first()
+                ?? Periode::with(['window'])->withCount('registrations')->orderByDesc('periode')->first();
+        }
+
+        $activePeriode = Periode::where('status', PeriodeStatus::DIBUKA)->orderByDesc('periode')->first();
+        $window = $selectedPeriode ? PendaftaranWindow::firstOrNew(['periode' => $selectedPeriode->periode]) : null;
+
+        // Metrik statistik periode terpilih
+        $totalPendaftar = $selectedPeriode ? $selectedPeriode->registrations_count : 0;
+        $totalDisetujui = $selectedPeriode ? $selectedPeriode->registrations()->where('status', 'DISETUJUI')->count() : 0;
+        $totalEskulAktif = $selectedPeriode ? $selectedPeriode->registrations()->whereNotNull('eskul_utama')->distinct('eskul_utama')->count('eskul_utama') : 0;
+        $totalSiswaAktif = Student::aktif()->count();
+        $rasioPartisipasi = $totalSiswaAktif > 0 ? round(($totalPendaftar / $totalSiswaAktif) * 100, 1) : 0;
+
+        $periodes = Periode::with(['window'])->withCount('registrations')->orderByDesc('periode')->paginate(15);
+
+        return view('admin.periodes.index', compact(
+            'periodes',
+            'allPeriodes',
+            'selectedPeriode',
+            'activePeriode',
+            'window',
+            'totalPendaftar',
+            'totalDisetujui',
+            'totalEskulAktif',
+            'totalSiswaAktif',
+            'rasioPartisipasi'
+        ));
     }
 
     public function create()
@@ -67,9 +98,7 @@ class PeriodeController extends Controller
 
     public function show(string $periode)
     {
-        $periodeModel = Periode::with('window')->findOrFail($periode);
-
-        return view('admin.periodes.show', ['periode' => $periodeModel]);
+        return redirect()->route('admin.periodes.index', ['periode' => $periode]);
     }
 
     public function edit(string $periode)
@@ -127,7 +156,7 @@ class PeriodeController extends Controller
 
         AdminLog::record('periode.update', 'periode', $periodeModel->periode, "Mengubah periode {$periodeModel->periode}");
 
-        return redirect()->route('admin.periodes.show', $periodeModel->periode)->with('status', 'Periode berhasil diperbarui.');
+        return redirect()->route('admin.periodes.index', ['periode' => $periodeModel->periode])->with('status', 'Periode berhasil diperbarui.');
     }
 
     public function destroy(string $periode)

@@ -44,7 +44,7 @@
     </div>
     <div class="flex gap-2">
         <button class="px-4 py-2 rounded bg-blue-600 text-white text-sm hover:bg-blue-700">Simpan</button>
-        <a href="{{ route('admin.periodes.show', $periode->periode) }}" class="px-4 py-2 rounded border text-sm">Batal</a>
+        <a href="{{ route('admin.periodes.index', ['periode' => $periode->periode]) }}" class="px-4 py-2 rounded border text-sm">Batal</a>
     </div>
 </form>
 @endsection

@@ -11,14 +11,9 @@ use Illuminate\Http\Request;
 
 class WindowController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $periodes = Periode::with(['window'])->withCount('registrations')->orderByDesc('periode')->paginate(15);
-        $activePeriode = Periode::where('status', PeriodeStatus::DIBUKA)->orderByDesc('periode')->first()
-            ?? Periode::orderByDesc('periode')->first();
-        $window = $activePeriode ? PendaftaranWindow::firstOrNew(['periode' => $activePeriode->periode]) : null;
-
-        return view('admin.periodes.index', compact('periodes', 'activePeriode', 'window'));
+        return redirect()->route('admin.periodes.index', $request->query());
     }
 
     public function update(Request $request, string $periode)
@@ -42,6 +37,6 @@ class WindowController extends Controller
 
         AdminLog::record('window.update', 'pendaftaran_window', $periodeModel->periode, "Mengubah jendela pendaftaran {$periodeModel->periode}");
 
-        return back()->with('status', 'Jendela pendaftaran berhasil diperbarui.');
+        return redirect()->route('admin.periodes.index', ['periode' => $periodeModel->periode])->with('status', 'Jendela pendaftaran berhasil diperbarui.');
     }
 }

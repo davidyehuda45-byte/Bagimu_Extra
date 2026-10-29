@@ -39,7 +39,7 @@ Antarmuka dibangun dengan pendekatan minimalis modern menggunakan palet warna fu
 
 ### 4. Panel Administrator & Kesiswaan
 - **Pengaturan Identitas Instansi:** Kustomisasi nama instansi, logo (penyimpanan mandiri tanpa dependensi symlink), nomor kontak pengaduan, slogan, dan alamat.
-- **Periode & Jendela Waktu:** Pengaturan tahun ajaran aktif, periode registrasi, pembatasan rentang waktu akses, pintasan rekapitulasi per periode, dan mekanisme roll-over akademik.
+- **Periode & Jendela Pendaftaran Terpadu:** Pengaturan tahun ajaran aktif dan arsip lampau menggunakan dropdown pemilih interaktif satu pintu, kontrol buka/tutup jendela pendaftaran instan, form penjadwalan otomatis, kartu metrik partisipasi kesiswaan, rincian detail periode langsung di tempat tanpa navigasi terpisah, serta tabel riwayat komparasi seluruh periode.
 - **Rekapitulasi & Riwayat Multi-Periode:** Pemantauan data historis lintas tahun ajaran yang menyajikan informasi nama pembina pengampu, jumlah pendaftar per eskul, sebaran asal rombel kelas siswa, rincian siswa, serta ekspor rekapitulasi menyeluruh ke format Excel.
 - **Direktori Siswa & Pelacakan Status:** Pelacakan status pemilihan eskul beserta penanda visual siklus hidup token login (Aktif, Sudah Dipakai, Dicabut, Belum Diterbitkan), filter instan tanpa reload, serta ekspor data multi-format.
 - **Distribusi Kredensial WhatsApp:** Integrasi gateway WhatsApp (Fonnte) untuk penerbitan dan pengiriman kredensial login (NIS dan Token) secara mandiri tanpa tautan otomatis yang berisiko.
