@@ -19,7 +19,9 @@ class AppSetting extends Model
 
     public static function get(string $key, ?string $default = null): ?string
     {
-        return self::find($key)?->value ?? $default;
+        $val = self::find($key)?->value;
+
+        return ($val !== null && $val !== '') ? $val : $default;
     }
 
     public static function set(string $key, string $value): void

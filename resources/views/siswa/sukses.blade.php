@@ -288,6 +288,11 @@
             <p class="text-xs text-slate-500">Simpan atau tangkap layar (screenshot) kartu ini dalam 15 detik sebagai bukti resmi keikutsertaan kegiatan eskul.</p>
         </div>
 
+        @php
+            $cardLogo = \App\Models\AppSetting::get('school.logo');
+            $cardLogoUrl = $cardLogo ? (str_starts_with($cardLogo, 'http') ? $cardLogo : asset(ltrim($cardLogo, '/'))) : asset('logo.png');
+        @endphp
+
         {{-- KARTU PELAJAR / KARTU PESERTA (UKURAN FISIK PRESISI 8.5 cm x 5.4 cm) --}}
         <div class="id-card-wrapper">
             <div class="id-card">
@@ -295,7 +300,7 @@
                 <div class="id-card-header">
                     <div class="id-card-header-left">
                         <span class="id-card-logo-circle">
-                            <img src="/logo.png" alt="Logo" style="width: 100%; height: 100%; object-fit: contain; display: none;" onload="this.style.display='block'; if(this.nextElementSibling) this.nextElementSibling.style.display='none';" onerror="this.style.display='none';">
+                            <img src="{{ $cardLogoUrl }}" alt="Logo" style="width: 100%; height: 100%; object-fit: contain; display: none;" onload="this.style.display='block'; if(this.nextElementSibling) this.nextElementSibling.style.display='none';" onerror="this.style.display='none';">
                             <svg style="width: 14px; height: 14px; color: #1e3a8a;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>
                         </span>
                         <div class="id-card-header-text">
@@ -311,7 +316,7 @@
                 {{-- Badan Kartu --}}
                 <div class="id-card-body">
                     {{-- Watermark Logo Sekolah (Transparan, tidak menghalangi teks) --}}
-                    <img src="/logo.png" alt="" class="id-card-watermark" onerror="this.style.display='none';">
+                    <img src="{{ $cardLogoUrl }}" alt="" class="id-card-watermark" onerror="this.style.display='none';">
 
                     {{-- Foto Siswa / Avatar --}}
                     <div class="id-card-photo">

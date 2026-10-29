@@ -1,10 +1,13 @@
 @props(['size' => 40])
+@php
+    $logo = \App\Models\AppSetting::get('school.logo');
+    $logoUrl = $logo ? (str_starts_with($logo, 'http') ? $logo : asset(ltrim($logo, '/'))) : asset('logo.png');
+@endphp
 {{--
-  Logo sekolah: pakai /logo.png bila ada, fallback ikon toga.
-  Taruh file logo di public/logo.png untuk mengganti ikon.
+  Logo sekolah: dinamis dari database (AppSetting::get('school.logo')), fallback /logo.png atau ikon toga.
 --}}
 <span {{ $attributes->merge(['class' => 'relative block shrink-0 overflow-hidden bg-white rounded-full ring-2 ring-slate-200']) }} style="width: {{ $size }}px; height: {{ $size }}px;">
-    <img src="/logo.png" alt="Logo sekolah" class="h-full w-full object-cover" style="display: none;"
+    <img src="{{ $logoUrl }}" alt="Logo sekolah" class="h-full w-full object-cover" style="display: none;"
         onload="this.style.display='block';this.parentElement.querySelector('[data-fallback]').style.display='none';"
         onerror="this.style.display='none';">
     <span data-fallback class="flex h-full w-full items-center justify-center bg-blue-800 text-white rounded-xl">

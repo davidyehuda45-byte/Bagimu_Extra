@@ -15,9 +15,10 @@ class SettingController extends Controller
 {
     private const IDENTITAS = [
         'school.name' => 'Nama Sekolah',
-        'school.contact' => 'Kontak',
-        'school.address' => 'Alamat',
-        'school.logo' => 'Path Logo',
+        'school.contact' => 'No. WhatsApp / Kontak',
+        'school.address' => 'Alamat Lengkap',
+        'school.motto' => 'Slogan / Motto Sekolah',
+        'school.logo' => 'Logo Sekolah',
     ];
 
     public function index()
@@ -68,23 +69,41 @@ class SettingController extends Controller
             'school_name' => ['nullable', 'string', 'max:255'],
             'school_contact' => ['nullable', 'string', 'max:255'],
             'school_address' => ['nullable', 'string', 'max:1000'],
+            'school_motto' => ['nullable', 'string', 'max:255'],
             'school_logo' => ['nullable', 'string', 'max:255'],
+            'school_logo_file' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp,svg', 'max:2048'],
+            'reset_logo' => ['nullable', 'boolean'],
         ]);
 
         $peta = [
             'school_name' => 'school.name',
             'school_contact' => 'school.contact',
             'school_address' => 'school.address',
-            'school_logo' => 'school.logo',
+            'school_motto' => 'school.motto',
         ];
 
         foreach ($peta as $input => $key) {
             AppSetting::set($key, (string) ($data[$input] ?? ''));
         }
 
-        AdminLog::record('settings.update', 'AppSetting', null, 'Perbarui identitas sekolah.');
+        if ($request->boolean('reset_logo')) {
+            AppSetting::set('school.logo', '');
+        } elseif ($request->hasFile('school_logo_file')) {
+            $file = $request->file('school_logo_file');
+            $filename = 'logo_' . time() . '.' . $file->getClientOriginalExtension();
+            $destDir = public_path('uploads');
+            if (! file_exists($destDir)) {
+                mkdir($destDir, 0755, true);
+            }
+            $file->move($destDir, $filename);
+            AppSetting::set('school.logo', '/uploads/' . $filename);
+        } elseif ($request->filled('school_logo')) {
+            AppSetting::set('school.logo', (string) $data['school_logo']);
+        }
 
-        return back()->with('status', 'Identitas sekolah disimpan.');
+        AdminLog::record('settings.update', 'AppSetting', null, 'Perbarui identitas dan slogan sekolah.');
+
+        return back()->with('status', 'Identitas dan slogan sekolah berhasil disimpan.');
     }
 
     /**

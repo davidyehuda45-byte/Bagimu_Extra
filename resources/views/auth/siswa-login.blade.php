@@ -16,6 +16,7 @@
 <body class="bg-white font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
 @php
     $sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra'));
+    $motto = \App\Models\AppSetting::get('school.motto', '4B Berbudi • Berkualitas • Berdaya • Berhasil');
 @endphp
 <main class="flex min-h-screen">
     {{-- Panel Branding Desktop - Sesuai Mockup Desain Resmi (58% Lebar Layar) --}}
@@ -24,7 +25,7 @@
 
         {{-- Foto Asli Gedung & Langit SMK Bagimu Negeriku (Bersih Tanpa Teks Bawaan) --}}
         <img src="{{ asset('images/gedung-backdrop-clean.jpg') }}?v={{ filemtime(public_path('images/gedung-backdrop-clean.jpg')) }}"
-             alt="Gedung SMK Bagimu Negeriku"
+             alt="Gedung {{ $sekolah }}"
              class="pointer-events-none absolute inset-0 h-full w-full object-cover object-right select-none z-0" />
 
         {{-- Header Sekolah Modern & Elegan --}}
@@ -32,8 +33,8 @@
             <div class="flex items-center gap-3.5">
                 <x-school-logo :size="54" class="rounded-full bg-white p-1 shadow-lg ring-2 ring-white/40 shrink-0" />
                 <div>
-                    <p class="text-lg xl:text-xl font-black tracking-tight text-white leading-tight drop-shadow-sm">SMK Bagimu Negeri</p>
-                    <p class="text-xs font-semibold text-white/90 tracking-wide mt-0.5">Berkualitas • Berdaya • Berhasil</p>
+                    <p class="text-lg xl:text-xl font-black tracking-tight text-white leading-tight drop-shadow-sm">{{ $sekolah }}</p>
+                    <p class="text-xs font-semibold text-white/90 tracking-wide mt-0.5">{{ $motto }}</p>
                 </div>
             </div>
 
@@ -41,7 +42,7 @@
             <div class="hidden sm:flex items-center">
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 border border-white/30 backdrop-blur-md text-xs font-semibold text-white shadow-sm">
                     <x-icon name="sparkles" class="h-3.5 w-3.5 text-sky-200 shrink-0" />
-                    <span>4B Berbudi • Berkualitas • Berdaya • Berhasil</span>
+                    <span>{{ $motto }}</span>
                 </div>
             </div>
         </div>
@@ -119,7 +120,7 @@
                     <div>
                         <p class="text-base font-extrabold text-slate-900 leading-tight">{{ config('app.name', 'Bagimu Extra') }}</p>
                         <p class="text-xs font-semibold text-slate-600 mt-0.5">{{ $sekolah }}</p>
-                        <p class="text-[11px] font-medium text-blue-600 mt-0.5 tracking-wide">4B Berbudi • Berkualitas • Berdaya • Berhasil</p>
+                        <p class="text-[11px] font-medium text-blue-600 mt-0.5 tracking-wide">{{ $motto }}</p>
                     </div>
                 </div>
 

@@ -82,21 +82,78 @@
 
 {{-- Identitas --}}
 <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm mb-4">
-    <h2 class="font-bold text-slate-900 text-sm mb-3">Identitas Sekolah</h2>
-    <form method="POST" action="{{ route('admin.settings.update') }}" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm w-full">
+    <div class="mb-4">
+        <h2 class="font-bold text-slate-900 text-sm">Identitas & Branding Sekolah</h2>
+        <p class="text-xs text-slate-500">Sesuaikan nama sekolah, kontak WhatsApp, alamat, slogan 4B, serta logo agar aplikasi siap digunakan dan dipersonalisasi sesuai kebutuhan instansi.</p>
+    </div>
+
+    <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data" class="space-y-4 text-sm w-full">
         @csrf
         @method('PUT')
-        @foreach ($labels as $key => $label)
-            <div class="{{ $key === 'school.address' ? 'sm:col-span-2' : '' }}">
-                <label for="{{ str_replace('.', '_', $key) }}" class="block font-medium text-slate-700 mb-1">{{ $label }}</label>
-                @if ($key === 'school.address')
-                    <textarea name="{{ str_replace('.', '_', $key) }}" id="{{ str_replace('.', '_', $key) }}" rows="2" class="w-full border-slate-300 rounded-xl">{{ old(str_replace('.', '_', $key), $settings[$key] ?? '') }}</textarea>
-                @else
-                    <input type="text" name="{{ str_replace('.', '_', $key) }}" id="{{ str_replace('.', '_', $key) }}" value="{{ old(str_replace('.', '_', $key), $settings[$key] ?? '') }}" class="w-full border-slate-300 rounded-xl">
-                @endif
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label for="school_name" class="block font-medium text-slate-700 mb-1">Nama Sekolah / Instansi</label>
+                <input type="text" name="school_name" id="school_name" value="{{ old('school_name', $settings['school.name'] ?? '') }}" placeholder="Contoh: SMK Bagimu Negeriku" class="w-full border-slate-300 rounded-xl text-sm">
             </div>
-        @endforeach
-        <div class="sm:col-span-2"><button class="px-4 py-2 rounded-xl bg-blue-700 text-white text-sm font-bold hover:bg-blue-800">Simpan Identitas</button></div>
+
+            <div>
+                <label for="school_contact" class="block font-medium text-slate-700 mb-1">No. WhatsApp / Kontak Narahubung</label>
+                <input type="text" name="school_contact" id="school_contact" value="{{ old('school_contact', $settings['school.contact'] ?? '') }}" placeholder="Contoh: 081234567890 / 6281234567890" class="w-full border-slate-300 rounded-xl text-sm">
+            </div>
+
+            <div class="sm:col-span-2">
+                <label for="school_motto" class="block font-medium text-slate-700 mb-1">Slogan / Motto Sekolah</label>
+                <input type="text" name="school_motto" id="school_motto" value="{{ old('school_motto', $settings['school.motto'] ?? '') }}" placeholder="Contoh: 4B Berbudi · Berkualitas · Berdaya · Berhasil" class="w-full border-slate-300 rounded-xl text-sm">
+                <p class="text-[11px] text-slate-400 mt-0.5">Slogan ini ditampilkan pada layar login siswa, splash screen, dan banner portal.</p>
+            </div>
+
+            <div class="sm:col-span-2">
+                <label for="school_address" class="block font-medium text-slate-700 mb-1">Alamat Lengkap Sekolah</label>
+                <textarea name="school_address" id="school_address" rows="2" placeholder="Contoh: Jl. Palir Raya No. 66, Podorejo, Ngaliyan, Kota Semarang" class="w-full border-slate-300 rounded-xl text-sm">{{ old('school_address', $settings['school.address'] ?? '') }}</textarea>
+            </div>
+        </div>
+
+        {{-- Logo Sekolah --}}
+        <div class="pt-2 border-t border-slate-100">
+            <label class="block font-medium text-slate-700 mb-2">Logo Sekolah</label>
+            @php
+                $currentLogo = $settings['school.logo'] ?? '';
+                $currentLogoUrl = $currentLogo ? (str_starts_with($currentLogo, 'http') ? $currentLogo : asset(ltrim($currentLogo, '/'))) : asset('logo.png');
+            @endphp
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-3.5 bg-slate-50/80 rounded-2xl border border-slate-200/80 mb-3">
+                <div class="h-16 w-16 rounded-xl bg-white p-1 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-2xs">
+                    <img src="{{ $currentLogoUrl }}" alt="Logo Saat Ini" class="max-h-full max-w-full object-contain" onerror="this.onerror=null; this.src='{{ asset('logo.png') }}';">
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-bold text-slate-800">Logo Aktif Saat Ini</p>
+                    <p class="text-[11px] text-slate-500 truncate">{{ $currentLogo ?: 'Default bawaan (/logo.png)' }}</p>
+                    @if ($currentLogo)
+                        <label class="inline-flex items-center gap-1.5 mt-2 text-xs text-rose-600 font-medium cursor-pointer hover:underline">
+                            <input type="checkbox" name="reset_logo" value="1" class="rounded border-slate-300 text-rose-600 focus:ring-rose-500">
+                            <span>Hapus logo kustom & kembalikan ke default bawaan</span>
+                        </label>
+                    @endif
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Unggah Berkas Logo Baru <span class="text-slate-400 font-normal">(PNG, JPG, SVG, WEBP maks. 2MB)</span></label>
+                    <input type="file" name="school_logo_file" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer border border-slate-300 rounded-xl bg-white">
+                </div>
+                <div>
+                    <label for="school_logo" class="block text-xs font-semibold text-slate-600 mb-1">Atau Masukkan Path / URL Logo <span class="text-slate-400 font-normal">(Opsional)</span></label>
+                    <input type="text" name="school_logo" id="school_logo" value="{{ old('school_logo', $settings['school.logo'] ?? '') }}" placeholder="Contoh: /logo.png atau https://..." class="w-full border-slate-300 rounded-xl text-xs sm:text-sm">
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-2">
+            <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-700 text-white text-sm font-bold hover:bg-blue-800 transition shadow-sm cursor-pointer">
+                Simpan Identitas & Slogan
+            </button>
+        </div>
     </form>
 </div>
 

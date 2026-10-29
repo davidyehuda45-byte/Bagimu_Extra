@@ -34,14 +34,17 @@
 }">
 @php
     $sekolah = \App\Models\AppSetting::get('school.name', config('app.name', 'Bagimu Extra'));
+    $motto = \App\Models\AppSetting::get('school.motto', '4B Berbudi · Berkualitas · Berdaya · Berhasil');
+    $logoSetting = \App\Models\AppSetting::get('school.logo');
+    $splashLogo = $logoSetting ? (str_starts_with($logoSetting, 'http') ? $logoSetting : asset(ltrim($logoSetting, '/'))) : asset('splash-logo.png');
 @endphp
 
 <!-- ====== SPLASH SCREEN ====== -->
 <div id="splash" role="status" aria-label="Memuat aplikasi">
-  <div class="sp-badge"><img src="{{ asset('splash-logo.png') }}" alt="Logo {{ $sekolah }}"></div>
+  <div class="sp-badge"><img src="{{ $splashLogo }}" alt="Logo {{ $sekolah }}" onerror="this.onerror=null; this.src='{{ asset('splash-logo.png') }}';"></div>
   <div class="sp-ekskul" id="sp-ekskul"></div>
   <h2 class="sp-name">{{ $sekolah }}</h2>
-  <p class="sp-motto">4B Berbudi · Berkualitas · Berdaya · Berhasil</p>
+  <p class="sp-motto">{{ $motto }}</p>
   <div class="sp-pct"><b id="sp-num">1</b>%</div>
 </div>
 <!-- =========================== -->
