@@ -46,6 +46,7 @@ Route::middleware(['auth', 'role:admin,operator,kepala_sekolah', \App\Http\Middl
     Route::delete('wali-kelas/{user}', [WaliKelasAdminController::class, 'destroy'])->name('wali-kelas.destroy');
 
     Route::get('rekap', [RekapController::class, 'index'])->name('rekap.index');
+    Route::get('rekap/export', [RekapController::class, 'export'])->name('rekap.export');
     Route::get('rekap/{eskul}', [RekapController::class, 'show'])->name('rekap.show');
 
     Route::get('kelas', [KelasController::class, 'index'])->name('kelas.index');

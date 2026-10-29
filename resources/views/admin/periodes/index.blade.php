@@ -110,6 +110,9 @@
                         <td class="py-2 px-3">{{ $p->registrations_count }}</td>
                         <td class="py-2 px-3">
                             <div class="flex items-center gap-1.5">
+                                <a href="{{ route('admin.rekap.index', ['periode' => $p->periode]) }}" title="Lihat Rekap & Riwayat Periode Ini" class="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 hover:border-emerald-200 transition shadow-2xs">
+                                    <x-icon name="trophy" class="h-4 w-4" />
+                                </a>
                                 <a href="{{ route('admin.periodes.show', $p->periode) }}" title="Lihat Detail" class="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition shadow-2xs">
                                     <x-icon name="eye" class="h-4 w-4" />
                                 </a>

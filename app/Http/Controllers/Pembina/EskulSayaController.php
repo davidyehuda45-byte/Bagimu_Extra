@@ -50,12 +50,18 @@ class EskulSayaController extends Controller
             abort(403);
         }
 
-        $periodeAktif = Periode::where('status', PeriodeStatus::DIBUKA)->pluck('periode');
+        $allPeriodes = Periode::orderByDesc('periode')->get();
+        $activePeriode = $allPeriodes->firstWhere('status', PeriodeStatus::DIBUKA);
+        $selectedPeriode = $request->query('periode') ?: ($activePeriode?->periode ?: $allPeriodes->first()?->periode);
+        $periodeModel = $allPeriodes->firstWhere('periode', $selectedPeriode);
+        $isArsip = $selectedPeriode !== ($activePeriode?->periode ?? '');
+
+        $periodeQuery = $selectedPeriode ? [$selectedPeriode] : [];
 
         $pendaftar = Registration::with('user')
             ->join('users', 'users.id', '=', 'registrations.user_id')
             ->select('registrations.*')
-            ->whereIn('periode', $periodeAktif)
+            ->whereIn('periode', $periodeQuery)
             ->where('eskul_utama', $eskul->name)
             ->orderBy('registrations.kelas')->orderBy('users.name')
             ->get();
@@ -86,7 +92,7 @@ class EskulSayaController extends Controller
         $disetujui = Registration::with('user')
             ->join('users', 'users.id', '=', 'registrations.user_id')
             ->select('registrations.*')
-            ->whereIn('periode', $periodeAktif)
+            ->whereIn('periode', $periodeQuery)
             ->where('eskul_utama', $eskul->name)
             ->where('status', Status::APPROVED)
             ->get()
@@ -96,7 +102,7 @@ class EskulSayaController extends Controller
         $pendaftar = Registration::with('user')
             ->join('users', 'users.id', '=', 'registrations.user_id')
             ->select('registrations.*')
-            ->whereIn('periode', $periodeAktif)
+            ->whereIn('periode', $periodeQuery)
             ->where('eskul_utama', $eskul->name)
             ->get()
             ->sort($sortFn)
@@ -141,17 +147,39 @@ class EskulSayaController extends Controller
             return $p;
         });
 
-        $registeredNis = Registration::whereIn('periode', $periodeAktif)->pluck('nis')->filter()->toArray();
-        $calonSiswa = Student::where('status', 'AKTIF')
-            ->whereNotIn('nis', $registeredNis)
-            ->orderBy('kelas')
-            ->orderBy('nama')
-            ->get();
+        if (! $isArsip) {
+            $registeredNis = Registration::whereIn('periode', $periodeQuery)->pluck('nis')->filter()->toArray();
+            $calonSiswa = Student::where('status', 'AKTIF')
+                ->whereNotIn('nis', $registeredNis)
+                ->orderBy('kelas')
+                ->orderBy('nama')
+                ->get();
+        } else {
+            $calonSiswa = collect();
+        }
 
         $tingkatCalon = $calonSiswa->pluck('kelas')->map(fn ($k) => \App\Support\Kelas::tingkat($k))->filter()->unique()->sort()->values();
         $daftarKelasCalon = $calonSiswa->pluck('kelas')->filter()->unique()->sort(SORT_NATURAL)->values();
 
-        return view('pembina.eskul.show', compact('eskul', 'pendaftar', 'jadwals', 'izinPending', 'tanggal', 'disetujui', 'peta', 'locked', 'pertemuans', 'rombelStats', 'calonSiswa', 'tingkatCalon', 'daftarKelasCalon'));
+        return view('pembina.eskul.show', compact(
+            'eskul',
+            'pendaftar',
+            'jadwals',
+            'izinPending',
+            'tanggal',
+            'disetujui',
+            'peta',
+            'locked',
+            'pertemuans',
+            'rombelStats',
+            'calonSiswa',
+            'tingkatCalon',
+            'daftarKelasCalon',
+            'allPeriodes',
+            'selectedPeriode',
+            'periodeModel',
+            'isArsip'
+        ));
     }
 
     public function export(Request $request, Eskul $eskul)
@@ -167,12 +195,15 @@ class EskulSayaController extends Controller
             abort(403);
         }
 
-        $periodeAktif = Periode::where('status', PeriodeStatus::DIBUKA)->pluck('periode');
+        $allPeriodes = Periode::orderByDesc('periode')->get();
+        $activePeriode = $allPeriodes->firstWhere('status', PeriodeStatus::DIBUKA);
+        $selectedPeriode = $request->query('periode') ?: ($activePeriode?->periode ?: $allPeriodes->first()?->periode);
+        $periodeQuery = $selectedPeriode ? [$selectedPeriode] : [];
 
         $disetujui = Registration::with(['user', 'kehadiran' => fn ($q) => $q->where('eskul_id', $eskul->id)])
             ->join('users', 'users.id', '=', 'registrations.user_id')
             ->select('registrations.*')
-            ->whereIn('periode', $periodeAktif)
+            ->whereIn('periode', $periodeQuery)
             ->where('eskul_utama', $eskul->name)
             ->where('status', Status::APPROVED)
             ->orderBy('registrations.kelas')->orderBy('users.name')
@@ -221,7 +252,7 @@ class EskulSayaController extends Controller
         });
 
         $slugEskul = Str::slug($eskul->name);
-        $namaBerkas = 'rekap-' . $slugEskul . '-' . date('Y-m-d');
+        $namaBerkas = 'rekap-' . $slugEskul . '-periode-' . Str::slug($selectedPeriode ?: 'all') . '-' . date('Y-m-d');
 
         if ($request->query('format') === 'excel') {
             return ExcelExport::xls($namaBerkas . '.xls', $headers, $rows);

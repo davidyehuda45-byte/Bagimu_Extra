@@ -34,11 +34,13 @@ Antarmuka dibangun dengan pendekatan minimalis modern menggunakan palet warna fu
 - **Verifikasi Izin & Sakit:** Peninjauan permohonan ketidakhadiran siswa beserta pratinjau dokumen atau foto bukti lampiran.
 - **Pendaftaran Siswa Susulan (+ Tambah Anggota):** Fitur manual untuk mendaftarkan siswa yang terkendala akses perangkat atau kuota internet.
 - **Evaluasi & Penilaian Akhir:** Input skor capaian (skala 0-100) dengan konversi predikat otomatis (A, B, C, D) dan catatan pembina untuk kebutuhan raport.
-- **Ekspor Laporan:** Pengunduhan rekapitulasi kehadiran dan data anggota dalam format Excel dan CSV.
+- **Riwayat & Arsip Multi-Periode:** Pembina dapat memilih dan memantau riwayat pendaftaran, kehadiran, dan penilaian anggota eskul dari tahun ajaran lampau dalam mode arsip aman (*read-only*).
+- **Ekspor Laporan:** Pengunduhan rekapitulasi kehadiran dan data anggota per periode dalam format Excel dan CSV.
 
 ### 4. Panel Administrator & Kesiswaan
 - **Pengaturan Identitas Instansi:** Kustomisasi nama instansi, logo (penyimpanan mandiri tanpa dependensi symlink), nomor kontak pengaduan, slogan, dan alamat.
-- **Periode & Jendela Waktu:** Pengaturan tahun ajaran aktif, periode registrasi, pembatasan rentang waktu akses, dan mekanisme roll-over akademik.
+- **Periode & Jendela Waktu:** Pengaturan tahun ajaran aktif, periode registrasi, pembatasan rentang waktu akses, pintasan rekapitulasi per periode, dan mekanisme roll-over akademik.
+- **Rekapitulasi & Riwayat Multi-Periode:** Pemantauan data historis lintas tahun ajaran yang menyajikan informasi nama pembina pengampu, jumlah pendaftar per eskul, sebaran asal rombel kelas siswa, rincian siswa, serta ekspor rekapitulasi menyeluruh ke format Excel.
 - **Direktori Siswa & Pelacakan Status:** Pelacakan status pemilihan eskul beserta penanda visual siklus hidup token login (Aktif, Sudah Dipakai, Dicabut, Belum Diterbitkan), filter instan tanpa reload, serta ekspor data multi-format.
 - **Distribusi Kredensial WhatsApp:** Integrasi gateway WhatsApp (Fonnte) untuk penerbitan dan pengiriman kredensial login (NIS dan Token) secara mandiri tanpa tautan otomatis yang berisiko.
 - **Pengelolaan Akses Pengguna:** Tata kelola akun staf, pembina eskul, wali kelas, operator, dan pimpinan sekolah.

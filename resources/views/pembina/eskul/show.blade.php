@@ -41,28 +41,58 @@
         return visibleIds.length > 0 && visibleIds.every(id => this.selected.includes(id));
     }
 }">
-    <div class="flex flex-wrap items-center gap-2">
-        <a href="{{ route('pembina.eskul.index') }}" class="text-sm text-blue-600 hover:underline">&larr; Kembali ke Eskul Saya</a>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <a href="{{ route('pembina.eskul.index') }}" class="text-sm text-blue-600 hover:underline inline-flex items-center gap-1 font-semibold">
+            <x-icon name="chevron-left" class="h-4 w-4" />
+            <span>Kembali ke Eskul Saya</span>
+        </a>
+        <form method="GET" action="{{ route('pembina.eskul.show', $eskul) }}" class="flex items-center gap-2">
+            <label for="pembina-periode-select" class="text-xs font-semibold text-slate-600">Pilih Periode:</label>
+            <select id="pembina-periode-select" name="periode" onchange="this.form.submit()" class="rounded-xl border-slate-300 py-1.5 pl-3 pr-8 text-xs font-bold text-slate-800 bg-white shadow-2xs focus:border-blue-500 focus:ring-blue-500 cursor-pointer">
+                @foreach ($allPeriodes as $p)
+                    <option value="{{ $p->periode }}" @selected($selectedPeriode === $p->periode)>
+                        Periode {{ $p->periode }} ({{ $p->status->value === 'DIBUKA' ? 'Aktif' : $p->status->label() }})
+                    </option>
+                @endforeach
+            </select>
+        </form>
     </div>
+
+    @if ($isArsip)
+        <div class="rounded-2xl border border-slate-300 bg-slate-100/90 p-4 text-xs text-slate-700 flex items-start gap-2.5 shadow-2xs">
+            <x-icon name="history" class="h-4 w-4 text-slate-600 shrink-0 mt-0.5" />
+            <div>
+                <span class="font-bold text-slate-900">Mode Arsip Riwayat Periode {{ $selectedPeriode }}:</span>
+                <span class="text-slate-600">Anda sedang melihat arsip riwayat resmi dari tahun ajaran lampau. Data pendaftaran, presensi, dan nilai bersifat hanya-baca (*read-only*) untuk keperluan evaluasi dan pelaporan sekolah.</span>
+            </div>
+        </div>
+    @endif
 
     <div class="rounded-lg border bg-white p-4 shadow-sm">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-                <h1 class="text-xl font-bold">{{ $eskul->name }}</h1>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-xl font-bold">{{ $eskul->name }}</h1>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold {{ $isArsip ? 'bg-slate-200 text-slate-700' : 'bg-emerald-100 text-emerald-800' }}">
+                        Periode {{ $selectedPeriode }}
+                    </span>
+                </div>
                 <p class="mt-1 text-sm text-gray-600">{{ $eskul->description }}</p>
                 <div class="mt-2 flex flex-wrap gap-2 text-sm">
                     <span class="rounded bg-slate-100 px-2 py-1">Kuota: {{ $eskul->kuota_aktif ? $eskul->kuota : 'Tanpa batas' }}</span>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <button type="button" @click="bukaModal = true" class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-700 transition shadow-sm cursor-pointer">
-                    <x-icon name="plus" class="h-3.5 w-3.5" />
-                    <span>+ Tambah Anggota</span>
-                </button>
-                <a href="{{ route('pembina.eskul.export', [$eskul, 'format' => 'excel']) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition shadow-sm">
+                @if (! $isArsip)
+                    <button type="button" @click="bukaModal = true" class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-700 transition shadow-sm cursor-pointer">
+                        <x-icon name="plus" class="h-3.5 w-3.5" />
+                        <span>+ Tambah Anggota</span>
+                    </button>
+                @endif
+                <a href="{{ route('pembina.eskul.export', [$eskul, 'format' => 'excel', 'periode' => $selectedPeriode]) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition shadow-sm">
                     <x-icon name="chart" class="h-3.5 w-3.5" /> Export Excel
                 </a>
-                <a href="{{ route('pembina.eskul.export', [$eskul, 'format' => 'csv']) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition shadow-sm">
+                <a href="{{ route('pembina.eskul.export', [$eskul, 'format' => 'csv', 'periode' => $selectedPeriode]) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition shadow-sm">
                     <x-icon name="file" class="h-3.5 w-3.5" /> Export CSV
                 </a>
             </div>
@@ -369,9 +399,13 @@
                                             <input type="text" name="keterangan[{{ $r->id }}]" value="{{ $ada?->keterangan }}" maxlength="200" placeholder="Keterangan izin/sakit..." class="rounded-xl border-slate-300 px-3 py-1.5 text-xs w-full max-w-xs shadow-2xs focus:border-blue-500 focus:ring-blue-500" @disabled($locked)>
                                         </td>
                                         <td class="px-3 py-2 text-center">
-                                            <button type="button" onclick="confirmHapusAnggota('{{ route('pembina.anggota.destroy', [$eskul, $r]) }}', '{{ addslashes($r->user?->name ?? $r->nis) }}')" class="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-slate-200 bg-white text-slate-400 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition shadow-2xs cursor-pointer" title="Keluarkan dari Eskul">
-                                                <x-icon name="trash" class="h-3.5 w-3.5" />
-                                            </button>
+                                            @if (! $isArsip)
+                                                <button type="button" onclick="confirmHapusAnggota('{{ route('pembina.anggota.destroy', [$eskul, $r]) }}', '{{ addslashes($r->user?->name ?? $r->nis) }}')" class="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-slate-200 bg-white text-slate-400 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition shadow-2xs cursor-pointer" title="Keluarkan dari Eskul">
+                                                    <x-icon name="trash" class="h-3.5 w-3.5" />
+                                                </button>
+                                            @else
+                                                <span class="text-[11px] text-slate-400 font-semibold">—</span>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
@@ -379,7 +413,7 @@
                         </tbody>
                     </table>
                 </div>
-                @unless ($locked)
+                @unless ($locked || $isArsip)
                     <div class="mt-4 flex justify-end">
                         <button class="rounded-xl bg-blue-600 px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-600/20 hover:bg-blue-700 transition-colors cursor-pointer">
                             Simpan Presensi ({{ $disetujui->count() }} Anggota)
