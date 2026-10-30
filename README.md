@@ -31,7 +31,7 @@ Antarmuka dibangun dengan pendekatan minimalis modern menggunakan palet warna fu
 ### 3. Panel Pembina Ekstrakurikuler
 - **Direktori Anggota Siswa:** Menu dedicated direktori murid binaan (`/pembina/anggota`) yang menyajikan tabel anggota eskul lengkap dengan ringkasan kehadiran (berapa kali Hadir, Tidak Hadir: Izin/Sakit/Alpa, dan Total Pertemuan), NIS, Kelas Rombel, status Nilai Rapor, filter pencarian instan, dan ekspor data Excel.
 - **Navigasi Mandiri 6 Menu:** Tata kelola panel pembina terpadu dengan navigasi langsung ke Dashboard Saya, Direktori Anggota, Eskul Saya, Scan Presensi QR, Penilaian Rapor, serta Kegiatan & Jadwal.
-- **Banner Dashboard Modern:** Latar gradasi biru modern dan ornamen mesh abstrak elegan bebas dari foto fisik gedung lama.
+- **Banner Dashboard Berfoto Resmi:** Banner utama berlatar foto kampus sekolah dilengkapi overlay gradient lembut untuk keterbacaan teks dan penyajian identitas sekolah yang elegan.
 - **Penyederhanaan Modul Kegiatan:** Penghapusan filter eskul redundan (otomatis terarah ke eskul binaan) dan peniadaan opsi klasifikasi jenis kegiatan yang tidak diperlukan.
 - **Antarmuka 4 Tab Modern:** Tata letak responsif ramah layar ponsel yang membagi modul eskul secara rapi ke dalam tab Anggota, Presensi Pertemuan, Nilai Rapor, serta Jadwal & Izin.
 - **Presensi Pertemuan & Pemindai QR Kartu Pelajar:**
